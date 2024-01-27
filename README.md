@@ -50,8 +50,8 @@ Reduce ambiguity between methods and operators by using types provided by strict
    dependencies = []
    
    ...
-
-   strict_cpp_subproject = subproject('strict_cpp')
+   # the name of the subproject is the same as the filename.
+   strict_cpp_subproject = subproject('strict-cpp')
 
    # strict_cpp_dep is provided by strict-cpp in the meson.build file.
    dependencies += strict_cpp_subproject.get_variable('strict_cpp_dep')

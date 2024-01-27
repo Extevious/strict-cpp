@@ -379,6 +379,18 @@ namespace STRICT_CPP_NAMESPACE {
    STRICT_CPP_DEFINE_INTEGRAL_TYPE(size32_t, std::uint32_t);
    STRICT_CPP_DEFINE_INTEGRAL_TYPE(size64_t, std::uint64_t);
 
+   STRICT_CPP_DEFINE_INTEGRAL_TYPE(src_size_t, std::size_t);
+   STRICT_CPP_DEFINE_INTEGRAL_TYPE(src_size8_t, std::uint8_t);
+   STRICT_CPP_DEFINE_INTEGRAL_TYPE(src_size16_t, std::uint16_t);
+   STRICT_CPP_DEFINE_INTEGRAL_TYPE(src_size32_t, std::uint32_t);
+   STRICT_CPP_DEFINE_INTEGRAL_TYPE(src_size64_t, std::uint64_t);
+
+   STRICT_CPP_DEFINE_INTEGRAL_TYPE(dst_size_t, std::size_t);
+   STRICT_CPP_DEFINE_INTEGRAL_TYPE(dst_size8_t, std::uint8_t);
+   STRICT_CPP_DEFINE_INTEGRAL_TYPE(dst_size16_t, std::uint16_t);
+   STRICT_CPP_DEFINE_INTEGRAL_TYPE(dst_size32_t, std::uint32_t);
+   STRICT_CPP_DEFINE_INTEGRAL_TYPE(dst_size64_t, std::uint64_t);
+
    STRICT_CPP_DEFINE_INTEGRAL_TYPE(capacity_t, std::size_t);
    STRICT_CPP_DEFINE_INTEGRAL_TYPE(capacity8_t, std::uint8_t);
    STRICT_CPP_DEFINE_INTEGRAL_TYPE(capacity16_t, std::uint16_t);
@@ -390,6 +402,18 @@ namespace STRICT_CPP_NAMESPACE {
    STRICT_CPP_DEFINE_INTEGRAL_TYPE(count16_t, std::uint16_t);
    STRICT_CPP_DEFINE_INTEGRAL_TYPE(count32_t, std::uint32_t);
    STRICT_CPP_DEFINE_INTEGRAL_TYPE(count64_t, std::uint64_t);
+
+   STRICT_CPP_DEFINE_INTEGRAL_TYPE(src_count_t, std::size_t);
+   STRICT_CPP_DEFINE_INTEGRAL_TYPE(src_count8_t, std::uint8_t);
+   STRICT_CPP_DEFINE_INTEGRAL_TYPE(src_count16_t, std::uint16_t);
+   STRICT_CPP_DEFINE_INTEGRAL_TYPE(src_count32_t, std::uint32_t);
+   STRICT_CPP_DEFINE_INTEGRAL_TYPE(src_count64_t, std::uint64_t);
+
+   STRICT_CPP_DEFINE_INTEGRAL_TYPE(dst_count_t, std::size_t);
+   STRICT_CPP_DEFINE_INTEGRAL_TYPE(dst_count8_t, std::uint8_t);
+   STRICT_CPP_DEFINE_INTEGRAL_TYPE(dst_count16_t, std::uint16_t);
+   STRICT_CPP_DEFINE_INTEGRAL_TYPE(dst_count32_t, std::uint32_t);
+   STRICT_CPP_DEFINE_INTEGRAL_TYPE(dst_count64_t, std::uint64_t);
 
    STRICT_CPP_DEFINE_INTEGRAL_TYPE(index_t, std::size_t);
    STRICT_CPP_DEFINE_INTEGRAL_TYPE(index8_t, std::uint8_t);

@@ -15,6 +15,7 @@
 
 #define STRICT_CPP_INLINE    inline
 #define STRICT_CPP_CONSTEXPR constexpr
+#define STRICT_CPP_NOEXCEPT  noexcept
 
 #include <cmath>
 #include <limits>
@@ -24,7 +25,7 @@
 namespace STRICT_CPP_NAMESPACE::detail {
    // Base type for integral<->float type qualifications.
    struct strict_cpp_base_t {
-         STRICT_CPP_INLINE STRICT_CPP_CONSTEXPR auto operator<=>(const strict_cpp_base_t&) const noexcept = default;
+         STRICT_CPP_INLINE STRICT_CPP_CONSTEXPR auto operator<=>(const strict_cpp_base_t&) const STRICT_CPP_NOEXCEPT = default;
    };
 
    template <typename T1, typename T2>
@@ -62,6 +63,19 @@ namespace STRICT_CPP_NAMESPACE::detail {
    template <typename Base, typename T1, typename T2>
    concept is_qualified_operator = is_type_compliant<Base, T2> || is_type_compliant<T1, T2>;
 
+   template <typename T1, typename T2>
+      requires std::is_base_of_v<detail::strict_cpp_base_t, T1>
+   STRICT_CPP_INLINE STRICT_CPP_CONSTEXPR auto get_implicit_promoted_or_demoted_value(auto value) STRICT_CPP_NOEXCEPT {
+      if constexpr (std::is_base_of_v<detail::strict_cpp_base_t, T2>) {
+         if constexpr (std::is_same_v<decltype(value), typename T1::type>) return T1(value);
+         else return T2(value);
+
+      } else {
+         if constexpr (std::is_same_v<decltype(value), T1>) return T1(value);
+         else return T2(value);
+      }
+   }
+
 }
 
 // The min and max constants of the type
@@ -82,176 +96,152 @@ namespace STRICT_CPP_NAMESPACE::detail {
 
 // Constructors
 #define DETAIL_STRICT_CPP_CONSTRUCTORS(STRICT_CPP_TYPE, T)                                                                                                                         \
-   STRICT_CPP_INLINE STRICT_CPP_CONSTEXPR STRICT_CPP_TYPE() noexcept = default;                                                                                                    \
+   STRICT_CPP_INLINE STRICT_CPP_CONSTEXPR STRICT_CPP_TYPE() STRICT_CPP_NOEXCEPT = default;                                                                                         \
                                                                                                                                                                                    \
    template <typename Other>                                                                                                                                                       \
       requires STRICT_CPP_NAMESPACE::detail::is_qualified_constructor<STRICT_CPP_TYPE, T, Other>                                                                                   \
-   STRICT_CPP_INLINE STRICT_CPP_CONSTEXPR STRICT_CPP_TYPE(const Other& other) noexcept :                                                                                           \
-      value(static_cast<T>(other)) { }                                                                                                                                             \
+   STRICT_CPP_INLINE STRICT_CPP_CONSTEXPR STRICT_CPP_TYPE(const Other& other) STRICT_CPP_NOEXCEPT : value(static_cast<T>(other)) { }                                               \
                                                                                                                                                                                    \
    template <typename Other>                                                                                                                                                       \
       requires STRICT_CPP_NAMESPACE::detail::is_qualified_explicit_constructor<STRICT_CPP_TYPE, T, Other>                                                                          \
-   STRICT_CPP_INLINE STRICT_CPP_CONSTEXPR explicit STRICT_CPP_TYPE(const Other& other) noexcept :                                                                                  \
-      value(static_cast<T>(other)) { }                                                                                                                                             \
-                                                                                                                                                                                   \
-   template <typename Other>                                                                                                                                                       \
-      requires STRICT_CPP_NAMESPACE::detail::is_qualified_implicit_cast_operator<T, Other>                                                                                         \
-   STRICT_CPP_INLINE STRICT_CPP_CONSTEXPR operator Other() const noexcept {                                                                                                        \
-      return (Other)this->value;                                                                                                                                                   \
-   }                                                                                                                                                                               \
-                                                                                                                                                                                   \
-   template <typename Other>                                                                                                                                                       \
-      requires STRICT_CPP_NAMESPACE::detail::is_qualified_explicit_cast_operator<T, Other>                                                                                         \
-   STRICT_CPP_INLINE STRICT_CPP_CONSTEXPR explicit operator Other() const noexcept {                                                                                               \
-      return (Other)this->value;                                                                                                                                                   \
-   }
+   STRICT_CPP_INLINE STRICT_CPP_CONSTEXPR explicit STRICT_CPP_TYPE(const Other& other) STRICT_CPP_NOEXCEPT : value(static_cast<T>(other)) { }
 
 // Operators for both integral and floating-point types
 #define DETAIL_STRICT_CPP_OPERATORS(STRICT_CPP_TYPE, T)                                                                                                                            \
-   STRICT_CPP_INLINE STRICT_CPP_CONSTEXPR auto operator<=>(const STRICT_CPP_TYPE&) const noexcept = default;                                                                       \
-                                                                                                                                                                                   \
-   STRICT_CPP_INLINE STRICT_CPP_CONSTEXPR STRICT_CPP_TYPE operator+() const noexcept { return STRICT_CPP_TYPE(+value); }                                                           \
-                                                                                                                                                                                   \
-   STRICT_CPP_INLINE STRICT_CPP_CONSTEXPR STRICT_CPP_TYPE operator-() const noexcept { return STRICT_CPP_TYPE(-value); }                                                           \
+   STRICT_CPP_INLINE STRICT_CPP_CONSTEXPR operator T() const STRICT_CPP_NOEXCEPT { return this->value; }                                                                           \
                                                                                                                                                                                    \
    template <typename Other>                                                                                                                                                       \
-      requires STRICT_CPP_NAMESPACE::detail::is_qualified_operator<STRICT_CPP_TYPE, T, Other>                                                                                      \
-   STRICT_CPP_INLINE STRICT_CPP_CONSTEXPR Other operator+(const Other& other) const noexcept {                                                                                     \
-      return Other(value + static_cast<T>(other));                                                                                                                                 \
+      requires STRICT_CPP_NAMESPACE::detail::is_qualified_explicit_cast_operator<T, Other>                                                                                         \
+   STRICT_CPP_INLINE STRICT_CPP_CONSTEXPR explicit operator Other() const STRICT_CPP_NOEXCEPT {                                                                                    \
+      return (Other)this->value;                                                                                                                                                   \
+   }                                                                                                                                                                               \
+                                                                                                                                                                                   \
+   STRICT_CPP_INLINE STRICT_CPP_CONSTEXPR auto operator<=>(const auto& other) const STRICT_CPP_NOEXCEPT { return this->value <=> other; }                                          \
+                                                                                                                                                                                   \
+   STRICT_CPP_INLINE STRICT_CPP_CONSTEXPR STRICT_CPP_NAMESPACE::STRICT_CPP_TYPE operator+() const STRICT_CPP_NOEXCEPT { return STRICT_CPP_NAMESPACE::STRICT_CPP_TYPE(+value); }    \
+                                                                                                                                                                                   \
+   STRICT_CPP_INLINE STRICT_CPP_CONSTEXPR STRICT_CPP_NAMESPACE::STRICT_CPP_TYPE operator-() const STRICT_CPP_NOEXCEPT { return STRICT_CPP_NAMESPACE::STRICT_CPP_TYPE(-value); }    \
+                                                                                                                                                                                   \
+   template <typename Other>                                                                                                                                                       \
+   STRICT_CPP_INLINE STRICT_CPP_CONSTEXPR auto operator+(const Other& other) const STRICT_CPP_NOEXCEPT {                                                                           \
+      return STRICT_CPP_NAMESPACE::detail::get_implicit_promoted_or_demoted_value<STRICT_CPP_NAMESPACE::STRICT_CPP_TYPE, Other>(this->value + other);                              \
    }                                                                                                                                                                               \
                                                                                                                                                                                    \
    template <typename Other>                                                                                                                                                       \
-      requires STRICT_CPP_NAMESPACE::detail::is_qualified_operator<STRICT_CPP_TYPE, T, Other>                                                                                      \
-   STRICT_CPP_INLINE STRICT_CPP_CONSTEXPR Other operator-(const Other& other) const noexcept {                                                                                     \
-      return Other(value - static_cast<T>(other));                                                                                                                                 \
+   STRICT_CPP_INLINE STRICT_CPP_CONSTEXPR auto operator-(const Other& other) const STRICT_CPP_NOEXCEPT {                                                                           \
+      return STRICT_CPP_NAMESPACE::detail::get_implicit_promoted_or_demoted_value<STRICT_CPP_NAMESPACE::STRICT_CPP_TYPE, Other>(this->value - other);                              \
    }                                                                                                                                                                               \
                                                                                                                                                                                    \
    template <typename Other>                                                                                                                                                       \
-      requires STRICT_CPP_NAMESPACE::detail::is_qualified_operator<STRICT_CPP_TYPE, T, Other>                                                                                      \
-   STRICT_CPP_INLINE STRICT_CPP_CONSTEXPR Other operator*(const Other& other) const noexcept {                                                                                     \
-      return Other(value * static_cast<T>(other));                                                                                                                                 \
+   STRICT_CPP_INLINE STRICT_CPP_CONSTEXPR auto operator*(const Other& other) const STRICT_CPP_NOEXCEPT {                                                                           \
+      return STRICT_CPP_NAMESPACE::detail::get_implicit_promoted_or_demoted_value<STRICT_CPP_NAMESPACE::STRICT_CPP_TYPE, Other>(this->value * other);                              \
    }                                                                                                                                                                               \
                                                                                                                                                                                    \
    template <typename Other>                                                                                                                                                       \
-      requires STRICT_CPP_NAMESPACE::detail::is_qualified_operator<STRICT_CPP_TYPE, T, Other>                                                                                      \
-   STRICT_CPP_INLINE STRICT_CPP_CONSTEXPR Other operator/(const Other& other) const noexcept {                                                                                     \
-      return Other(value / static_cast<T>(other));                                                                                                                                 \
+   STRICT_CPP_INLINE STRICT_CPP_CONSTEXPR auto operator/(const Other& other) const STRICT_CPP_NOEXCEPT {                                                                           \
+      return STRICT_CPP_NAMESPACE::detail::get_implicit_promoted_or_demoted_value<STRICT_CPP_NAMESPACE::STRICT_CPP_TYPE, Other>(this->value / other);                              \
    }                                                                                                                                                                               \
                                                                                                                                                                                    \
    template <typename Other>                                                                                                                                                       \
-      requires STRICT_CPP_NAMESPACE::detail::is_qualified_operator<STRICT_CPP_TYPE, T, Other>                                                                                      \
-   STRICT_CPP_INLINE STRICT_CPP_CONSTEXPR STRICT_CPP_TYPE& operator+=(const Other& other) noexcept {                                                                               \
+   STRICT_CPP_INLINE STRICT_CPP_CONSTEXPR STRICT_CPP_NAMESPACE::STRICT_CPP_TYPE& operator+=(const Other& other) STRICT_CPP_NOEXCEPT {                                              \
       this->value += static_cast<T>(other);                                                                                                                                        \
       return *this;                                                                                                                                                                \
    }                                                                                                                                                                               \
                                                                                                                                                                                    \
    template <typename Other>                                                                                                                                                       \
-      requires STRICT_CPP_NAMESPACE::detail::is_qualified_operator<STRICT_CPP_TYPE, T, Other>                                                                                      \
-   STRICT_CPP_INLINE STRICT_CPP_CONSTEXPR STRICT_CPP_TYPE& operator-=(const Other& other) noexcept {                                                                               \
+   STRICT_CPP_INLINE STRICT_CPP_CONSTEXPR STRICT_CPP_NAMESPACE::STRICT_CPP_TYPE& operator-=(const Other& other) STRICT_CPP_NOEXCEPT {                                              \
       this->value -= static_cast<T>(other);                                                                                                                                        \
       return *this;                                                                                                                                                                \
    }                                                                                                                                                                               \
                                                                                                                                                                                    \
    template <typename Other>                                                                                                                                                       \
-      requires STRICT_CPP_NAMESPACE::detail::is_qualified_operator<STRICT_CPP_TYPE, T, Other>                                                                                      \
-   STRICT_CPP_INLINE STRICT_CPP_CONSTEXPR STRICT_CPP_TYPE& operator*=(const Other& other) noexcept {                                                                               \
+   STRICT_CPP_INLINE STRICT_CPP_CONSTEXPR STRICT_CPP_NAMESPACE::STRICT_CPP_TYPE& operator*=(const Other& other) STRICT_CPP_NOEXCEPT {                                              \
       this->value *= static_cast<T>(other);                                                                                                                                        \
       return *this;                                                                                                                                                                \
    }                                                                                                                                                                               \
                                                                                                                                                                                    \
    template <typename Other>                                                                                                                                                       \
-      requires STRICT_CPP_NAMESPACE::detail::is_qualified_operator<STRICT_CPP_TYPE, T, Other>                                                                                      \
-   STRICT_CPP_INLINE STRICT_CPP_CONSTEXPR STRICT_CPP_TYPE& operator/=(const Other& other) noexcept {                                                                               \
+   STRICT_CPP_INLINE STRICT_CPP_CONSTEXPR STRICT_CPP_NAMESPACE::STRICT_CPP_TYPE& operator/=(const Other& other) STRICT_CPP_NOEXCEPT {                                              \
       this->value /= static_cast<T>(other);                                                                                                                                        \
       return *this;                                                                                                                                                                \
    }                                                                                                                                                                               \
                                                                                                                                                                                    \
-   STRICT_CPP_INLINE STRICT_CPP_CONSTEXPR STRICT_CPP_TYPE operator++() noexcept { return STRICT_CPP_TYPE(++value); }                                                               \
+   STRICT_CPP_INLINE STRICT_CPP_CONSTEXPR STRICT_CPP_NAMESPACE::STRICT_CPP_TYPE operator++() STRICT_CPP_NOEXCEPT { return STRICT_CPP_NAMESPACE::STRICT_CPP_TYPE(++value); }        \
                                                                                                                                                                                    \
-   STRICT_CPP_INLINE STRICT_CPP_CONSTEXPR STRICT_CPP_TYPE operator++(auto) noexcept { return STRICT_CPP_TYPE(value++); }                                                           \
+   STRICT_CPP_INLINE STRICT_CPP_CONSTEXPR STRICT_CPP_NAMESPACE::STRICT_CPP_TYPE operator++(auto) STRICT_CPP_NOEXCEPT { return STRICT_CPP_NAMESPACE::STRICT_CPP_TYPE(value++); }    \
                                                                                                                                                                                    \
-   STRICT_CPP_INLINE STRICT_CPP_CONSTEXPR STRICT_CPP_TYPE operator--() noexcept { return STRICT_CPP_TYPE(--value); }                                                               \
+   STRICT_CPP_INLINE STRICT_CPP_CONSTEXPR STRICT_CPP_NAMESPACE::STRICT_CPP_TYPE operator--() STRICT_CPP_NOEXCEPT { return STRICT_CPP_NAMESPACE::STRICT_CPP_TYPE(--value); }        \
                                                                                                                                                                                    \
-   STRICT_CPP_INLINE STRICT_CPP_CONSTEXPR STRICT_CPP_TYPE operator--(auto) noexcept { return STRICT_CPP_TYPE(value++); }
+   STRICT_CPP_INLINE STRICT_CPP_CONSTEXPR STRICT_CPP_NAMESPACE::STRICT_CPP_TYPE operator--(auto) STRICT_CPP_NOEXCEPT { return STRICT_CPP_NAMESPACE::STRICT_CPP_TYPE(value++); }
 
 // Integral-only operators
 #define DETAIL_STRICT_CPP_INTEGRAL_OPERATORS(STRICT_CPP_TYPE, T)                                                                                                                   \
-   STRICT_CPP_INLINE STRICT_CPP_CONSTEXPR STRICT_CPP_TYPE operator~() const noexcept { return STRICT_CPP_TYPE(~this->value); }                                                     \
-                                                                                                                                                                                   \
-   template <typename Other>                                                                                                                                                       \
-      requires STRICT_CPP_NAMESPACE::detail::is_qualified_operator<STRICT_CPP_TYPE, T, Other>                                                                                      \
-   STRICT_CPP_INLINE STRICT_CPP_CONSTEXPR Other operator&(const Other& other) const noexcept {                                                                                     \
-      return Other(this->value & static_cast<T>(other));                                                                                                                           \
+   STRICT_CPP_INLINE STRICT_CPP_CONSTEXPR STRICT_CPP_NAMESPACE::STRICT_CPP_TYPE operator~() const STRICT_CPP_NOEXCEPT {                                                            \
+      return STRICT_CPP_NAMESPACE::STRICT_CPP_TYPE(~this->value);                                                                                                                  \
    }                                                                                                                                                                               \
                                                                                                                                                                                    \
    template <typename Other>                                                                                                                                                       \
-      requires STRICT_CPP_NAMESPACE::detail::is_qualified_operator<STRICT_CPP_TYPE, T, Other>                                                                                      \
-   STRICT_CPP_INLINE STRICT_CPP_CONSTEXPR Other operator%(const Other& other) const noexcept {                                                                                     \
-      return Other(this->value % static_cast<T>(other));                                                                                                                           \
+   STRICT_CPP_INLINE STRICT_CPP_CONSTEXPR auto operator&(const Other& other) const STRICT_CPP_NOEXCEPT {                                                                           \
+      return STRICT_CPP_NAMESPACE::detail::get_implicit_promoted_or_demoted_value<STRICT_CPP_NAMESPACE::STRICT_CPP_TYPE, Other>(this->value & other);                              \
    }                                                                                                                                                                               \
                                                                                                                                                                                    \
    template <typename Other>                                                                                                                                                       \
-      requires STRICT_CPP_NAMESPACE::detail::is_qualified_operator<STRICT_CPP_TYPE, T, Other>                                                                                      \
-   STRICT_CPP_INLINE STRICT_CPP_CONSTEXPR Other operator|(const Other& other) const noexcept {                                                                                     \
-      return Other(this->value | static_cast<T>(other));                                                                                                                           \
+   STRICT_CPP_INLINE STRICT_CPP_CONSTEXPR auto operator%(const Other& other) const STRICT_CPP_NOEXCEPT {                                                                           \
+      return STRICT_CPP_NAMESPACE::detail::get_implicit_promoted_or_demoted_value<STRICT_CPP_NAMESPACE::STRICT_CPP_TYPE, Other>(this->value % other);                              \
    }                                                                                                                                                                               \
                                                                                                                                                                                    \
    template <typename Other>                                                                                                                                                       \
-      requires STRICT_CPP_NAMESPACE::detail::is_qualified_operator<STRICT_CPP_TYPE, T, Other>                                                                                      \
-   STRICT_CPP_INLINE STRICT_CPP_CONSTEXPR Other operator^(const Other& other) const noexcept {                                                                                     \
-      return Other(this->value ^ static_cast<T>(other));                                                                                                                           \
+   STRICT_CPP_INLINE STRICT_CPP_CONSTEXPR auto operator|(const Other& other) const STRICT_CPP_NOEXCEPT {                                                                           \
+      return STRICT_CPP_NAMESPACE::detail::get_implicit_promoted_or_demoted_value<STRICT_CPP_NAMESPACE::STRICT_CPP_TYPE, Other>(this->value | other);                              \
    }                                                                                                                                                                               \
                                                                                                                                                                                    \
    template <typename Other>                                                                                                                                                       \
-      requires STRICT_CPP_NAMESPACE::detail::is_qualified_operator<STRICT_CPP_TYPE, T, Other>                                                                                      \
-   STRICT_CPP_INLINE STRICT_CPP_CONSTEXPR Other operator<<(const Other& other) const noexcept {                                                                                    \
-      return Other(this->value << static_cast<T>(other));                                                                                                                          \
+   STRICT_CPP_INLINE STRICT_CPP_CONSTEXPR auto operator^(const Other& other) const STRICT_CPP_NOEXCEPT {                                                                           \
+      return STRICT_CPP_NAMESPACE::detail::get_implicit_promoted_or_demoted_value<STRICT_CPP_NAMESPACE::STRICT_CPP_TYPE, Other>(this->value ^ other);                              \
    }                                                                                                                                                                               \
                                                                                                                                                                                    \
    template <typename Other>                                                                                                                                                       \
-      requires STRICT_CPP_NAMESPACE::detail::is_qualified_operator<STRICT_CPP_TYPE, T, Other>                                                                                      \
-   STRICT_CPP_INLINE STRICT_CPP_CONSTEXPR Other operator>>(const Other& other) const noexcept {                                                                                    \
-      return Other(this->value >> static_cast<T>(other));                                                                                                                          \
+   STRICT_CPP_INLINE STRICT_CPP_CONSTEXPR auto operator<<(const Other& other) const STRICT_CPP_NOEXCEPT {                                                                          \
+      return STRICT_CPP_NAMESPACE::detail::get_implicit_promoted_or_demoted_value<STRICT_CPP_NAMESPACE::STRICT_CPP_TYPE, Other>(this->value << other);                             \
    }                                                                                                                                                                               \
                                                                                                                                                                                    \
    template <typename Other>                                                                                                                                                       \
-      requires STRICT_CPP_NAMESPACE::detail::is_qualified_operator<STRICT_CPP_TYPE, T, Other>                                                                                      \
-   STRICT_CPP_INLINE STRICT_CPP_CONSTEXPR STRICT_CPP_TYPE& operator%=(const Other& other) noexcept {                                                                               \
+   STRICT_CPP_INLINE STRICT_CPP_CONSTEXPR auto operator>>(const Other& other) const STRICT_CPP_NOEXCEPT {                                                                          \
+      return STRICT_CPP_NAMESPACE::detail::get_implicit_promoted_or_demoted_value<STRICT_CPP_NAMESPACE::STRICT_CPP_TYPE, Other>(this->value >> other);                             \
+   }                                                                                                                                                                               \
+                                                                                                                                                                                   \
+   template <typename Other>                                                                                                                                                       \
+   STRICT_CPP_INLINE STRICT_CPP_CONSTEXPR STRICT_CPP_NAMESPACE::STRICT_CPP_TYPE& operator%=(const Other& other) STRICT_CPP_NOEXCEPT {                                              \
       this->value %= static_cast<T>(other);                                                                                                                                        \
       return *this;                                                                                                                                                                \
    }                                                                                                                                                                               \
                                                                                                                                                                                    \
    template <typename Other>                                                                                                                                                       \
-      requires STRICT_CPP_NAMESPACE::detail::is_qualified_operator<STRICT_CPP_TYPE, T, Other>                                                                                      \
-   STRICT_CPP_INLINE STRICT_CPP_CONSTEXPR STRICT_CPP_TYPE& operator&=(const Other& other) noexcept {                                                                               \
+   STRICT_CPP_INLINE STRICT_CPP_CONSTEXPR STRICT_CPP_NAMESPACE::STRICT_CPP_TYPE& operator&=(const Other& other) STRICT_CPP_NOEXCEPT {                                              \
       this->value &= static_cast<T>(other);                                                                                                                                        \
       return *this;                                                                                                                                                                \
    }                                                                                                                                                                               \
                                                                                                                                                                                    \
    template <typename Other>                                                                                                                                                       \
-      requires STRICT_CPP_NAMESPACE::detail::is_qualified_operator<STRICT_CPP_TYPE, T, Other>                                                                                      \
-   STRICT_CPP_INLINE STRICT_CPP_CONSTEXPR STRICT_CPP_TYPE& operator|=(const Other& other) noexcept {                                                                               \
+   STRICT_CPP_INLINE STRICT_CPP_CONSTEXPR STRICT_CPP_NAMESPACE::STRICT_CPP_TYPE& operator|=(const Other& other) STRICT_CPP_NOEXCEPT {                                              \
       this->value |= static_cast<T>(other);                                                                                                                                        \
       return *this;                                                                                                                                                                \
    }                                                                                                                                                                               \
                                                                                                                                                                                    \
    template <typename Other>                                                                                                                                                       \
-      requires STRICT_CPP_NAMESPACE::detail::is_qualified_operator<STRICT_CPP_TYPE, T, Other>                                                                                      \
-   STRICT_CPP_INLINE STRICT_CPP_CONSTEXPR STRICT_CPP_TYPE& operator^=(const Other& other) noexcept {                                                                               \
+   STRICT_CPP_INLINE STRICT_CPP_CONSTEXPR STRICT_CPP_NAMESPACE::STRICT_CPP_TYPE& operator^=(const Other& other) STRICT_CPP_NOEXCEPT {                                              \
       this->value ^= static_cast<T>(other);                                                                                                                                        \
       return *this;                                                                                                                                                                \
    }                                                                                                                                                                               \
                                                                                                                                                                                    \
    template <typename Other>                                                                                                                                                       \
-      requires STRICT_CPP_NAMESPACE::detail::is_qualified_operator<STRICT_CPP_TYPE, T, Other>                                                                                      \
-   STRICT_CPP_INLINE STRICT_CPP_CONSTEXPR STRICT_CPP_TYPE& operator<<=(const Other& other) noexcept {                                                                              \
+   STRICT_CPP_INLINE STRICT_CPP_CONSTEXPR STRICT_CPP_NAMESPACE::STRICT_CPP_TYPE& operator<<=(const Other& other) STRICT_CPP_NOEXCEPT {                                             \
       this->value <<= static_cast<T>(other);                                                                                                                                       \
       return *this;                                                                                                                                                                \
    }                                                                                                                                                                               \
                                                                                                                                                                                    \
    template <typename Other>                                                                                                                                                       \
-      requires STRICT_CPP_NAMESPACE::detail::is_qualified_operator<STRICT_CPP_TYPE, T, Other>                                                                                      \
-   STRICT_CPP_INLINE STRICT_CPP_CONSTEXPR STRICT_CPP_TYPE& operator>>=(const Other& other) noexcept {                                                                              \
+   STRICT_CPP_INLINE STRICT_CPP_CONSTEXPR STRICT_CPP_NAMESPACE::STRICT_CPP_TYPE& operator>>=(const Other& other) STRICT_CPP_NOEXCEPT {                                             \
       this->value >>= static_cast<T>(other);                                                                                                                                       \
       return *this;                                                                                                                                                                \
    }
@@ -260,28 +250,24 @@ namespace STRICT_CPP_NAMESPACE::detail {
 #if __cplusplus >= 202207L
    #define DEFINE_STRICT_CPP_FLOAT_OPERATORS(STRICT_CPP_TYPE, T)                                                                                                                   \
       template <typename Other>                                                                                                                                                    \
-         requires STRICT_CPP_NAMESPACE::detail::is_qualified_operator<STRICT_CPP_TYPE, T, Other>                                                                                   \
-      STRICT_CPP_INLINE STRICT_CPP_CONSTEXPR Other& operator%(const Other& other) noexcept {                                                                                       \
-         return Other(std::fmod(this->value, static_cast<T>(other)));                                                                                                              \
+      STRICT_CPP_INLINE STRICT_CPP_CONSTEXPR Other& operator%(const Other& other) STRICT_CPP_NOEXCEPT {                                                                            \
+         return STRICT_CPP_NAMESPACE::detail::get_implicit_promoted_or_demoted_value<STRICT_CPP_NAMESPACE::STRICT_CPP_TYPE, Other>(std::fmod(this->value, other));                 \
       }                                                                                                                                                                            \
                                                                                                                                                                                    \
       template <typename Other>                                                                                                                                                    \
-         requires STRICT_CPP_NAMESPACE::detail::is_qualified_operator<STRICT_CPP_TYPE, T, Other>                                                                                   \
-      STRICT_CPP_INLINE STRICT_CPP_CONSTEXPR STRICT_CPP_TYPE& operator%=(const Other& other) noexcept {                                                                            \
+      STRICT_CPP_INLINE STRICT_CPP_CONSTEXPR STRICT_CPP_NAMESPACE::STRICT_CPP_TYPE& operator%=(const Other& other) STRICT_CPP_NOEXCEPT {                                           \
          this->value = std::fmod(this->value, static_cast<T>(other));                                                                                                              \
          return *this;                                                                                                                                                             \
       }
 #else
    #define DEFINE_STRICT_CPP_FLOAT_OPERATORS(STRICT_CPP_TYPE, T)                                                                                                                   \
       template <typename Other>                                                                                                                                                    \
-         requires STRICT_CPP_NAMESPACE::detail::is_qualified_operator<STRICT_CPP_TYPE, T, Other>                                                                                   \
-      STRICT_CPP_INLINE STRICT_CPP_CONSTEXPR Other operator%(const Other& other) noexcept {                                                                                        \
-         return Other(std::fmodf(this->value, static_cast<T>(other)));                                                                                                             \
+      STRICT_CPP_INLINE STRICT_CPP_CONSTEXPR Other operator%(const Other& other) STRICT_CPP_NOEXCEPT {                                                                             \
+         return STRICT_CPP_NAMESPACE::detail::get_implicit_promoted_or_demoted_value<STRICT_CPP_NAMESPACE::STRICT_CPP_TYPE, Other>(std::fmodl(this->value, other));                \
       }                                                                                                                                                                            \
                                                                                                                                                                                    \
       template <typename Other>                                                                                                                                                    \
-         requires STRICT_CPP_NAMESPACE::detail::is_qualified_operator<STRICT_CPP_TYPE, T, Other>                                                                                   \
-      STRICT_CPP_INLINE STRICT_CPP_CONSTEXPR STRICT_CPP_TYPE& operator%=(const Other& other) noexcept {                                                                            \
+      STRICT_CPP_INLINE STRICT_CPP_CONSTEXPR STRICT_CPP_NAMESPACE::STRICT_CPP_TYPE& operator%=(const Other& other) STRICT_CPP_NOEXCEPT {                                           \
          this->value = std::fmodl(this->value, static_cast<T>(other));                                                                                                             \
          return *this;                                                                                                                                                             \
       }
@@ -292,18 +278,18 @@ namespace STRICT_CPP_NAMESPACE::detail {
                                                                                                                                                                                    \
    STRICT_CPP_INLINE std::string to_string() const { return std::to_string(value); }                                                                                               \
                                                                                                                                                                                    \
-   STRICT_CPP_INLINE STRICT_CPP_CONSTEXPR std::string to_string_t() const noexcept { return "" #T; }                                                                               \
+   STRICT_CPP_INLINE STRICT_CPP_CONSTEXPR std::string to_string_t() const STRICT_CPP_NOEXCEPT { return "" #T; }                                                                    \
                                                                                                                                                                                    \
-   STRICT_CPP_INLINE STRICT_CPP_CONSTEXPR std::string to_string_n() const noexcept { return STRICT_CPP_NAMESPACE_STR "::" #STRICT_CPP_TYPE; }                                      \
+   STRICT_CPP_INLINE STRICT_CPP_CONSTEXPR std::string to_string_n() const STRICT_CPP_NOEXCEPT { return STRICT_CPP_NAMESPACE_STR "::" #STRICT_CPP_TYPE; }                           \
                                                                                                                                                                                    \
    STRICT_CPP_INLINE std::wstring to_wstring() const { return std::to_wstring(value); }                                                                                            \
                                                                                                                                                                                    \
-   STRICT_CPP_INLINE STRICT_CPP_CONSTEXPR std::wstring to_wstring_t() const noexcept { return L"" L#T; }                                                                           \
+   STRICT_CPP_INLINE STRICT_CPP_CONSTEXPR std::wstring to_wstring_t() const STRICT_CPP_NOEXCEPT { return L"" L#T; }                                                                \
                                                                                                                                                                                    \
-   STRICT_CPP_INLINE STRICT_CPP_CONSTEXPR std::wstring to_wstring_n() const noexcept { return STRICT_CPP_NAMESPACE_WSTR L"::" L#STRICT_CPP_TYPE; }
+   STRICT_CPP_INLINE STRICT_CPP_CONSTEXPR std::wstring to_wstring_n() const STRICT_CPP_NOEXCEPT { return STRICT_CPP_NAMESPACE_WSTR L"::" L#STRICT_CPP_TYPE; }
 
 #define STRICT_CPP_DEFINE_INTEGRAL_TYPE(STRICT_CPP_TYPE, T)                                                                                                                        \
-   struct STRICT_CPP_TYPE : private STRICT_CPP_NAMESPACE::detail::strict_cpp_base_t {                                                                                              \
+   struct STRICT_CPP_TYPE : STRICT_CPP_NAMESPACE::detail::strict_cpp_base_t {                                                                                                      \
          using type = T;                                                                                                                                                           \
          T value    = {};                                                                                                                                                          \
                                                                                                                                                                                    \
@@ -315,7 +301,7 @@ namespace STRICT_CPP_NAMESPACE::detail {
    };
 
 #define STRICT_CPP_DEFINE_FLOAT_TYPE(STRICT_CPP_TYPE, T)                                                                                                                           \
-   struct STRICT_CPP_TYPE : private STRICT_CPP_NAMESPACE::detail::strict_cpp_base_t {                                                                                              \
+   struct STRICT_CPP_TYPE : STRICT_CPP_NAMESPACE::detail::strict_cpp_base_t {                                                                                                      \
          using type = T;                                                                                                                                                           \
          T value    = {};                                                                                                                                                          \
                                                                                                                                                                                    \

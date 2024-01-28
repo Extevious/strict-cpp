@@ -194,6 +194,12 @@ count16_t            (std::uint16_t)
 count32_t            (std::uint32_t)
 count64_t            (std::uint64_t)
 
+offset_count_t       (std::size_t)
+offset_count8_t      (std::uint8_t)
+offset_count16_t     (std::uint16_t)
+offset_count32_t     (std::uint32_t)
+offset_count64_t     (std::uint64_t)
+
 src_count_t          (std::size_t)
 src_count8_t         (std::uint8_t)
 src_count16_t        (std::uint16_t)

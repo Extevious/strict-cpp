@@ -401,6 +401,12 @@ namespace STRICT_CPP_NAMESPACE {
    STRICT_CPP_DEFINE_INTEGRAL_TYPE(count32_t, std::uint32_t);
    STRICT_CPP_DEFINE_INTEGRAL_TYPE(count64_t, std::uint64_t);
 
+   STRICT_CPP_DEFINE_INTEGRAL_TYPE(offset_count_t, std::size_t);
+   STRICT_CPP_DEFINE_INTEGRAL_TYPE(offset_count8_t, std::uint8_t);
+   STRICT_CPP_DEFINE_INTEGRAL_TYPE(offset_count16_t, std::uint16_t);
+   STRICT_CPP_DEFINE_INTEGRAL_TYPE(offset_count32_t, std::uint32_t);
+   STRICT_CPP_DEFINE_INTEGRAL_TYPE(offset_count64_t, std::uint64_t);
+
    STRICT_CPP_DEFINE_INTEGRAL_TYPE(src_count_t, std::size_t);
    STRICT_CPP_DEFINE_INTEGRAL_TYPE(src_count8_t, std::uint8_t);
    STRICT_CPP_DEFINE_INTEGRAL_TYPE(src_count16_t, std::uint16_t);

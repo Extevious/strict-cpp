@@ -2,7 +2,7 @@
 Reduce ambiguity between methods and operators by using types provided by strict-cpp, a C++20 platform-agnostic project.
 
 ### Features:
- * Type wrappers implementing integral and floating-point types.
+ * Strict type wrappers encapsulating integral and floating-point types.
  * Singular header file.
  * [Meson Build](https://mesonbuild.com/) support.
  * MIT license.
@@ -10,13 +10,13 @@ Reduce ambiguity between methods and operators by using types provided by strict
 ### Can be used to...:
  * Reduce ambiguity between methods and operators.
  * Enforce more explicit type-safety.
- * Use overloads more freely with minimal ambiguity.
+ * Use method or operator overloads more freely with less ambiguity.
 
 ### Example:
 ```cpp
    // These are ambiguous...
-   strict::int32_t add(std::int32_t a, std::int32_t b) { return a + b; } // int
-   strict::size_t add(std::size_t a, std::size_t b) { return a + b; } // size_t
+   std::int32_t add(std::int32_t a, std::int32_t b) { return a + b; } // int
+   std::size_t add(std::size_t a, std::size_t b) { return a + b; } // size_t
 
    // ...but these are not!
    strict::int32_t add(strict::int32_t a, strict::int32_t b) { return a + b; } // int
@@ -85,12 +85,12 @@ Reduce ambiguity between methods and operators by using types provided by strict
 ### User-exposed:
 
 ```cpp
-// Macro to define integral types.
+// Macro to define integral types (needs to be in the STRICT_CPP_NAMESPACE namespace).
 //    STRICT_CPP_TYPE : your strict type's name.
 //    T               : the underlying type (int, char, size_t, etc).
 #define STRICT_CPP_DEFINE_INTEGRAL_TYPE(STRICT_CPP_TYPE, T)
 
-// Macro to define floating-point types.
+// Macro to define floating-point types (needs to be in the STRICT_CPP_NAMESPACE namespace).
 //    STRICT_CPP_TYPE : your strict type's name.
 //    T               : the underlying type (float, double, etc).
 #define STRICT_CPP_DEFINE_FLOAT_TYPE(STRICT_CPP_TYPE, T)  

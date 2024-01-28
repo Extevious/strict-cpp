@@ -13,8 +13,8 @@ void nl() { std::cout << '\n'; }
 void integral() {
    output("=== Integral ===");
 
-   strict::size_t a = 42ULL;
-   strict::size_t b = strict::size_t(5.0f);
+   strict::size_t  a = 42ULL;
+   strict::count_t b = strict::count_t(5.0f);
 
    output("Arithmetic operators:");
    output(a + b);
@@ -98,7 +98,7 @@ void floating() {
    output("=== Floating ===");
 
    strict::float_t a = 16.854f;
-   strict::float_t b = strict::float_t(5.4f);
+   strict::float_t b = strict::float_t(5.4l);
 
    output("Unary operators:");
    output(+a);

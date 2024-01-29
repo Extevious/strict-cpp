@@ -1,1 +1,2 @@
-option('examples', type : 'boolean', value : false,  description : 'If examples should be built or not.')
+option('optional_types', type : 'boolean', value : false, description : 'If pre-defined optional types should be exposed.')
+option('examples',       type : 'boolean', value : false, description : 'If examples should be built or not.')

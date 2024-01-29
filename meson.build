@@ -15,6 +15,10 @@ strict_cpp_dep = declare_dependency(
    version             : meson.project_version()
 )
 
+if get_option('optional_types')
+   add_project_arguments('-DSTRICT_CPP_OPTIONAL_TYPES', language : 'cpp')
+endif
+
 if get_option('examples')
    subdir('examples')
 endif

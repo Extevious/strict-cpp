@@ -110,12 +110,6 @@ namespace STRICT_CPP_NAMESPACE::detail {
 #define DETAIL_STRICT_CPP_OPERATORS(STRICT_CPP_TYPE, T)                                                                                                                            \
    STRICT_CPP_INLINE STRICT_CPP_CONSTEXPR operator T() const STRICT_CPP_NOEXCEPT { return this->value; }                                                                           \
                                                                                                                                                                                    \
-   template <typename Other>                                                                                                                                                       \
-      requires STRICT_CPP_NAMESPACE::detail::is_qualified_explicit_cast_operator<T, Other>                                                                                         \
-   STRICT_CPP_INLINE STRICT_CPP_CONSTEXPR explicit operator Other() const STRICT_CPP_NOEXCEPT {                                                                                    \
-      return (Other)this->value;                                                                                                                                                   \
-   }                                                                                                                                                                               \
-                                                                                                                                                                                   \
    STRICT_CPP_INLINE STRICT_CPP_CONSTEXPR auto operator<=>(const auto& other) const STRICT_CPP_NOEXCEPT { return this->value <=> other; }                                          \
                                                                                                                                                                                    \
    STRICT_CPP_INLINE STRICT_CPP_CONSTEXPR STRICT_CPP_NAMESPACE::STRICT_CPP_TYPE operator+() const STRICT_CPP_NOEXCEPT { return STRICT_CPP_NAMESPACE::STRICT_CPP_TYPE(+value); }    \

@@ -258,14 +258,14 @@ namespace STRICT_CPP_NAMESPACE {
    template <typename T1, typename T2>
       requires STRICT_CPP_NAMESPACE::detail::is_qualified_integral_operator<T1>
    STRICT_CPP_INLINE STRICT_CPP_CONSTEXPR T1& operator<<=(T1& t1, const T2& t2) STRICT_CPP_NOEXCEPT {
-      t1.value %= static_cast<typename T1::type>(t2);
+      t1.value <<= static_cast<typename T1::type>(t2);
       return t1;
    }
 
    template <typename T1, typename T2>
       requires STRICT_CPP_NAMESPACE::detail::is_qualified_integral_operator<T1>
    STRICT_CPP_INLINE STRICT_CPP_CONSTEXPR T1& operator>>=(T1& t1, const T2& t2) STRICT_CPP_NOEXCEPT {
-      t1.value %= static_cast<typename T1::type>(t2);
+      t1.value >>= static_cast<typename T1::type>(t2);
       return t1;
    }
 

@@ -14,13 +14,27 @@ Reduce ambiguity between methods and operators by using types provided by strict
 
 ### Example:
 ```cpp
-   // These are ambiguous...
-   std::int32_t add(std::int32_t a, std::int32_t b) { return a + b; } // int
-   std::size_t add(std::size_t a, std::size_t b) { return a + b; } // size_t
+   // These could be ambiguous...
+   std::int16_t add(std::int16_t a, std::int16_t b) { return a + b; } // #1
+   std::int32_t add(std::int32_t a, std::int32_t b) { return a + b; } // #2
 
    // ...but these are not!
-   strict::int32_t add(strict::int32_t a, strict::int32_t b) { return a + b; } // int
-   strict::size_t add(strict::size_t a, strict::size_t b) { return a + b; } // size_t
+   strict::int16_t add(strict::int16_t a, strict::int16_t b) { return a + b; } // #3
+   strict::int32_t add(strict::int32_t a, strict::int32_t b) { return a + b; } // #4
+
+   ...
+
+   // === If only the add() methods #1 and #2 existed ===
+   //
+   add(5, 6); // This would call add() #2 as expected.
+   add(5U, 6); // This would also call add() #2 due to the 2nd argument qualifying.
+   add(5U, 6U); // But this is ambiguous between #1 and #2.
+
+   // === ...but if only the strict-type add() methods #3 and #4 existed ===
+   //
+   add(5, 6); // This would call add() #4 as expected.
+   add(5U, 6); // This would fail due to no implicit conversion available for the first argument.
+   add(5U, 6U);  // This would fail due to no implicit conversion available for both arguments.
 ```
 
 ## How to include in your projects

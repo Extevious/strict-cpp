@@ -1,4 +1,6 @@
-#define STRICT_CPP_OPTIONAL_TYPES
+#if !defined(STRICT_CPP_OPTIONAL_TYPES)
+   #define STRICT_CPP_OPTIONAL_TYPES
+#endif
 
 #include "strict-cpp.hpp"
 

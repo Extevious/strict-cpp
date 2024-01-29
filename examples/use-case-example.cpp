@@ -6,51 +6,32 @@
 
 #include <iostream>
 
+void test(int a);
+
+void abc() { test((short)5); }
+
 void output(auto... out) { (std::cout << ... << out) << '\n'; }
 
-// This gets called instead of the other add() methods because of implicit
-// conversion. This is to allow compatibility with existing APIs.
-//
-//       void add(int a, int b) { }
-//
-
-// A compiler error is thrown claiming this is a redefinition since the conversion
-// between int and unsigned int is implicit.
-//
-//       void add(uint a, uint b) { }
-//
-
-// A simple method adding 2 signed ints together.
 void add(strict::int32_t a, strict::int32_t b) { output("add() #1: ", a + b); }
 
-// Similar to above, but b is unsigned.
 void add(strict::int32_t a, strict::uint32_t b) { output("add() #2: ", a + b); }
 
-// Notice how the only difference from the above add() is the similar types.
-// Without using the strict types, add() calls would be ambiguous since
-// converting std::int32_t to std::int8_t is implicit.
 void add(strict::int8_t a, strict::int8_t b) { output("add() #3: ", a + b); }
 
-// Adding of an int64 and int32.
 void add(strict::int64_t a, strict::int32_t b) { output("add() #4: ", a + b); }
 
-// Adding of the implicit same type is still supported.
 void add(strict::int16_t a, short b) { output("add() #5: ", a + b); }
 
 void subtract(strict::size_t a, strict::size_t b) { output("subtract() #1: ", a - b); }
 
 void subtract(strict::count_t a, strict::count_t b) { output("subtract() #2: ", a - b); }
 
-// Simple multiplication of 2 floats.
 void multiply(strict::float_t a, strict::float_t b) { output("multiply() #1: ", a * b); }
 
-// Regardless of order, ((a * b) vs (b * a)) the smaller type gets promoted.
 void multiply(strict::float_t a, strict::double_t b) { output("multiply() #2: ", a * b); }
 
-// The resulting type is strict::long_double_t after multiplying a * b.
 void multiply(strict::long_double_t a, strict::double_t b) { output("multiply() #3: ", a * b); }
 
-// Multiplying a float with a strict::size_t.
 void multiply(strict::float_t a, strict::size_t b) { output("multiply() #4: ", a * b); }
 
 int main() {
@@ -70,7 +51,7 @@ int main() {
    add(a, 5U);
 
    // Calls #5
-   add(strict::int16_t(a), (short)12);
+   add((short)a, (short)12);
 
    // Calls #3
    add((std::int8_t)41, (std::int8_t)65);

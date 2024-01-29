@@ -1,6 +1,5 @@
 #pragma once
 
-#include <cstdint>
 #if !defined(STRICT_CPP_NAMESPACE)
    #define STRICT_CPP_NAMESPACE strict
 #endif
@@ -18,6 +17,7 @@
 #define STRICT_CPP_NOEXCEPT  noexcept
 
 #include <cmath>
+#include <cstdint>
 #include <limits>
 #include <string>
 #include <type_traits>

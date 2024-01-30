@@ -1,15 +1,13 @@
 #pragma once
 
+#define STRICT_CPP_STR(...)  #__VA_ARGS__
+#define STRICT_CPP_XSTR(...) STRICT_CPP_STR(__VA_ARGS__)
+
+#define STRICT_CPP_JOIN_STR(a, b)  a##b
+#define STRICT_CPP_JOIN_XSTR(a, b) STRICT_CPP_JOIN_STR(a, b)
+
 #if !defined(STRICT_CPP_NAMESPACE)
    #define STRICT_CPP_NAMESPACE strict
-#endif
-
-#if !defined(STRICT_CPP_NAMESPACE_STR)
-   #define STRICT_CPP_NAMESPACE_STR "strict"
-#endif
-
-#if !defined(STRICT_CPP_NAMESPACE_WSTR)
-   #define STRICT_CPP_NAMESPACE_WSTR L"strict"
 #endif
 
 #define STRICT_CPP_INLINE    inline
@@ -311,11 +309,13 @@ namespace STRICT_CPP_NAMESPACE {
          STRICT_CPP_INLINE STRICT_CPP_CONSTEXPR operator T() const STRICT_CPP_NOEXCEPT { return this->value; }                                                                     \
          STRICT_CPP_INLINE                      operator std::string() const { return to_string(); }                                                                               \
          STRICT_CPP_INLINE std::string          to_string() const { return std::to_string(value); }                                                                                \
-         STRICT_CPP_INLINE STRICT_CPP_CONSTEXPR std::string to_string_t() const STRICT_CPP_NOEXCEPT { return "" #T; }                                                              \
-         STRICT_CPP_INLINE STRICT_CPP_CONSTEXPR std::string to_string_n() const STRICT_CPP_NOEXCEPT { return STRICT_CPP_NAMESPACE_STR "::" #STRICT_CPP_TYPE; }                     \
+         STRICT_CPP_INLINE STRICT_CPP_CONSTEXPR std::string to_string_t() const STRICT_CPP_NOEXCEPT { return #T; }                                                                 \
+         STRICT_CPP_INLINE STRICT_CPP_CONSTEXPR std::string to_string_n() const STRICT_CPP_NOEXCEPT { return STRICT_CPP_XSTR(STRICT_CPP_NAMESPACE) "::" #STRICT_CPP_TYPE; }        \
          STRICT_CPP_INLINE std::wstring         to_wstring() const { return std::to_wstring(value); }                                                                              \
-         STRICT_CPP_INLINE STRICT_CPP_CONSTEXPR std::wstring to_wstring_t() const STRICT_CPP_NOEXCEPT { return L"" L#T; }                                                          \
-         STRICT_CPP_INLINE STRICT_CPP_CONSTEXPR std::wstring to_wstring_n() const STRICT_CPP_NOEXCEPT { return STRICT_CPP_NAMESPACE_WSTR L"::" L#STRICT_CPP_TYPE; }                \
+         STRICT_CPP_INLINE STRICT_CPP_CONSTEXPR std::wstring to_wstring_t() const STRICT_CPP_NOEXCEPT { return L#T; }                                                              \
+         STRICT_CPP_INLINE STRICT_CPP_CONSTEXPR std::wstring to_wstring_n() const STRICT_CPP_NOEXCEPT {                                                                            \
+            return STRICT_CPP_JOIN_XSTR(L, STRICT_CPP_XSTR(STRICT_CPP_NAMESPACE)) L"::" L#STRICT_CPP_TYPE;                                                                         \
+         }                                                                                                                                                                         \
    };
 
 #define STRICT_CPP_DEFINE_FLOAT_TYPE(STRICT_CPP_TYPE, T)                                                                                                                           \
@@ -347,11 +347,13 @@ namespace STRICT_CPP_NAMESPACE {
          STRICT_CPP_INLINE STRICT_CPP_CONSTEXPR operator T() const STRICT_CPP_NOEXCEPT { return this->value; }                                                                     \
          STRICT_CPP_INLINE                      operator std::string() const { return to_string(); }                                                                               \
          STRICT_CPP_INLINE std::string          to_string() const { return std::to_string(value); }                                                                                \
-         STRICT_CPP_INLINE STRICT_CPP_CONSTEXPR std::string to_string_t() const STRICT_CPP_NOEXCEPT { return "" #T; }                                                              \
-         STRICT_CPP_INLINE STRICT_CPP_CONSTEXPR std::string to_string_n() const STRICT_CPP_NOEXCEPT { return STRICT_CPP_NAMESPACE_STR "::" #STRICT_CPP_TYPE; }                     \
+         STRICT_CPP_INLINE STRICT_CPP_CONSTEXPR std::string to_string_t() const STRICT_CPP_NOEXCEPT { return #T; }                                                                 \
+         STRICT_CPP_INLINE STRICT_CPP_CONSTEXPR std::string to_string_n() const STRICT_CPP_NOEXCEPT { return STRICT_CPP_XSTR(STRICT_CPP_NAMESPACE) "::" #STRICT_CPP_TYPE; }        \
          STRICT_CPP_INLINE std::wstring         to_wstring() const { return std::to_wstring(value); }                                                                              \
-         STRICT_CPP_INLINE STRICT_CPP_CONSTEXPR std::wstring to_wstring_t() const STRICT_CPP_NOEXCEPT { return L"" L#T; }                                                          \
-         STRICT_CPP_INLINE STRICT_CPP_CONSTEXPR std::wstring to_wstring_n() const STRICT_CPP_NOEXCEPT { return STRICT_CPP_NAMESPACE_WSTR L"::" L#STRICT_CPP_TYPE; }                \
+         STRICT_CPP_INLINE STRICT_CPP_CONSTEXPR std::wstring to_wstring_t() const STRICT_CPP_NOEXCEPT { return L#T; }                                                              \
+         STRICT_CPP_INLINE STRICT_CPP_CONSTEXPR std::wstring to_wstring_n() const STRICT_CPP_NOEXCEPT {                                                                            \
+            return STRICT_CPP_JOIN_XSTR(L, STRICT_CPP_XSTR(STRICT_CPP_NAMESPACE)) L"::" L#STRICT_CPP_TYPE;                                                                         \
+         }                                                                                                                                                                         \
    };
 
 #pragma warning(disable : 4146)

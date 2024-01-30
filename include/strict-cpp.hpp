@@ -448,6 +448,18 @@ namespace STRICT_CPP_NAMESPACE {
    STRICT_CPP_DEFINE_INTEGRAL_TYPE(begin_offset_size32_t, std::uint32_t);
    STRICT_CPP_DEFINE_INTEGRAL_TYPE(begin_offset_size64_t, std::uint64_t);
 
+   STRICT_CPP_DEFINE_INTEGRAL_TYPE(lhs_size_t, std::size_t);
+   STRICT_CPP_DEFINE_INTEGRAL_TYPE(lhs_size8_t, std::uint8_t);
+   STRICT_CPP_DEFINE_INTEGRAL_TYPE(lhs_size16_t, std::uint16_t);
+   STRICT_CPP_DEFINE_INTEGRAL_TYPE(lhs_size32_t, std::uint32_t);
+   STRICT_CPP_DEFINE_INTEGRAL_TYPE(lhs_size64_t, std::uint64_t);
+
+   STRICT_CPP_DEFINE_INTEGRAL_TYPE(lhs_offset_size_t, std::size_t);
+   STRICT_CPP_DEFINE_INTEGRAL_TYPE(lhs_offset_size8_t, std::uint8_t);
+   STRICT_CPP_DEFINE_INTEGRAL_TYPE(lhs_offset_size16_t, std::uint16_t);
+   STRICT_CPP_DEFINE_INTEGRAL_TYPE(lhs_offset_size32_t, std::uint32_t);
+   STRICT_CPP_DEFINE_INTEGRAL_TYPE(lhs_offset_size64_t, std::uint64_t);
+
    STRICT_CPP_DEFINE_INTEGRAL_TYPE(dst_size_t, std::size_t);
    STRICT_CPP_DEFINE_INTEGRAL_TYPE(dst_size8_t, std::uint8_t);
    STRICT_CPP_DEFINE_INTEGRAL_TYPE(dst_size16_t, std::uint16_t);
@@ -471,6 +483,18 @@ namespace STRICT_CPP_NAMESPACE {
    STRICT_CPP_DEFINE_INTEGRAL_TYPE(end_offset_size16_t, std::uint16_t);
    STRICT_CPP_DEFINE_INTEGRAL_TYPE(end_offset_size32_t, std::uint32_t);
    STRICT_CPP_DEFINE_INTEGRAL_TYPE(end_offset_size64_t, std::uint64_t);
+
+   STRICT_CPP_DEFINE_INTEGRAL_TYPE(rhs_size_t, std::size_t);
+   STRICT_CPP_DEFINE_INTEGRAL_TYPE(rhs_size8_t, std::uint8_t);
+   STRICT_CPP_DEFINE_INTEGRAL_TYPE(rhs_size16_t, std::uint16_t);
+   STRICT_CPP_DEFINE_INTEGRAL_TYPE(rhs_size32_t, std::uint32_t);
+   STRICT_CPP_DEFINE_INTEGRAL_TYPE(rhs_size64_t, std::uint64_t);
+
+   STRICT_CPP_DEFINE_INTEGRAL_TYPE(rhs_offset_size_t, std::size_t);
+   STRICT_CPP_DEFINE_INTEGRAL_TYPE(rhs_offset_size8_t, std::uint8_t);
+   STRICT_CPP_DEFINE_INTEGRAL_TYPE(rhs_offset_size16_t, std::uint16_t);
+   STRICT_CPP_DEFINE_INTEGRAL_TYPE(rhs_offset_size32_t, std::uint32_t);
+   STRICT_CPP_DEFINE_INTEGRAL_TYPE(rhs_offset_size64_t, std::uint64_t);
 
    STRICT_CPP_DEFINE_INTEGRAL_TYPE(count_t, std::size_t);
    STRICT_CPP_DEFINE_INTEGRAL_TYPE(count8_t, std::uint8_t);
@@ -508,6 +532,18 @@ namespace STRICT_CPP_NAMESPACE {
    STRICT_CPP_DEFINE_INTEGRAL_TYPE(begin_offset_count32_t, std::uint32_t);
    STRICT_CPP_DEFINE_INTEGRAL_TYPE(begin_offset_count64_t, std::uint64_t);
 
+   STRICT_CPP_DEFINE_INTEGRAL_TYPE(lhs_count_t, std::size_t);
+   STRICT_CPP_DEFINE_INTEGRAL_TYPE(lhs_count8_t, std::uint8_t);
+   STRICT_CPP_DEFINE_INTEGRAL_TYPE(lhs_count16_t, std::uint16_t);
+   STRICT_CPP_DEFINE_INTEGRAL_TYPE(lhs_count32_t, std::uint32_t);
+   STRICT_CPP_DEFINE_INTEGRAL_TYPE(lhs_count64_t, std::uint64_t);
+
+   STRICT_CPP_DEFINE_INTEGRAL_TYPE(lhs_offset_count_t, std::size_t);
+   STRICT_CPP_DEFINE_INTEGRAL_TYPE(lhs_offset_count8_t, std::uint8_t);
+   STRICT_CPP_DEFINE_INTEGRAL_TYPE(lhs_offset_count16_t, std::uint16_t);
+   STRICT_CPP_DEFINE_INTEGRAL_TYPE(lhs_offset_count32_t, std::uint32_t);
+   STRICT_CPP_DEFINE_INTEGRAL_TYPE(lhs_offset_count64_t, std::uint64_t);
+
    STRICT_CPP_DEFINE_INTEGRAL_TYPE(dst_count_t, std::size_t);
    STRICT_CPP_DEFINE_INTEGRAL_TYPE(dst_count8_t, std::uint8_t);
    STRICT_CPP_DEFINE_INTEGRAL_TYPE(dst_count16_t, std::uint16_t);
@@ -531,6 +567,18 @@ namespace STRICT_CPP_NAMESPACE {
    STRICT_CPP_DEFINE_INTEGRAL_TYPE(end_offset_count16_t, std::uint16_t);
    STRICT_CPP_DEFINE_INTEGRAL_TYPE(end_offset_count32_t, std::uint32_t);
    STRICT_CPP_DEFINE_INTEGRAL_TYPE(end_offset_count64_t, std::uint64_t);
+
+   STRICT_CPP_DEFINE_INTEGRAL_TYPE(rhs_count_t, std::size_t);
+   STRICT_CPP_DEFINE_INTEGRAL_TYPE(rhs_count8_t, std::uint8_t);
+   STRICT_CPP_DEFINE_INTEGRAL_TYPE(rhs_count16_t, std::uint16_t);
+   STRICT_CPP_DEFINE_INTEGRAL_TYPE(rhs_count32_t, std::uint32_t);
+   STRICT_CPP_DEFINE_INTEGRAL_TYPE(rhs_count64_t, std::uint64_t);
+
+   STRICT_CPP_DEFINE_INTEGRAL_TYPE(rhs_offset_count_t, std::size_t);
+   STRICT_CPP_DEFINE_INTEGRAL_TYPE(rhs_offset_count8_t, std::uint8_t);
+   STRICT_CPP_DEFINE_INTEGRAL_TYPE(rhs_offset_count16_t, std::uint16_t);
+   STRICT_CPP_DEFINE_INTEGRAL_TYPE(rhs_offset_count32_t, std::uint32_t);
+   STRICT_CPP_DEFINE_INTEGRAL_TYPE(rhs_offset_count64_t, std::uint64_t);
 
    STRICT_CPP_DEFINE_INTEGRAL_TYPE(offset_t, std::size_t);
    STRICT_CPP_DEFINE_INTEGRAL_TYPE(offset8_t, std::uint8_t);

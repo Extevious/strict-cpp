@@ -6,10 +6,6 @@
 
 #include <iostream>
 
-void test(int a);
-
-void abc() { test((short)5); }
-
 void output(auto... out) { (std::cout << ... << out) << '\n'; }
 
 void add(strict::int32_t a, strict::int32_t b) { output("add() #1: ", a + b); }

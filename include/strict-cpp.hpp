@@ -358,6 +358,10 @@ namespace STRICT_CPP_NAMESPACE {
 
 #pragma warning(disable : 4146)
 
+// =============================================================================
+// Pre-defined types
+// =============================================================================
+
 namespace STRICT_CPP_NAMESPACE {
    // Common integral types:
    STRICT_CPP_DEFINE_INTEGRAL_TYPE(size_t, std::size_t);
@@ -402,7 +406,13 @@ namespace STRICT_CPP_NAMESPACE {
    STRICT_CPP_DEFINE_INTEGRAL_TYPE(schar_t, signed char);
    STRICT_CPP_DEFINE_INTEGRAL_TYPE(uchar_t, unsigned char);
 
+   // Common floating-point types:
+   STRICT_CPP_DEFINE_FLOAT_TYPE(float_t, float);
+   STRICT_CPP_DEFINE_FLOAT_TYPE(double_t, double);
+   STRICT_CPP_DEFINE_FLOAT_TYPE(long_double_t, long double);
+
 #if defined(STRICT_CPP_OPTIONAL_TYPES)
+   // Optional integral types:
    STRICT_CPP_DEFINE_INTEGRAL_TYPE(size8_t, std::uint8_t);
    STRICT_CPP_DEFINE_INTEGRAL_TYPE(size16_t, std::uint16_t);
    STRICT_CPP_DEFINE_INTEGRAL_TYPE(size32_t, std::uint32_t);
@@ -461,12 +471,6 @@ namespace STRICT_CPP_NAMESPACE {
    STRICT_CPP_DEFINE_INTEGRAL_TYPE(end_offset_size16_t, std::uint16_t);
    STRICT_CPP_DEFINE_INTEGRAL_TYPE(end_offset_size32_t, std::uint32_t);
    STRICT_CPP_DEFINE_INTEGRAL_TYPE(end_offset_size64_t, std::uint64_t);
-
-   STRICT_CPP_DEFINE_INTEGRAL_TYPE(capacity_t, std::size_t);
-   STRICT_CPP_DEFINE_INTEGRAL_TYPE(capacity8_t, std::uint8_t);
-   STRICT_CPP_DEFINE_INTEGRAL_TYPE(capacity16_t, std::uint16_t);
-   STRICT_CPP_DEFINE_INTEGRAL_TYPE(capacity32_t, std::uint32_t);
-   STRICT_CPP_DEFINE_INTEGRAL_TYPE(capacity64_t, std::uint64_t);
 
    STRICT_CPP_DEFINE_INTEGRAL_TYPE(count_t, std::size_t);
    STRICT_CPP_DEFINE_INTEGRAL_TYPE(count8_t, std::uint8_t);
@@ -528,12 +532,6 @@ namespace STRICT_CPP_NAMESPACE {
    STRICT_CPP_DEFINE_INTEGRAL_TYPE(end_offset_count32_t, std::uint32_t);
    STRICT_CPP_DEFINE_INTEGRAL_TYPE(end_offset_count64_t, std::uint64_t);
 
-   STRICT_CPP_DEFINE_INTEGRAL_TYPE(index_t, std::size_t);
-   STRICT_CPP_DEFINE_INTEGRAL_TYPE(index8_t, std::uint8_t);
-   STRICT_CPP_DEFINE_INTEGRAL_TYPE(index16_t, std::uint16_t);
-   STRICT_CPP_DEFINE_INTEGRAL_TYPE(index32_t, std::uint32_t);
-   STRICT_CPP_DEFINE_INTEGRAL_TYPE(index64_t, std::uint64_t);
-
    STRICT_CPP_DEFINE_INTEGRAL_TYPE(offset_t, std::size_t);
    STRICT_CPP_DEFINE_INTEGRAL_TYPE(offset8_t, std::uint8_t);
    STRICT_CPP_DEFINE_INTEGRAL_TYPE(offset16_t, std::uint16_t);
@@ -563,10 +561,17 @@ namespace STRICT_CPP_NAMESPACE {
    STRICT_CPP_DEFINE_INTEGRAL_TYPE(end_offset16_t, std::uint16_t);
    STRICT_CPP_DEFINE_INTEGRAL_TYPE(end_offset32_t, std::uint32_t);
    STRICT_CPP_DEFINE_INTEGRAL_TYPE(end_offset64_t, std::uint64_t);
-#endif
 
-   // Float types:
-   STRICT_CPP_DEFINE_FLOAT_TYPE(float_t, float);
-   STRICT_CPP_DEFINE_FLOAT_TYPE(double_t, double);
-   STRICT_CPP_DEFINE_FLOAT_TYPE(long_double_t, long double);
+   STRICT_CPP_DEFINE_INTEGRAL_TYPE(capacity_t, std::size_t);
+   STRICT_CPP_DEFINE_INTEGRAL_TYPE(capacity8_t, std::uint8_t);
+   STRICT_CPP_DEFINE_INTEGRAL_TYPE(capacity16_t, std::uint16_t);
+   STRICT_CPP_DEFINE_INTEGRAL_TYPE(capacity32_t, std::uint32_t);
+   STRICT_CPP_DEFINE_INTEGRAL_TYPE(capacity64_t, std::uint64_t);
+
+   STRICT_CPP_DEFINE_INTEGRAL_TYPE(index_t, std::size_t);
+   STRICT_CPP_DEFINE_INTEGRAL_TYPE(index8_t, std::uint8_t);
+   STRICT_CPP_DEFINE_INTEGRAL_TYPE(index16_t, std::uint16_t);
+   STRICT_CPP_DEFINE_INTEGRAL_TYPE(index32_t, std::uint32_t);
+   STRICT_CPP_DEFINE_INTEGRAL_TYPE(index64_t, std::uint64_t);
+#endif
 }

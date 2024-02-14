@@ -31,8 +31,8 @@ namespace STRICT_CPP_NAMESPACE {
       // Base type for int-only type qualifications.
       struct strict_cpp_integral_base_t : public strict_cpp_base_t { };
 
-      template <typename T1, typename T2>
-      concept is_type_compliant = std::is_same_v<T1, T2>;
+      template <typename Left, typename Right>
+      concept is_type_compliant = std::is_same_v<Left, Right>;
 
       template <typename Derived>
       concept is_base_compliant = std::is_base_of_v<strict_cpp_base_t, Derived>;
@@ -43,25 +43,25 @@ namespace STRICT_CPP_NAMESPACE {
       template <typename Derived>
       concept is_integral_base_compliant = std::is_base_of_v<strict_cpp_integral_base_t, Derived>;
 
-      template <typename T1, typename T2>
-      concept is_conversion_compliant = std::is_convertible_v<T1, T2>;
+      template <typename Left, typename Right>
+      concept is_conversion_compliant = std::is_convertible_v<Left, Right>;
 
       // Implicit casts should always convert to the exact same type.
-      template <typename T1, typename T2>
-      concept is_implicit_conversion_compliant = is_conversion_compliant<T1, T2> && is_type_compliant<T1, T2>;
+      template <typename Left, typename Right>
+      concept is_implicit_conversion_compliant = is_conversion_compliant<Left, Right> && is_type_compliant<Left, Right>;
 
       // Explicit casts are allowed to convert to any convertible type.
-      template <typename T1, typename T2>
-      concept is_explicit_conversion_compliant = is_conversion_compliant<T1, T2> && !is_implicit_conversion_compliant<T1, T2>;
+      template <typename Left, typename Right>
+      concept is_explicit_conversion_compliant = is_conversion_compliant<Left, Right> && !is_implicit_conversion_compliant<Left, Right>;
 
-      template <typename T1, typename T2>
-      concept is_qualified_type = is_type_compliant<T1, T2>;
+      template <typename Left, typename Right>
+      concept is_qualified_type = is_type_compliant<Left, Right>;
 
-      template <typename Base, typename T1, typename T2>
-      concept is_qualified_constructor = is_qualified_type<T1, T2>;
+      template <typename Left, typename Right>
+      concept is_qualified_implicit_constructor = is_qualified_type<Left, Right>;
 
-      template <typename Base, typename T1, typename T2>
-      concept is_qualified_explicit_constructor = (is_explicit_conversion_compliant<T1, T2> || is_base_compliant<Base>)&&!is_qualified_constructor<Base, T1, T2>;
+      template <typename Derived, typename T, typename Other>
+      concept is_qualified_explicit_constructor = (is_explicit_conversion_compliant<T, Other> || is_base_compliant<Derived>)&&!is_qualified_implicit_constructor<T, Other>;
 
       template <typename... Types>
       concept is_qualified_operator = (is_base_compliant<Types> && ...);
@@ -71,220 +71,212 @@ namespace STRICT_CPP_NAMESPACE {
 
       template <typename... Types>
       concept is_qualified_float_operator = (is_float_base_compliant<Types> && ...);
-
-      template <typename T1, typename T2>
-         requires is_base_compliant<T1> && is_base_compliant<T2>
-      STRICT_CPP_INLINE STRICT_CPP_CONSTEXPR auto convert_implicit_value(auto value) STRICT_CPP_NOEXCEPT {
-         if constexpr (std::is_same_v<decltype(value), typename T1::type>) return T1(value);
-         else return T2(value);
-      }
-
    }
 
    // =============================================================================
    // Operators for both integral and floating-point types
    // =============================================================================
 
-   template <typename T1, typename T2>
-      requires STRICT_CPP_NAMESPACE::detail::is_qualified_operator<T1, T2>
-   STRICT_CPP_INLINE STRICT_CPP_CONSTEXPR auto operator<=>(const T1& t1, const T2& t2) STRICT_CPP_NOEXCEPT {
-      return t1.value <=> t2.value;
+   template <typename Left, typename Right>
+      requires STRICT_CPP_NAMESPACE::detail::is_qualified_operator<Left, Right>
+   STRICT_CPP_INLINE STRICT_CPP_CONSTEXPR auto operator<=>(const Left& left, const Right& right) STRICT_CPP_NOEXCEPT {
+      return left.value <=> right.value;
    }
 
    template <typename T>
       requires STRICT_CPP_NAMESPACE::detail::is_qualified_operator<T>
    STRICT_CPP_INLINE STRICT_CPP_CONSTEXPR T operator+(const T& t) STRICT_CPP_NOEXCEPT {
-      return T(+t.value);
+      return static_cast<T>(+t.value);
    }
 
    template <typename T>
       requires STRICT_CPP_NAMESPACE::detail::is_qualified_operator<T>
    STRICT_CPP_INLINE STRICT_CPP_CONSTEXPR T operator-(const T& t) STRICT_CPP_NOEXCEPT {
-      return T(-t.value);
+      return static_cast<T>(-t.value);
    }
 
-   template <typename T1, typename T2>
-      requires STRICT_CPP_NAMESPACE::detail::is_qualified_operator<T1, T2>
-   STRICT_CPP_INLINE STRICT_CPP_CONSTEXPR auto operator+(const T1& t1, const T2& t2) STRICT_CPP_NOEXCEPT {
-      return STRICT_CPP_NAMESPACE::detail::convert_implicit_value<T1, T2>(t1.value + t2.value);
+   template <typename Left, typename Right>
+      requires STRICT_CPP_NAMESPACE::detail::is_qualified_operator<Left, Right>
+   STRICT_CPP_INLINE STRICT_CPP_CONSTEXPR Left operator+(const Left& left, const Right& right) STRICT_CPP_NOEXCEPT {
+      return static_cast<Left>(left.value + right.value);
    }
 
-   template <typename T1, typename T2>
-      requires STRICT_CPP_NAMESPACE::detail::is_qualified_operator<T1, T2>
-   STRICT_CPP_INLINE STRICT_CPP_CONSTEXPR auto operator-(const T1& t1, const T2& t2) STRICT_CPP_NOEXCEPT {
-      return STRICT_CPP_NAMESPACE::detail::convert_implicit_value<T1, T2>(t1.value - t2.value);
+   template <typename Left, typename Right>
+      requires STRICT_CPP_NAMESPACE::detail::is_qualified_operator<Left, Right>
+   STRICT_CPP_INLINE STRICT_CPP_CONSTEXPR Left operator-(const Left& left, const Right& right) STRICT_CPP_NOEXCEPT {
+      return static_cast<Left>(left.value - right.value);
    }
 
-   template <typename T1, typename T2>
-      requires STRICT_CPP_NAMESPACE::detail::is_qualified_operator<T1, T2>
-   STRICT_CPP_INLINE STRICT_CPP_CONSTEXPR auto operator*(const T1& t1, const T2& t2) STRICT_CPP_NOEXCEPT {
-      return STRICT_CPP_NAMESPACE::detail::convert_implicit_value<T1, T2>(t1.value * t2.value);
+   template <typename Left, typename Right>
+      requires STRICT_CPP_NAMESPACE::detail::is_qualified_operator<Left, Right>
+   STRICT_CPP_INLINE STRICT_CPP_CONSTEXPR Left operator*(const Left& left, const Right& right) STRICT_CPP_NOEXCEPT {
+      return static_cast<Left>(left.value * right.value);
    }
 
-   template <typename T1, typename T2>
-      requires STRICT_CPP_NAMESPACE::detail::is_qualified_operator<T1, T2>
-   STRICT_CPP_INLINE STRICT_CPP_CONSTEXPR auto operator/(const T1& t1, const T2& t2) STRICT_CPP_NOEXCEPT {
-      return STRICT_CPP_NAMESPACE::detail::convert_implicit_value<T1, T2>(t1.value / t2.value);
+   template <typename Left, typename Right>
+      requires STRICT_CPP_NAMESPACE::detail::is_qualified_operator<Left, Right>
+   STRICT_CPP_INLINE STRICT_CPP_CONSTEXPR Left operator/(const Left& left, const Right& right) STRICT_CPP_NOEXCEPT {
+      return static_cast<Left>(left.value / right.value);
    }
 
-   template <typename T1, typename T2>
-      requires STRICT_CPP_NAMESPACE::detail::is_qualified_operator<T1>
-   STRICT_CPP_INLINE STRICT_CPP_CONSTEXPR T1& operator+=(T1& t1, const T2& t2) STRICT_CPP_NOEXCEPT {
-      t1.value += static_cast<typename T1::type>(t2);
-      return t1;
+   template <typename Left, typename Right>
+      requires STRICT_CPP_NAMESPACE::detail::is_qualified_operator<Left>
+   STRICT_CPP_INLINE STRICT_CPP_CONSTEXPR Left& operator+=(Left& left, const Right& right) STRICT_CPP_NOEXCEPT {
+      left.value += static_cast<typename Left::type>(right.value);
+      return left;
    }
 
-   template <typename T1, typename T2>
-      requires STRICT_CPP_NAMESPACE::detail::is_qualified_operator<T1>
-   STRICT_CPP_INLINE STRICT_CPP_CONSTEXPR T1& operator-=(T1& t1, const T2& t2) STRICT_CPP_NOEXCEPT {
-      t1.value -= static_cast<typename T1::type>(t2);
-      return t1;
+   template <typename Left, typename Right>
+      requires STRICT_CPP_NAMESPACE::detail::is_qualified_operator<Left>
+   STRICT_CPP_INLINE STRICT_CPP_CONSTEXPR Left& operator-=(Left& left, const Right& right) STRICT_CPP_NOEXCEPT {
+      left.value -= static_cast<typename Left::type>(right.value);
+      return left;
    }
 
-   template <typename T1, typename T2>
-      requires STRICT_CPP_NAMESPACE::detail::is_qualified_operator<T1>
-   STRICT_CPP_INLINE STRICT_CPP_CONSTEXPR T1& operator*=(T1& t1, const T2& t2) STRICT_CPP_NOEXCEPT {
-      t1.value *= static_cast<typename T1::type>(t2);
-      return t1;
+   template <typename Left, typename Right>
+      requires STRICT_CPP_NAMESPACE::detail::is_qualified_operator<Left>
+   STRICT_CPP_INLINE STRICT_CPP_CONSTEXPR Left& operator*=(Left& left, const Right& right) STRICT_CPP_NOEXCEPT {
+      left.value *= static_cast<typename Left::type>(right.value);
+      return left;
    }
 
-   template <typename T1, typename T2>
-      requires STRICT_CPP_NAMESPACE::detail::is_qualified_operator<T1>
-   STRICT_CPP_INLINE STRICT_CPP_CONSTEXPR T1& operator/=(T1& t1, const T2& t2) STRICT_CPP_NOEXCEPT {
-      t1.value /= static_cast<typename T1::type>(t2);
-      return t1;
-   }
-
-   template <typename T>
-      requires STRICT_CPP_NAMESPACE::detail::is_qualified_operator<T>
-   STRICT_CPP_INLINE STRICT_CPP_CONSTEXPR T operator++(T& t) STRICT_CPP_NOEXCEPT {
-      return T(++t.value);
+   template <typename Left, typename Right>
+      requires STRICT_CPP_NAMESPACE::detail::is_qualified_operator<Left>
+   STRICT_CPP_INLINE STRICT_CPP_CONSTEXPR Left& operator/=(Left& left, const Right& right) STRICT_CPP_NOEXCEPT {
+      left.value /= static_cast<typename Left::type>(right.value);
+      return left;
    }
 
    template <typename T>
       requires STRICT_CPP_NAMESPACE::detail::is_qualified_operator<T>
-   STRICT_CPP_INLINE STRICT_CPP_CONSTEXPR T operator++(T& t, auto) STRICT_CPP_NOEXCEPT {
-      return T(t.value++);
+   STRICT_CPP_INLINE STRICT_CPP_CONSTEXPR T operator++(T& value) STRICT_CPP_NOEXCEPT {
+      return static_cast<T>(++value.value);
    }
 
    template <typename T>
       requires STRICT_CPP_NAMESPACE::detail::is_qualified_operator<T>
-   STRICT_CPP_INLINE STRICT_CPP_CONSTEXPR T operator--(T& t) STRICT_CPP_NOEXCEPT {
-      return T(--t.value);
+   STRICT_CPP_INLINE STRICT_CPP_CONSTEXPR T operator++(T& value, auto) STRICT_CPP_NOEXCEPT {
+      return static_cast<T>(value.value++);
    }
 
    template <typename T>
       requires STRICT_CPP_NAMESPACE::detail::is_qualified_operator<T>
-   STRICT_CPP_INLINE STRICT_CPP_CONSTEXPR T operator--(T& t, auto) STRICT_CPP_NOEXCEPT {
-      return T(t.value++);
+   STRICT_CPP_INLINE STRICT_CPP_CONSTEXPR T operator--(T& value) STRICT_CPP_NOEXCEPT {
+      return static_cast<T>(--value.value);
+   }
+
+   template <typename T>
+      requires STRICT_CPP_NAMESPACE::detail::is_qualified_operator<T>
+   STRICT_CPP_INLINE STRICT_CPP_CONSTEXPR T operator--(T& value, auto) STRICT_CPP_NOEXCEPT {
+      return static_cast<T>(value.value++);
    }
 
    // ==========================================================================
    // Integral-only operators
    // ==========================================================================
 
-   template <typename T1>
-      requires STRICT_CPP_NAMESPACE::detail::is_qualified_integral_operator<T1>
-   STRICT_CPP_INLINE STRICT_CPP_CONSTEXPR T1 operator~(const T1& t1) STRICT_CPP_NOEXCEPT {
-      return T1(~t1.value);
+   template <typename T>
+      requires STRICT_CPP_NAMESPACE::detail::is_qualified_integral_operator<T>
+   STRICT_CPP_INLINE STRICT_CPP_CONSTEXPR T operator~(const T& value) STRICT_CPP_NOEXCEPT {
+      return static_cast<T>(~value.value);
    }
 
-   template <typename T1, typename T2>
-      requires STRICT_CPP_NAMESPACE::detail::is_qualified_integral_operator<T1, T2>
-   STRICT_CPP_INLINE STRICT_CPP_CONSTEXPR auto operator&(const T1& t1, const T2& t2) STRICT_CPP_NOEXCEPT {
-      return STRICT_CPP_NAMESPACE::detail::convert_implicit_value<T1, T2>(t1.value & t2.value);
+   template <typename Left, typename Right>
+      requires STRICT_CPP_NAMESPACE::detail::is_qualified_integral_operator<Left, Right>
+   STRICT_CPP_INLINE STRICT_CPP_CONSTEXPR Left operator&(const Left& left, const Right& right) STRICT_CPP_NOEXCEPT {
+      return left.value & static_cast<typename Left::type>(right.value);
    }
 
-   template <typename T1, typename T2>
-      requires STRICT_CPP_NAMESPACE::detail::is_qualified_integral_operator<T1, T2>
-   STRICT_CPP_INLINE STRICT_CPP_CONSTEXPR auto operator%(const T1& t1, const T2& t2) STRICT_CPP_NOEXCEPT {
-      return STRICT_CPP_NAMESPACE::detail::convert_implicit_value<T1, T2>(t1.value % t2.value);
+   template <typename Left, typename Right>
+      requires STRICT_CPP_NAMESPACE::detail::is_qualified_integral_operator<Left, Right>
+   STRICT_CPP_INLINE STRICT_CPP_CONSTEXPR Left operator%(const Left& left, const Right& right) STRICT_CPP_NOEXCEPT {
+      return left.value % static_cast<typename Left::type>(right.value);
    }
 
-   template <typename T1, typename T2>
-      requires STRICT_CPP_NAMESPACE::detail::is_qualified_integral_operator<T1, T2>
-   STRICT_CPP_INLINE STRICT_CPP_CONSTEXPR auto operator|(const T1& t1, const T2& t2) STRICT_CPP_NOEXCEPT {
-      return STRICT_CPP_NAMESPACE::detail::convert_implicit_value<T1, T2>(t1.value | t2.value);
+   template <typename Left, typename Right>
+      requires STRICT_CPP_NAMESPACE::detail::is_qualified_integral_operator<Left, Right>
+   STRICT_CPP_INLINE STRICT_CPP_CONSTEXPR Left operator|(const Left& left, const Right& right) STRICT_CPP_NOEXCEPT {
+      return left.value | static_cast<typename Left::type>(right.value);
    }
 
-   template <typename T1, typename T2>
-      requires STRICT_CPP_NAMESPACE::detail::is_qualified_integral_operator<T1, T2>
-   STRICT_CPP_INLINE STRICT_CPP_CONSTEXPR auto operator^(const T1& t1, const T2& t2) STRICT_CPP_NOEXCEPT {
-      return STRICT_CPP_NAMESPACE::detail::convert_implicit_value<T1, T2>(t1.value ^ t2.value);
+   template <typename Left, typename Right>
+      requires STRICT_CPP_NAMESPACE::detail::is_qualified_integral_operator<Left, Right>
+   STRICT_CPP_INLINE STRICT_CPP_CONSTEXPR Left operator^(const Left& left, const Right& right) STRICT_CPP_NOEXCEPT {
+      return left.value ^ static_cast<typename Left::type>(right.value);
    }
 
-   template <typename T1, typename T2>
-      requires STRICT_CPP_NAMESPACE::detail::is_qualified_integral_operator<T1, T2>
-   STRICT_CPP_INLINE STRICT_CPP_CONSTEXPR auto operator<<(const T1& t1, const T2& t2) STRICT_CPP_NOEXCEPT {
-      return STRICT_CPP_NAMESPACE::detail::convert_implicit_value<T1, T2>(t1.value << t2.value);
+   template <typename Left, typename Right>
+      requires STRICT_CPP_NAMESPACE::detail::is_qualified_integral_operator<Left, Right>
+   STRICT_CPP_INLINE STRICT_CPP_CONSTEXPR Left operator<<(const Left& left, const Right& right) STRICT_CPP_NOEXCEPT {
+      return left.value << static_cast<typename Left::type>(right.value);
    }
 
-   template <typename T1, typename T2>
-      requires STRICT_CPP_NAMESPACE::detail::is_qualified_integral_operator<T1, T2>
-   STRICT_CPP_INLINE STRICT_CPP_CONSTEXPR auto operator>>(const T1& t1, const T2& t2) STRICT_CPP_NOEXCEPT {
-      return STRICT_CPP_NAMESPACE::detail::convert_implicit_value<T1, T2>(t1.value >> t2.value);
+   template <typename Left, typename Right>
+      requires STRICT_CPP_NAMESPACE::detail::is_qualified_integral_operator<Left, Right>
+   STRICT_CPP_INLINE STRICT_CPP_CONSTEXPR Left operator>>(const Left& left, const Right& right) STRICT_CPP_NOEXCEPT {
+      return left.value >> static_cast<typename Left::type>(right.value);
    }
 
-   template <typename T1, typename T2>
-      requires STRICT_CPP_NAMESPACE::detail::is_qualified_integral_operator<T1>
-   STRICT_CPP_INLINE STRICT_CPP_CONSTEXPR T1& operator%=(T1& t1, const T2& t2) STRICT_CPP_NOEXCEPT {
-      t1.value %= static_cast<typename T1::type>(t2);
-      return t1;
+   template <typename Left, typename Right>
+      requires STRICT_CPP_NAMESPACE::detail::is_qualified_integral_operator<Left>
+   STRICT_CPP_INLINE STRICT_CPP_CONSTEXPR Left& operator%=(Left& left, const Right& right) STRICT_CPP_NOEXCEPT {
+      left.value %= static_cast<typename Left::type>(right.value);
+      return left;
    }
 
-   template <typename T1, typename T2>
-      requires STRICT_CPP_NAMESPACE::detail::is_qualified_integral_operator<T1>
-   STRICT_CPP_INLINE STRICT_CPP_CONSTEXPR T1& operator&=(T1& t1, const T2& t2) STRICT_CPP_NOEXCEPT {
-      t1.value &= static_cast<typename T1::type>(t2);
-      return t1;
+   template <typename Left, typename Right>
+      requires STRICT_CPP_NAMESPACE::detail::is_qualified_integral_operator<Left>
+   STRICT_CPP_INLINE STRICT_CPP_CONSTEXPR Left& operator&=(Left& left, const Right& right) STRICT_CPP_NOEXCEPT {
+      left.value &= static_cast<typename Left::type>(right.value);
+      return left;
    }
 
-   template <typename T1, typename T2>
-      requires STRICT_CPP_NAMESPACE::detail::is_qualified_integral_operator<T1>
-   STRICT_CPP_INLINE STRICT_CPP_CONSTEXPR T1& operator|=(T1& t1, const T2& t2) STRICT_CPP_NOEXCEPT {
-      t1.value |= static_cast<typename T1::type>(t2);
-      return t1;
+   template <typename Left, typename Right>
+      requires STRICT_CPP_NAMESPACE::detail::is_qualified_integral_operator<Left>
+   STRICT_CPP_INLINE STRICT_CPP_CONSTEXPR Left& operator|=(Left& left, const Right& right) STRICT_CPP_NOEXCEPT {
+      left.value |= static_cast<typename Left::type>(right.value);
+      return left;
    }
 
-   template <typename T1, typename T2>
-      requires STRICT_CPP_NAMESPACE::detail::is_qualified_integral_operator<T1>
-   STRICT_CPP_INLINE STRICT_CPP_CONSTEXPR T1& operator^=(T1& t1, const T2& t2) STRICT_CPP_NOEXCEPT {
-      t1.value ^= static_cast<typename T1::type>(t2);
-      return t1;
+   template <typename Left, typename Right>
+      requires STRICT_CPP_NAMESPACE::detail::is_qualified_integral_operator<Left>
+   STRICT_CPP_INLINE STRICT_CPP_CONSTEXPR Left& operator^=(Left& left, const Right& right) STRICT_CPP_NOEXCEPT {
+      left.value ^= static_cast<typename Left::type>(right.value);
+      return left;
    }
 
-   template <typename T1, typename T2>
-      requires STRICT_CPP_NAMESPACE::detail::is_qualified_integral_operator<T1>
-   STRICT_CPP_INLINE STRICT_CPP_CONSTEXPR T1& operator<<=(T1& t1, const T2& t2) STRICT_CPP_NOEXCEPT {
-      t1.value <<= static_cast<typename T1::type>(t2);
-      return t1;
+   template <typename Left, typename Right>
+      requires STRICT_CPP_NAMESPACE::detail::is_qualified_integral_operator<Left>
+   STRICT_CPP_INLINE STRICT_CPP_CONSTEXPR Left& operator<<=(Left& left, const Right& right) STRICT_CPP_NOEXCEPT {
+      left.value <<= static_cast<typename Left::type>(right.value);
+      return left;
    }
 
-   template <typename T1, typename T2>
-      requires STRICT_CPP_NAMESPACE::detail::is_qualified_integral_operator<T1>
-   STRICT_CPP_INLINE STRICT_CPP_CONSTEXPR T1& operator>>=(T1& t1, const T2& t2) STRICT_CPP_NOEXCEPT {
-      t1.value >>= static_cast<typename T1::type>(t2);
-      return t1;
+   template <typename Left, typename Right>
+      requires STRICT_CPP_NAMESPACE::detail::is_qualified_integral_operator<Left>
+   STRICT_CPP_INLINE STRICT_CPP_CONSTEXPR Left& operator>>=(Left& left, const Right& right) STRICT_CPP_NOEXCEPT {
+      left.value >>= static_cast<typename Left::type>(right.value);
+      return left;
    }
 
    // ==========================================================================
    // Float-only operators
    // ==========================================================================
 
-   template <typename T1, typename T2>
-      requires STRICT_CPP_NAMESPACE::detail::is_qualified_float_operator<T1, T2>
-   STRICT_CPP_INLINE STRICT_CPP_CONSTEXPR auto operator%(const T1& t1, const T2& t2) STRICT_CPP_NOEXCEPT {
-      if constexpr (__cplusplus >= 202207L) return STRICT_CPP_NAMESPACE::detail::convert_implicit_value<T1, T2>(std::fmod(t1, t2));
-      else return STRICT_CPP_NAMESPACE::detail::convert_implicit_value<T1, T2>(std::fmodl(t1, t2));
+   template <typename Left, typename Right>
+      requires STRICT_CPP_NAMESPACE::detail::is_qualified_float_operator<Left, Right>
+   STRICT_CPP_INLINE STRICT_CPP_CONSTEXPR Left operator%(const Left& left, const Right& right) STRICT_CPP_NOEXCEPT {
+      if constexpr (__cplusplus >= 202207L) return static_cast<Left>(std::fmod(left.value, right.value));
+      else return static_cast<Left>(std::fmodl(left.value, right.value));
    }
 
-   template <typename T1, typename T2>
-      requires STRICT_CPP_NAMESPACE::detail::is_qualified_float_operator<T1>
-   STRICT_CPP_INLINE STRICT_CPP_CONSTEXPR T1& operator%=(T1& t1, const T2& t2) STRICT_CPP_NOEXCEPT {
-      if constexpr (__cplusplus >= 202207L) t1.value = std::fmod(t1.value, t2);
-      else t1.value = std::fmodl(t1.value, t2);
+   template <typename Left, typename Right>
+      requires STRICT_CPP_NAMESPACE::detail::is_qualified_float_operator<Left>
+   STRICT_CPP_INLINE STRICT_CPP_CONSTEXPR Left& operator%=(Left& left, const Right& right) STRICT_CPP_NOEXCEPT {
+      if constexpr (__cplusplus >= 202207L) left.value = static_cast<typename Left::type>(std::fmod(left.value, right.value));
+      else left.value = static_cast<typename Left::type>(std::fmodl(left.value, right.value));
 
-      return t1;
+      return left;
    }
 }
 
@@ -299,12 +291,19 @@ namespace STRICT_CPP_NAMESPACE {
          STRICT_CPP_INLINE STRICT_CPP_CONSTEXPR STRICT_CPP_TYPE() STRICT_CPP_NOEXCEPT = default;                                                                                   \
                                                                                                                                                                                    \
          template <typename Other>                                                                                                                                                 \
-            requires STRICT_CPP_NAMESPACE::detail::is_qualified_constructor<STRICT_CPP_TYPE, T, Other>                                                                             \
+            requires STRICT_CPP_NAMESPACE::detail::is_qualified_implicit_constructor<T, Other>                                                                                     \
          STRICT_CPP_INLINE STRICT_CPP_CONSTEXPR STRICT_CPP_TYPE(const Other& other) STRICT_CPP_NOEXCEPT : value(static_cast<T>(other)) { }                                         \
                                                                                                                                                                                    \
          template <typename Other>                                                                                                                                                 \
             requires STRICT_CPP_NAMESPACE::detail::is_qualified_explicit_constructor<STRICT_CPP_TYPE, T, Other>                                                                    \
          STRICT_CPP_INLINE STRICT_CPP_CONSTEXPR explicit STRICT_CPP_TYPE(const Other& other) STRICT_CPP_NOEXCEPT : value(static_cast<T>(other)) { }                                \
+                                                                                                                                                                                   \
+         template <typename Other>                                                                                                                                                 \
+            requires STRICT_CPP_NAMESPACE::detail::is_qualified_integral_operator<STRICT_CPP_TYPE, Other>                                                                          \
+         STRICT_CPP_INLINE STRICT_CPP_CONSTEXPR STRICT_CPP_TYPE& operator=(const Other& other) STRICT_CPP_NOEXCEPT {                                                               \
+            this->value = other.value;                                                                                                                                             \
+            return *this;                                                                                                                                                          \
+         }                                                                                                                                                                         \
                                                                                                                                                                                    \
          STRICT_CPP_INLINE STRICT_CPP_CONSTEXPR operator T() const STRICT_CPP_NOEXCEPT { return this->value; }                                                                     \
          STRICT_CPP_INLINE                      operator std::string() const { return to_string(); }                                                                               \
@@ -337,12 +336,19 @@ namespace STRICT_CPP_NAMESPACE {
          STRICT_CPP_INLINE STRICT_CPP_CONSTEXPR STRICT_CPP_TYPE() STRICT_CPP_NOEXCEPT = default;                                                                                   \
                                                                                                                                                                                    \
          template <typename Other>                                                                                                                                                 \
-            requires STRICT_CPP_NAMESPACE::detail::is_qualified_constructor<STRICT_CPP_TYPE, T, Other>                                                                             \
+            requires STRICT_CPP_NAMESPACE::detail::is_qualified_implicit_constructor<T, Other>                                                                                     \
          STRICT_CPP_INLINE STRICT_CPP_CONSTEXPR STRICT_CPP_TYPE(const Other& other) STRICT_CPP_NOEXCEPT : value(static_cast<T>(other)) { }                                         \
                                                                                                                                                                                    \
          template <typename Other>                                                                                                                                                 \
             requires STRICT_CPP_NAMESPACE::detail::is_qualified_explicit_constructor<STRICT_CPP_TYPE, T, Other>                                                                    \
          STRICT_CPP_INLINE STRICT_CPP_CONSTEXPR explicit STRICT_CPP_TYPE(const Other& other) STRICT_CPP_NOEXCEPT : value(static_cast<T>(other)) { }                                \
+                                                                                                                                                                                   \
+         template <typename Other>                                                                                                                                                 \
+            requires STRICT_CPP_NAMESPACE::detail::is_qualified_float_operator<STRICT_CPP_TYPE, Other>                                                                             \
+         STRICT_CPP_INLINE STRICT_CPP_CONSTEXPR STRICT_CPP_TYPE& operator=(const Other& other) STRICT_CPP_NOEXCEPT {                                                               \
+            this->value = other.value;                                                                                                                                             \
+            return *this;                                                                                                                                                          \
+         }                                                                                                                                                                         \
                                                                                                                                                                                    \
          STRICT_CPP_INLINE STRICT_CPP_CONSTEXPR operator T() const STRICT_CPP_NOEXCEPT { return this->value; }                                                                     \
          STRICT_CPP_INLINE                      operator std::string() const { return to_string(); }                                                                               \

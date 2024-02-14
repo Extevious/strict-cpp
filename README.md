@@ -50,11 +50,9 @@ Reduce ambiguity between methods and operators by using types provided by strict
    [wrap-git]
    url = https://github.com/Extevious/strict-cpp
    revision = head
-   depth = 1
-   clone-recursive = true
 
    [provide]
-   strict_cpp = strict_cpp_dep
+   strict_cpp = strict_cpp_dependency
 ```
 
 2. In your `meson.build` file, implement the following example:
@@ -67,13 +65,13 @@ Reduce ambiguity between methods and operators by using types provided by strict
    # the name of the subproject is the same as the filename.
    strict_cpp_subproject = subproject('strict-cpp')
 
-   # strict_cpp_dep is provided by strict-cpp in the meson.build file.
-   dependencies += strict_cpp_subproject.get_variable('strict_cpp_dep')
+   # strict_cpp_dependency is provided by strict-cpp in the meson.build file.
+   dependencies += strict_cpp_subproject.get_variable('strict_cpp_dependency')
 
    ...
 
    # Example executable.
-   executable('MyProject', 'main.cpp', dependencies : strict_cpp_dep)
+   executable('MyProject', 'main.cpp', dependencies : strict_cpp_dependency)
 ```
 
 3. `strict-cpp.hpp` should be available once your project has been updated.
@@ -84,13 +82,7 @@ Reduce ambiguity between methods and operators by using types provided by strict
 
 ```cpp
 // Default namespace name.
-#define STRICT_CPP_NAMESPACE      strict
-
-// Name of the namespace as a string.
-#define STRICT_CPP_NAMESPACE_STR  "strict"
-
-// Name of the namespace as a wstring.
-#define STRICT_CPP_NAMESPACE_WSTR L"strict"
+#define STRICT_CPP_NAMESPACE strict
 
 // Expose optional pre-defined types.
 #define STRICT_CPP_OPTIONAL_TYPES
@@ -268,8 +260,8 @@ dst_offset64_t       (std::uint64_t)
 * Add more types.
 * Aligned types.
 * Create types that are not arithmetic-based.
-* Implement support for older versions of C++.
+* Maybe implement support for older versions of C++.
 * Tests.
 * Verify cross-platform support.
-* Support for [C++20 modules](https://en.cppreference.com/w/cpp/language/modules).
+* Implement support for [C++20 modules](https://en.cppreference.com/w/cpp/language/modules).
 * ???

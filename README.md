@@ -26,15 +26,15 @@ Reduce ambiguity between methods and operators by using types provided by strict
 
    // === If only the add() methods #1 and #2 existed ===
    //
-   add(5, 6); // This would call add() #2 as expected.
-   add(5U, 6); // This would also call add() #2 due to the 2nd argument qualifying.
-   add(5U, 6U); // But this is ambiguous between #1 and #2.
+   add(5, 6);   // This would call add() #2 as expected.
+   add(5U, 6);  // This would also call add() #2 because of the 2nd argument qualifying.
+   add(5U, 6U); // However this add() is ambiguous between #1 and #2.
 
    // === ...but if only the strict-type add() methods #3 and #4 existed ===
    //
-   add(5, 6); // This would call add() #4 as expected.
-   add(5U, 6); // This would fail due to no implicit conversion available for the first argument.
-   add(5U, 6U);  // This would fail due to no implicit conversion available for both arguments.
+   add(5, 6);   // This would call add() #4 as expected.
+   add(5U, 6);  // This would fail due to no implicit conversion available for the first argument.
+   add(5U, 6U); // This would fail due to no implicit conversion available for both arguments.
 ```
 
 ## How to include in your projects
@@ -52,26 +52,32 @@ Reduce ambiguity between methods and operators by using types provided by strict
    revision = head
 
    [provide]
-   strict_cpp = strict_cpp_dependency
+   strict-cpp = strict_cpp_dependency
 ```
 
 2. In your `meson.build` file, implement the following example:
 
 ```cmake
-   # Your dependencies array.
-   dependencies = []
-   
-   ...
-   # the name of the subproject is the same as the filename.
-   strict_cpp_subproject = subproject('strict-cpp')
+    # Your dependencies array.
+    dependencies = []
 
-   # strict_cpp_dependency is provided by strict-cpp in the meson.build file.
-   dependencies += strict_cpp_subproject.get_variable('strict_cpp_dependency')
+    ...
 
-   ...
+    # The name of the subproject is the same as the filename.
+    strict_cpp_subproject = subproject('strict-cpp')
 
-   # Example executable.
-   executable('MyProject', 'main.cpp', dependencies : strict_cpp_dependency)
+    # Same as the name [provide] exposes in the .wrap file.
+    dependencies += dependency('strict-cpp')
+    #
+    # Or...
+    #
+    # strict_cpp_dependency is provided by strict-cpp meson.build file.
+    dependencies += strict_cpp_subproject.get_variable('strict_cpp_dependency')
+
+    ...
+
+    # Example executable.
+    executable('MyProject', 'main.cpp', dependencies : strict_cpp_dependency)
 ```
 
 3. `strict-cpp.hpp` should be available once your project has been updated.

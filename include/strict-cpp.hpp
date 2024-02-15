@@ -91,10 +91,10 @@ namespace STRICT_CPP_NAMESPACE {
       concept is_qualified_float_operator = (is_float_base_compliant<Types> && ...);
 
       template <typename Left, typename Right>
-      concept is_qualified_float_operator_left_only = (is_qualified_float_operator<Left> && is_scalar_compliant<Right>);
+      concept is_qualified_float_operator_left_only = (is_qualified_float_operator<Left> && (std::is_arithmetic_v<Right> || is_qualified_integral_operator<Right>));
 
       template <typename Left, typename Right>
-      concept is_qualified_float_operator_right_only = (is_qualified_float_operator<Right> && is_scalar_compliant<Left>);
+      concept is_qualified_float_operator_right_only = (is_qualified_float_operator<Right> && (std::is_arithmetic_v<Left> || is_qualified_integral_operator<Left>));
    }
 
 #define STRICT_CPP_DEFINE_FLOAT_OPERATOR(OPERATOR_TYPE)                                                                                                                            \

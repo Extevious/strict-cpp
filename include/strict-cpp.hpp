@@ -37,6 +37,12 @@ namespace STRICT_CPP_NAMESPACE {
       template <typename Derived>
       concept is_base_compliant = std::is_base_of_v<strict_cpp_base_t, Derived>;
 
+      template <typename T>
+      concept is_scalar_compliant = std::is_scalar_v<T>;
+
+      template <typename T>
+      concept is_float_compliant = std::is_floating_point_v<T>;
+
       template <typename Derived>
       concept is_float_base_compliant = std::is_base_of_v<strict_cpp_float_base_t, Derived>;
 
@@ -61,91 +67,113 @@ namespace STRICT_CPP_NAMESPACE {
       concept is_qualified_implicit_constructor = is_qualified_type<Left, Right>;
 
       template <typename Derived, typename T, typename Other>
-      concept is_qualified_explicit_constructor = (is_explicit_conversion_compliant<T, Other> || is_base_compliant<Derived>)&&!is_qualified_implicit_constructor<T, Other>;
+      concept is_qualified_explicit_constructor = (is_explicit_conversion_compliant<T, Other> || is_base_compliant<Derived>)&&(!is_qualified_implicit_constructor<T, Other>);
 
       template <typename... Types>
       concept is_qualified_operator = (is_base_compliant<Types> && ...);
 
+      template <typename Left, typename Right>
+      concept is_qualified_operator_left_only = (is_qualified_operator<Left> && is_scalar_compliant<Right>);
+
+      template <typename Left, typename Right>
+      concept is_qualified_operator_right_only = (is_qualified_operator<Right> && is_scalar_compliant<Left>);
+
       template <typename... Types>
       concept is_qualified_integral_operator = (is_integral_base_compliant<Types> && ...);
 
+      template <typename Left, typename Right>
+      concept is_qualified_integral_operator_left_only = (is_qualified_integral_operator<Left> && is_scalar_compliant<Right> && !is_float_compliant<Right>);
+
+      template <typename Left, typename Right>
+      concept is_qualified_integral_operator_right_only = (is_qualified_integral_operator<Right> && is_scalar_compliant<Left> && !is_float_compliant<Left>);
+
       template <typename... Types>
       concept is_qualified_float_operator = (is_float_base_compliant<Types> && ...);
+
+      template <typename Left, typename Right>
+      concept is_qualified_float_operator_left_only = (is_qualified_float_operator<Left> && is_scalar_compliant<Right>);
+
+      template <typename Left, typename Right>
+      concept is_qualified_float_operator_right_only = (is_qualified_float_operator<Right> && is_scalar_compliant<Left>);
+   }
+
+#define STRICT_CPP_DEFINE_FLOAT_OPERATOR(OPERATOR_TYPE)                                                                                                                            \
+   template <typename Left, typename Right>                                                                                                                                        \
+      requires STRICT_CPP_NAMESPACE::detail::is_qualified_float_operator<Left, Right>                                                                                              \
+   STRICT_CPP_INLINE STRICT_CPP_CONSTEXPR Left operator OPERATOR_TYPE(const Left& left, const Right& right) STRICT_CPP_NOEXCEPT {                                                  \
+      return static_cast<Left>(left.value OPERATOR_TYPE right.value);                                                                                                              \
+   }                                                                                                                                                                               \
+   template <typename Left, typename Right>                                                                                                                                        \
+      requires STRICT_CPP_NAMESPACE::detail::is_qualified_float_operator_left_only<Left, Right>                                                                                    \
+   STRICT_CPP_INLINE STRICT_CPP_CONSTEXPR Left operator OPERATOR_TYPE(const Left& left, const Right& right) STRICT_CPP_NOEXCEPT {                                                  \
+      return static_cast<Left>(left.value OPERATOR_TYPE right);                                                                                                                    \
+   }                                                                                                                                                                               \
+   template <typename Left, typename Right>                                                                                                                                        \
+      requires STRICT_CPP_NAMESPACE::detail::is_qualified_float_operator_right_only<Left, Right>                                                                                   \
+   STRICT_CPP_INLINE STRICT_CPP_CONSTEXPR Left operator OPERATOR_TYPE(const Left& left, const Right& right) STRICT_CPP_NOEXCEPT {                                                  \
+      return static_cast<Left>(left OPERATOR_TYPE right.value);                                                                                                                    \
+   }
+
+#define STRICT_CPP_DEFINE_COMPOUND_FLOAT_OPERATOR(OPERATOR_TYPE)                                                                                                                   \
+   template <typename Left, typename Right>                                                                                                                                        \
+      requires STRICT_CPP_NAMESPACE::detail::is_qualified_float_operator<Left, Right>                                                                                              \
+   STRICT_CPP_INLINE STRICT_CPP_CONSTEXPR Left& operator OPERATOR_TYPE(Left & left, const Right & right) STRICT_CPP_NOEXCEPT {                                                     \
+      left.value OPERATOR_TYPE right.value;                                                                                                                                        \
+      return left;                                                                                                                                                                 \
+   }                                                                                                                                                                               \
+   template <typename Left, typename Right>                                                                                                                                        \
+      requires STRICT_CPP_NAMESPACE::detail::is_qualified_float_operator_left_only<Left, Right>                                                                                    \
+   STRICT_CPP_INLINE STRICT_CPP_CONSTEXPR Left& operator OPERATOR_TYPE(Left & left, const Right & right) STRICT_CPP_NOEXCEPT {                                                     \
+      left.value OPERATOR_TYPE right;                                                                                                                                              \
+      return left;                                                                                                                                                                 \
+   }                                                                                                                                                                               \
+   template <typename Left, typename Right>                                                                                                                                        \
+      requires STRICT_CPP_NAMESPACE::detail::is_qualified_float_operator_right_only<Left, Right>                                                                                   \
+   STRICT_CPP_INLINE STRICT_CPP_CONSTEXPR Left& operator OPERATOR_TYPE(Left & left, const Right & right) STRICT_CPP_NOEXCEPT {                                                     \
+      left OPERATOR_TYPE right.value;                                                                                                                                              \
+      return left;                                                                                                                                                                 \
+   }
+
+#define STRICT_CPP_DEFINE_INTEGRAL_OPERATOR(OPERATOR_TYPE)                                                                                                                         \
+   template <typename Left, typename Right>                                                                                                                                        \
+      requires STRICT_CPP_NAMESPACE::detail::is_qualified_integral_operator<Left, Right>                                                                                           \
+   STRICT_CPP_INLINE STRICT_CPP_CONSTEXPR Left operator OPERATOR_TYPE(const Left& left, const Right& right) STRICT_CPP_NOEXCEPT {                                                  \
+      return static_cast<Left>(left.value OPERATOR_TYPE right.value);                                                                                                              \
+   }                                                                                                                                                                               \
+   template <typename Left, typename Right>                                                                                                                                        \
+      requires STRICT_CPP_NAMESPACE::detail::is_qualified_integral_operator_left_only<Left, Right>                                                                                 \
+   STRICT_CPP_INLINE STRICT_CPP_CONSTEXPR Left operator OPERATOR_TYPE(const Left& left, const Right& right) STRICT_CPP_NOEXCEPT {                                                  \
+      return static_cast<Left>(left.value OPERATOR_TYPE right);                                                                                                                    \
+   }                                                                                                                                                                               \
+   template <typename Left, typename Right>                                                                                                                                        \
+      requires STRICT_CPP_NAMESPACE::detail::is_qualified_integral_operator_right_only<Left, Right>                                                                                \
+   STRICT_CPP_INLINE STRICT_CPP_CONSTEXPR Left operator OPERATOR_TYPE(const Left& left, const Right& right) STRICT_CPP_NOEXCEPT {                                                  \
+      return static_cast<Left>(left OPERATOR_TYPE right.value);                                                                                                                    \
+   }
+
+#define STRICT_CPP_DEFINE_COMPOUND_INTEGRAL_OPERATOR(OPERATOR_TYPE)                                                                                                                \
+   template <typename Left, typename Right>                                                                                                                                        \
+      requires STRICT_CPP_NAMESPACE::detail::is_qualified_integral_operator<Left, Right>                                                                                           \
+   STRICT_CPP_INLINE STRICT_CPP_CONSTEXPR Left& operator OPERATOR_TYPE(Left & left, const Right & right) STRICT_CPP_NOEXCEPT {                                                     \
+      left.value OPERATOR_TYPE right.value;                                                                                                                                        \
+      return left;                                                                                                                                                                 \
+   }                                                                                                                                                                               \
+   template <typename Left, typename Right>                                                                                                                                        \
+      requires STRICT_CPP_NAMESPACE::detail::is_qualified_integral_operator_left_only<Left, Right>                                                                                 \
+   STRICT_CPP_INLINE STRICT_CPP_CONSTEXPR Left& operator OPERATOR_TYPE(Left & left, const Right & right) STRICT_CPP_NOEXCEPT {                                                     \
+      left.value OPERATOR_TYPE right;                                                                                                                                              \
+      return left;                                                                                                                                                                 \
+   }                                                                                                                                                                               \
+   template <typename Left, typename Right>                                                                                                                                        \
+      requires STRICT_CPP_NAMESPACE::detail::is_qualified_integral_operator_right_only<Left, Right>                                                                                \
+   STRICT_CPP_INLINE STRICT_CPP_CONSTEXPR Left& operator OPERATOR_TYPE(Left & left, const Right & right) STRICT_CPP_NOEXCEPT {                                                     \
+      left OPERATOR_TYPE right.value;                                                                                                                                              \
+      return left;                                                                                                                                                                 \
    }
 
    // =============================================================================
    // Operators for both integral and floating-point types
    // =============================================================================
-
-   template <typename Left, typename Right>
-      requires STRICT_CPP_NAMESPACE::detail::is_qualified_operator<Left, Right>
-   STRICT_CPP_INLINE STRICT_CPP_CONSTEXPR auto operator<=>(const Left& left, const Right& right) STRICT_CPP_NOEXCEPT {
-      return left.value <=> right.value;
-   }
-
-   template <typename T>
-      requires STRICT_CPP_NAMESPACE::detail::is_qualified_operator<T>
-   STRICT_CPP_INLINE STRICT_CPP_CONSTEXPR T operator+(const T& t) STRICT_CPP_NOEXCEPT {
-      return static_cast<T>(+t.value);
-   }
-
-   template <typename T>
-      requires STRICT_CPP_NAMESPACE::detail::is_qualified_operator<T>
-   STRICT_CPP_INLINE STRICT_CPP_CONSTEXPR T operator-(const T& t) STRICT_CPP_NOEXCEPT {
-      return static_cast<T>(-t.value);
-   }
-
-   template <typename Left, typename Right>
-      requires STRICT_CPP_NAMESPACE::detail::is_qualified_operator<Left, Right>
-   STRICT_CPP_INLINE STRICT_CPP_CONSTEXPR Left operator+(const Left& left, const Right& right) STRICT_CPP_NOEXCEPT {
-      return static_cast<Left>(left.value + static_cast<typename Left::type>(right.value));
-   }
-
-   template <typename Left, typename Right>
-      requires STRICT_CPP_NAMESPACE::detail::is_qualified_operator<Left, Right>
-   STRICT_CPP_INLINE STRICT_CPP_CONSTEXPR Left operator-(const Left& left, const Right& right) STRICT_CPP_NOEXCEPT {
-      return static_cast<Left>(left.value - static_cast<typename Left::type>(right.value));
-   }
-
-   template <typename Left, typename Right>
-      requires STRICT_CPP_NAMESPACE::detail::is_qualified_operator<Left, Right>
-   STRICT_CPP_INLINE STRICT_CPP_CONSTEXPR Left operator*(const Left& left, const Right& right) STRICT_CPP_NOEXCEPT {
-      return static_cast<Left>(left.value * static_cast<typename Left::type>(right.value));
-   }
-
-   template <typename Left, typename Right>
-      requires STRICT_CPP_NAMESPACE::detail::is_qualified_operator<Left, Right>
-   STRICT_CPP_INLINE STRICT_CPP_CONSTEXPR Left operator/(const Left& left, const Right& right) STRICT_CPP_NOEXCEPT {
-      return static_cast<Left>(left.value / static_cast<typename Left::type>(right.value));
-   }
-
-   template <typename Left, typename Right>
-      requires STRICT_CPP_NAMESPACE::detail::is_qualified_operator<Left>
-   STRICT_CPP_INLINE STRICT_CPP_CONSTEXPR Left& operator+=(Left& left, const Right& right) STRICT_CPP_NOEXCEPT {
-      left.value += static_cast<typename Left::type>(right);
-      return left;
-   }
-
-   template <typename Left, typename Right>
-      requires STRICT_CPP_NAMESPACE::detail::is_qualified_operator<Left>
-   STRICT_CPP_INLINE STRICT_CPP_CONSTEXPR Left& operator-=(Left& left, const Right& right) STRICT_CPP_NOEXCEPT {
-      left.value -= static_cast<typename Left::type>(right);
-      return left;
-   }
-
-   template <typename Left, typename Right>
-      requires STRICT_CPP_NAMESPACE::detail::is_qualified_operator<Left>
-   STRICT_CPP_INLINE STRICT_CPP_CONSTEXPR Left& operator*=(Left& left, const Right& right) STRICT_CPP_NOEXCEPT {
-      left.value *= static_cast<typename Left::type>(right);
-      return left;
-   }
-
-   template <typename Left, typename Right>
-      requires STRICT_CPP_NAMESPACE::detail::is_qualified_operator<Left>
-   STRICT_CPP_INLINE STRICT_CPP_CONSTEXPR Left& operator/=(Left& left, const Right& right) STRICT_CPP_NOEXCEPT {
-      left.value /= static_cast<typename Left::type>(right);
-      return left;
-   }
 
    template <typename T>
       requires STRICT_CPP_NAMESPACE::detail::is_qualified_operator<T>
@@ -171,6 +199,24 @@ namespace STRICT_CPP_NAMESPACE {
       return static_cast<T>(value.value++);
    }
 
+   template <typename Left, typename Right>
+      requires strict::detail::is_qualified_operator<Left, Right>
+   inline constexpr auto operator<=>(const Left& left, const Right& right) noexcept {
+      return left.value <=> right.value;
+   }
+
+   template <typename Left, typename Right>
+      requires strict::detail::is_qualified_operator_left_only<Left, Right>
+   inline constexpr auto operator<=>(const Left& left, const Right& right) noexcept {
+      return left.value <=> right;
+   }
+
+   template <typename Left, typename Right>
+      requires strict::detail::is_qualified_operator_right_only<Left, Right>
+   inline constexpr auto operator<=>(const Left& left, const Right& right) noexcept {
+      return left <=> right.value;
+   }
+
    // ==========================================================================
    // Integral-only operators
    // ==========================================================================
@@ -181,83 +227,27 @@ namespace STRICT_CPP_NAMESPACE {
       return static_cast<T>(~value.value);
    }
 
-   template <typename Left, typename Right>
-      requires STRICT_CPP_NAMESPACE::detail::is_qualified_integral_operator<Left, Right>
-   STRICT_CPP_INLINE STRICT_CPP_CONSTEXPR Left operator&(const Left& left, const Right& right) STRICT_CPP_NOEXCEPT {
-      return left.value & static_cast<typename Left::type>(right);
-   }
+   STRICT_CPP_DEFINE_INTEGRAL_OPERATOR(+)
+   STRICT_CPP_DEFINE_INTEGRAL_OPERATOR(-)
+   STRICT_CPP_DEFINE_INTEGRAL_OPERATOR(*)
+   STRICT_CPP_DEFINE_INTEGRAL_OPERATOR(/)
+   STRICT_CPP_DEFINE_INTEGRAL_OPERATOR(&)
+   STRICT_CPP_DEFINE_INTEGRAL_OPERATOR(%)
+   STRICT_CPP_DEFINE_INTEGRAL_OPERATOR(|)
+   STRICT_CPP_DEFINE_INTEGRAL_OPERATOR(^)
+   STRICT_CPP_DEFINE_INTEGRAL_OPERATOR(>>)
+   STRICT_CPP_DEFINE_INTEGRAL_OPERATOR(<<)
 
-   template <typename Left, typename Right>
-      requires STRICT_CPP_NAMESPACE::detail::is_qualified_integral_operator<Left, Right>
-   STRICT_CPP_INLINE STRICT_CPP_CONSTEXPR Left operator%(const Left& left, const Right& right) STRICT_CPP_NOEXCEPT {
-      return left.value % static_cast<typename Left::type>(right);
-   }
-
-   template <typename Left, typename Right>
-      requires STRICT_CPP_NAMESPACE::detail::is_qualified_integral_operator<Left, Right>
-   STRICT_CPP_INLINE STRICT_CPP_CONSTEXPR Left operator|(const Left& left, const Right& right) STRICT_CPP_NOEXCEPT {
-      return left.value | static_cast<typename Left::type>(right);
-   }
-
-   template <typename Left, typename Right>
-      requires STRICT_CPP_NAMESPACE::detail::is_qualified_integral_operator<Left, Right>
-   STRICT_CPP_INLINE STRICT_CPP_CONSTEXPR Left operator^(const Left& left, const Right& right) STRICT_CPP_NOEXCEPT {
-      return left.value ^ static_cast<typename Left::type>(right);
-   }
-
-   template <typename Left, typename Right>
-      requires STRICT_CPP_NAMESPACE::detail::is_qualified_integral_operator<Left, Right>
-   STRICT_CPP_INLINE STRICT_CPP_CONSTEXPR Left operator<<(const Left& left, const Right& right) STRICT_CPP_NOEXCEPT {
-      return left.value << static_cast<typename Left::type>(right);
-   }
-
-   template <typename Left, typename Right>
-      requires STRICT_CPP_NAMESPACE::detail::is_qualified_integral_operator<Left, Right>
-   STRICT_CPP_INLINE STRICT_CPP_CONSTEXPR Left operator>>(const Left& left, const Right& right) STRICT_CPP_NOEXCEPT {
-      return left.value >> static_cast<typename Left::type>(right);
-   }
-
-   template <typename Left, typename Right>
-      requires STRICT_CPP_NAMESPACE::detail::is_qualified_integral_operator<Left>
-   STRICT_CPP_INLINE STRICT_CPP_CONSTEXPR Left& operator%=(Left& left, const Right& right) STRICT_CPP_NOEXCEPT {
-      left.value %= static_cast<typename Left::type>(right);
-      return left;
-   }
-
-   template <typename Left, typename Right>
-      requires STRICT_CPP_NAMESPACE::detail::is_qualified_integral_operator<Left>
-   STRICT_CPP_INLINE STRICT_CPP_CONSTEXPR Left& operator&=(Left& left, const Right& right) STRICT_CPP_NOEXCEPT {
-      left.value &= static_cast<typename Left::type>(right);
-      return left;
-   }
-
-   template <typename Left, typename Right>
-      requires STRICT_CPP_NAMESPACE::detail::is_qualified_integral_operator<Left>
-   STRICT_CPP_INLINE STRICT_CPP_CONSTEXPR Left& operator|=(Left& left, const Right& right) STRICT_CPP_NOEXCEPT {
-      left.value |= static_cast<typename Left::type>(right);
-      return left;
-   }
-
-   template <typename Left, typename Right>
-      requires STRICT_CPP_NAMESPACE::detail::is_qualified_integral_operator<Left>
-   STRICT_CPP_INLINE STRICT_CPP_CONSTEXPR Left& operator^=(Left& left, const Right& right) STRICT_CPP_NOEXCEPT {
-      left.value ^= static_cast<typename Left::type>(right);
-      return left;
-   }
-
-   template <typename Left, typename Right>
-      requires STRICT_CPP_NAMESPACE::detail::is_qualified_integral_operator<Left>
-   STRICT_CPP_INLINE STRICT_CPP_CONSTEXPR Left& operator<<=(Left& left, const Right& right) STRICT_CPP_NOEXCEPT {
-      left.value <<= static_cast<typename Left::type>(right);
-      return left;
-   }
-
-   template <typename Left, typename Right>
-      requires STRICT_CPP_NAMESPACE::detail::is_qualified_integral_operator<Left>
-   STRICT_CPP_INLINE STRICT_CPP_CONSTEXPR Left& operator>>=(Left& left, const Right& right) STRICT_CPP_NOEXCEPT {
-      left.value >>= static_cast<typename Left::type>(right);
-      return left;
-   }
+   STRICT_CPP_DEFINE_COMPOUND_INTEGRAL_OPERATOR(+=)
+   STRICT_CPP_DEFINE_COMPOUND_INTEGRAL_OPERATOR(-=)
+   STRICT_CPP_DEFINE_COMPOUND_INTEGRAL_OPERATOR(*=)
+   STRICT_CPP_DEFINE_COMPOUND_INTEGRAL_OPERATOR(/=)
+   STRICT_CPP_DEFINE_COMPOUND_INTEGRAL_OPERATOR(&=)
+   STRICT_CPP_DEFINE_COMPOUND_INTEGRAL_OPERATOR(%=)
+   STRICT_CPP_DEFINE_COMPOUND_INTEGRAL_OPERATOR(|=)
+   STRICT_CPP_DEFINE_COMPOUND_INTEGRAL_OPERATOR(^=)
+   STRICT_CPP_DEFINE_COMPOUND_INTEGRAL_OPERATOR(>>=)
+   STRICT_CPP_DEFINE_COMPOUND_INTEGRAL_OPERATOR(<<=)
 
    // ==========================================================================
    // Float-only operators
@@ -266,18 +256,60 @@ namespace STRICT_CPP_NAMESPACE {
    template <typename Left, typename Right>
       requires STRICT_CPP_NAMESPACE::detail::is_qualified_float_operator<Left, Right>
    STRICT_CPP_INLINE STRICT_CPP_CONSTEXPR Left operator%(const Left& left, const Right& right) STRICT_CPP_NOEXCEPT {
-      if constexpr (__cplusplus >= 202207L) return static_cast<Left>(std::fmod(left.value, static_cast<typename Left::type>(right.value)));
-      else return static_cast<Left>(std::fmodl(left.value, static_cast<typename Left::type>(right.value)));
+      if constexpr (__cplusplus >= 202207L) return static_cast<Left>(std::fmod(left.value, right.value));
+      else return static_cast<Left>(std::fmodl(left.value, right.value));
    }
 
    template <typename Left, typename Right>
-      requires STRICT_CPP_NAMESPACE::detail::is_qualified_float_operator<Left>
+      requires STRICT_CPP_NAMESPACE::detail::is_qualified_float_operator_left_only<Left, Right>
+   STRICT_CPP_INLINE STRICT_CPP_CONSTEXPR Left operator%(const Left& left, const Right& right) STRICT_CPP_NOEXCEPT {
+      if constexpr (__cplusplus >= 202207L) return static_cast<Left>(std::fmod(left.value, right));
+      else return static_cast<Left>(std::fmodl(left.value, right));
+   }
+
+   template <typename Left, typename Right>
+      requires STRICT_CPP_NAMESPACE::detail::is_qualified_float_operator_right_only<Left, Right>
+   STRICT_CPP_INLINE STRICT_CPP_CONSTEXPR Left operator%(const Left& left, const Right& right) STRICT_CPP_NOEXCEPT {
+      if constexpr (__cplusplus >= 202207L) return static_cast<Left>(std::fmod(left, right.value));
+      else return static_cast<Left>(std::fmodl(left, right.value));
+   }
+
+   template <typename Left, typename Right>
+      requires STRICT_CPP_NAMESPACE::detail::is_qualified_float_operator<Left, Right>
    STRICT_CPP_INLINE STRICT_CPP_CONSTEXPR Left& operator%=(Left& left, const Right& right) STRICT_CPP_NOEXCEPT {
-      if constexpr (__cplusplus >= 202207L) left.value = static_cast<typename Left::type>(std::fmod(left.value, static_cast<typename Left::type>(right.value)));
-      else left.value = static_cast<typename Left::type>(std::fmodl(left.value, static_cast<typename Left::type>(right.value)));
+      if constexpr (__cplusplus >= 202207L) left.value = static_cast<typename Left::type>(std::fmod(left.value, right.value));
+      else left.value = static_cast<typename Left::type>(std::fmodl(left.value, right.value));
 
       return left;
    }
+
+   template <typename Left, typename Right>
+      requires STRICT_CPP_NAMESPACE::detail::is_qualified_float_operator_left_only<Left, Right>
+   STRICT_CPP_INLINE STRICT_CPP_CONSTEXPR Left& operator%=(Left& left, const Right& right) STRICT_CPP_NOEXCEPT {
+      if constexpr (__cplusplus >= 202207L) left.value = static_cast<typename Left::type>(std::fmod(left.value, right));
+      else left.value = static_cast<typename Left::type>(std::fmodl(left.value, right));
+
+      return left;
+   }
+
+   template <typename Left, typename Right>
+      requires STRICT_CPP_NAMESPACE::detail::is_qualified_float_operator_right_only<Left, Right>
+   STRICT_CPP_INLINE STRICT_CPP_CONSTEXPR Left& operator%=(Left& left, const Right& right) STRICT_CPP_NOEXCEPT {
+      if constexpr (__cplusplus >= 202207L) left = static_cast<typename Left::type>(std::fmod(left, right.value));
+      else left = static_cast<typename Left::type>(std::fmodl(left, right.value));
+
+      return left;
+   }
+
+   STRICT_CPP_DEFINE_FLOAT_OPERATOR(+)
+   STRICT_CPP_DEFINE_FLOAT_OPERATOR(-)
+   STRICT_CPP_DEFINE_FLOAT_OPERATOR(*)
+   STRICT_CPP_DEFINE_FLOAT_OPERATOR(/)
+
+   STRICT_CPP_DEFINE_COMPOUND_FLOAT_OPERATOR(+=)
+   STRICT_CPP_DEFINE_COMPOUND_FLOAT_OPERATOR(-=)
+   STRICT_CPP_DEFINE_COMPOUND_FLOAT_OPERATOR(*=)
+   STRICT_CPP_DEFINE_COMPOUND_FLOAT_OPERATOR(/=)
 }
 
 #define STRICT_CPP_DEFINE_INTEGRAL_TYPE(STRICT_CPP_TYPE, T)                                                                                                                        \

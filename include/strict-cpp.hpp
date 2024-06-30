@@ -446,6 +446,9 @@ namespace STRICT_CPP_NAMESPACE {
    STRICT_CPP_DEFINE_INTEGRAL_TYPE(schar_t, signed char);
    STRICT_CPP_DEFINE_INTEGRAL_TYPE(uchar_t, unsigned char);
 
+   STRICT_CPP_DEFINE_INTEGRAL_TYPE(byte_t, unsigned char);
+   STRICT_CPP_DEFINE_INTEGRAL_TYPE(sbyte_t, signed char);
+
    // Common floating-point types:
    STRICT_CPP_DEFINE_FLOAT_TYPE(float_t, float);
    STRICT_CPP_DEFINE_FLOAT_TYPE(double_t, double);

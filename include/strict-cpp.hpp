@@ -67,7 +67,7 @@ namespace STRICT_CPP_NAMESPACE {
       concept is_qualified_implicit_constructor = is_qualified_type<Left, Right>;
 
       template <typename Derived, typename T, typename Other>
-      concept is_qualified_explicit_constructor = (is_explicit_conversion_compliant<T, Other> || is_base_compliant<Derived>)&&(!is_qualified_implicit_constructor<T, Other>);
+      concept is_qualified_explicit_constructor = (is_explicit_conversion_compliant<T, Other> || is_base_compliant<Derived>) && (!is_qualified_implicit_constructor<T, Other>);
 
       template <typename... Types>
       concept is_qualified_operator = (is_base_compliant<Types> && ...);

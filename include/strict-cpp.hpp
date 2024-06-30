@@ -338,7 +338,8 @@ namespace STRICT_CPP_NAMESPACE {
          }                                                                                                                                                                         \
                                                                                                                                                                                    \
          STRICT_CPP_INLINE STRICT_CPP_CONSTEXPR operator T() const STRICT_CPP_NOEXCEPT { return this->value; }                                                                     \
-         STRICT_CPP_INLINE                      operator std::string() const { return to_string(); }                                                                               \
+         STRICT_CPP_INLINE explicit             operator std::string() const { return this->to_string(); }                                                                         \
+         STRICT_CPP_INLINE explicit             operator std::wstring() const { return this->to_wstring(); }                                                                       \
          STRICT_CPP_INLINE std::string          to_string() const { return std::to_string(value); }                                                                                \
          STRICT_CPP_INLINE STRICT_CPP_CONSTEXPR std::string to_string_t() const STRICT_CPP_NOEXCEPT { return #T; }                                                                 \
          STRICT_CPP_INLINE STRICT_CPP_CONSTEXPR std::string to_string_n() const STRICT_CPP_NOEXCEPT { return STRICT_CPP_XSTR(STRICT_CPP_NAMESPACE) "::" #STRICT_CPP_TYPE; }        \
@@ -383,7 +384,8 @@ namespace STRICT_CPP_NAMESPACE {
          }                                                                                                                                                                         \
                                                                                                                                                                                    \
          STRICT_CPP_INLINE STRICT_CPP_CONSTEXPR operator T() const STRICT_CPP_NOEXCEPT { return this->value; }                                                                     \
-         STRICT_CPP_INLINE                      operator std::string() const { return to_string(); }                                                                               \
+         STRICT_CPP_INLINE explicit             operator std::string() const { return this->to_string(); }                                                                         \
+         STRICT_CPP_INLINE explicit             operator std::wstring() const { return this->to_wstring(); }                                                                       \
          STRICT_CPP_INLINE std::string          to_string() const { return std::to_string(value); }                                                                                \
          STRICT_CPP_INLINE STRICT_CPP_CONSTEXPR std::string to_string_t() const STRICT_CPP_NOEXCEPT { return #T; }                                                                 \
          STRICT_CPP_INLINE STRICT_CPP_CONSTEXPR std::string to_string_n() const STRICT_CPP_NOEXCEPT { return STRICT_CPP_XSTR(STRICT_CPP_NAMESPACE) "::" #STRICT_CPP_TYPE; }        \

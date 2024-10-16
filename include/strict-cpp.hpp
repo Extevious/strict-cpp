@@ -1,11 +1,5 @@
 #pragma once
 
-#define STRICT_CPP_STR(...)  #__VA_ARGS__
-#define STRICT_CPP_XSTR(...) STRICT_CPP_STR(__VA_ARGS__)
-
-#define STRICT_CPP_JOIN_STR(a, b)  a##b
-#define STRICT_CPP_JOIN_XSTR(a, b) STRICT_CPP_JOIN_STR(a, b)
-
 #if !defined(STRICT_CPP_NAMESPACE)
    #define STRICT_CPP_NAMESPACE strict
 #endif
@@ -26,10 +20,10 @@ namespace STRICT_CPP_NAMESPACE {
       struct strict_cpp_base_t { };
 
       // Base type for float-only type qualifications.
-      struct strict_cpp_float_base_t : public strict_cpp_base_t { };
+      struct strict_cpp_float_base_t { };
 
-      // Base type for int-only type qualifications.
-      struct strict_cpp_integral_base_t : public strict_cpp_base_t { };
+      // Base type for integer-only type qualifications.
+      struct strict_cpp_integral_base_t { };
 
       template <typename Type>
       concept is_integral = std::is_integral_v<Type>;
@@ -332,90 +326,93 @@ namespace STRICT_CPP_NAMESPACE {
    STRICT_CPP_DEFINE_COMPOUND_FLOAT_OPERATOR(-=)
    STRICT_CPP_DEFINE_COMPOUND_FLOAT_OPERATOR(*=)
    STRICT_CPP_DEFINE_COMPOUND_FLOAT_OPERATOR(/=)
+
+   template <typename Type>
+   struct strict_type_base : STRICT_CPP_NAMESPACE::detail::strict_cpp_base_t {
+         STRICT_CPP_INLINE STRICT_CPP_CONSTEXPR static Type min = std::numeric_limits<Type>::min();
+         STRICT_CPP_INLINE STRICT_CPP_CONSTEXPR static Type max = std::numeric_limits<Type>::max();
+
+         using type = Type;
+         Type value = {};
+
+         /// @brief Default constructor.
+         STRICT_CPP_INLINE STRICT_CPP_CONSTEXPR strict_type_base() STRICT_CPP_NOEXCEPT = default;
+
+         /// @brief Implicit constructor.
+         /// @tparam Other The implicitly-constructable type.
+         /// @param other The implicitly-constructable value.
+         template <typename Other>
+            requires STRICT_CPP_NAMESPACE::detail::is_qualified_implicit_constructor<Type, Other>
+         STRICT_CPP_INLINE STRICT_CPP_CONSTEXPR strict_type_base(const Other& other) STRICT_CPP_NOEXCEPT : value(static_cast<Type>(other)) { }
+
+         /// @brief Explicit constructor.
+         /// @tparam Other The explicitly-constructable type.
+         /// @param other The explicitly-constructable value.
+         template <typename Other>
+            requires STRICT_CPP_NAMESPACE::detail::is_qualified_explicit_constructor<Type, Other>
+         STRICT_CPP_INLINE STRICT_CPP_CONSTEXPR explicit strict_type_base(const Other& other) STRICT_CPP_NOEXCEPT : value(static_cast<Type>(other)) { }
+
+         /// @brief Assignment operator.
+         /// @tparam Other The assignment type.
+         /// @returns auto&
+         template <typename Other>
+            requires STRICT_CPP_NAMESPACE::detail::is_qualified_operator<Type, Other>
+         STRICT_CPP_INLINE STRICT_CPP_CONSTEXPR auto& operator=(const Other& other) STRICT_CPP_NOEXCEPT {
+            this->value = other.value;
+            return *this;
+         }
+
+         /// @brief Implicit conversion operator converts to the same encapsulated type only.
+         /// @returns Type
+         STRICT_CPP_INLINE STRICT_CPP_CONSTEXPR operator Type() const STRICT_CPP_NOEXCEPT { return this->value; }
+
+         /// @brief Explicit conversion operator.
+         /// @tparam Other The type to convert to.
+         /// @returns Other
+         template <typename Other>
+            requires STRICT_CPP_NAMESPACE::detail::is_convertible<Type, Other>
+         STRICT_CPP_INLINE STRICT_CPP_CONSTEXPR explicit operator Other() const STRICT_CPP_NOEXCEPT {
+            return static_cast<Other>(this->value);
+         }
+
+         /// @brief Conversion function.
+         /// @tparam Other The type to convert to.
+         /// @returns Other
+         template <typename Other>
+            requires STRICT_CPP_NAMESPACE::detail::is_qualified_operator<Other>
+         STRICT_CPP_INLINE STRICT_CPP_CONSTEXPR Other as() const STRICT_CPP_NOEXCEPT {
+            return static_cast<Other>(this->value);
+         }
+
+         /// @brief Converts to a human-readable string representing the current value.
+         /// @returns std::string
+         STRICT_CPP_INLINE std::string to_string() const { return std::to_string(value); }
+
+         /// @brief Converts to a human-readable wide string representing the current value.
+         /// @returns std::wstring
+         STRICT_CPP_INLINE std::wstring to_wstring() const { return std::to_wstring(value); }
+   };
 }
 
-#define STRICT_CPP_DEFINE_INTEGRAL_TYPE(STRICT_CPP_TYPE, T)                                                                                                                        \
-   struct STRICT_CPP_TYPE : STRICT_CPP_NAMESPACE::detail::strict_cpp_integral_base_t {                                                                                             \
-         STRICT_CPP_INLINE STRICT_CPP_CONSTEXPR static T min = std::numeric_limits<T>::min();                                                                                      \
-         STRICT_CPP_INLINE STRICT_CPP_CONSTEXPR static T max = std::numeric_limits<T>::max();                                                                                      \
-                                                                                                                                                                                   \
-         using type = T;                                                                                                                                                           \
-         T value    = {};                                                                                                                                                          \
-                                                                                                                                                                                   \
-         STRICT_CPP_INLINE STRICT_CPP_CONSTEXPR STRICT_CPP_TYPE() STRICT_CPP_NOEXCEPT = default;                                                                                   \
-                                                                                                                                                                                   \
-         template <typename Other>                                                                                                                                                 \
-            requires STRICT_CPP_NAMESPACE::detail::is_qualified_implicit_constructor<T, Other>                                                                                     \
-         STRICT_CPP_INLINE STRICT_CPP_CONSTEXPR STRICT_CPP_TYPE(const Other& other) STRICT_CPP_NOEXCEPT : value(static_cast<T>(other)) { }                                         \
-                                                                                                                                                                                   \
-         template <typename Other>                                                                                                                                                 \
-            requires STRICT_CPP_NAMESPACE::detail::is_qualified_explicit_constructor<STRICT_CPP_TYPE, T, Other>                                                                    \
-         STRICT_CPP_INLINE STRICT_CPP_CONSTEXPR explicit STRICT_CPP_TYPE(const Other& other) STRICT_CPP_NOEXCEPT : value(static_cast<T>(other)) { }                                \
-                                                                                                                                                                                   \
-         template <typename Other>                                                                                                                                                 \
-            requires STRICT_CPP_NAMESPACE::detail::is_qualified_integral_operator<STRICT_CPP_TYPE, Other>                                                                          \
-         STRICT_CPP_INLINE STRICT_CPP_CONSTEXPR STRICT_CPP_TYPE& operator=(const Other& other) STRICT_CPP_NOEXCEPT {                                                               \
-            this->value = other.value;                                                                                                                                             \
-            return *this;                                                                                                                                                          \
-         }                                                                                                                                                                         \
-                                                                                                                                                                                   \
-         STRICT_CPP_INLINE STRICT_CPP_CONSTEXPR operator T() const STRICT_CPP_NOEXCEPT { return this->value; }                                                                     \
-         STRICT_CPP_INLINE explicit             operator std::string() const { return this->to_string(); }                                                                         \
-         STRICT_CPP_INLINE explicit             operator std::wstring() const { return this->to_wstring(); }                                                                       \
-         STRICT_CPP_INLINE std::string          to_string() const { return std::to_string(value); }                                                                                \
-         STRICT_CPP_INLINE STRICT_CPP_CONSTEXPR std::string to_string_t() const STRICT_CPP_NOEXCEPT { return #T; }                                                                 \
-         STRICT_CPP_INLINE STRICT_CPP_CONSTEXPR std::string to_string_n() const STRICT_CPP_NOEXCEPT { return STRICT_CPP_XSTR(STRICT_CPP_NAMESPACE) "::" #STRICT_CPP_TYPE; }        \
-         STRICT_CPP_INLINE std::wstring         to_wstring() const { return std::to_wstring(value); }                                                                              \
-         STRICT_CPP_INLINE STRICT_CPP_CONSTEXPR std::wstring to_wstring_t() const STRICT_CPP_NOEXCEPT { return L#T; }                                                              \
-         STRICT_CPP_INLINE STRICT_CPP_CONSTEXPR std::wstring to_wstring_n() const STRICT_CPP_NOEXCEPT {                                                                            \
-            return STRICT_CPP_JOIN_XSTR(L, STRICT_CPP_XSTR(STRICT_CPP_NAMESPACE)) L"::" L#STRICT_CPP_TYPE;                                                                         \
-         }                                                                                                                                                                         \
+#define STRICT_CPP_DEFINE_INTEGRAL_TYPE(STRICT_CPP_TYPE, TYPE)                                                                                                                     \
+   struct STRICT_CPP_TYPE : STRICT_CPP_NAMESPACE::strict_type_base<TYPE>, STRICT_CPP_NAMESPACE::detail::strict_cpp_integral_base_t {                                               \
+         using STRICT_CPP_NAMESPACE::strict_type_base<TYPE>::strict_type_base;                                                                                                     \
    };
 
-#define STRICT_CPP_DEFINE_FLOAT_TYPE(STRICT_CPP_TYPE, T)                                                                                                                           \
-   struct STRICT_CPP_TYPE : STRICT_CPP_NAMESPACE::detail::strict_cpp_float_base_t {                                                                                                \
-         STRICT_CPP_INLINE STRICT_CPP_CONSTEXPR static T min         = std::numeric_limits<T>::min();                                                                              \
-         STRICT_CPP_INLINE STRICT_CPP_CONSTEXPR static T max         = std::numeric_limits<T>::max();                                                                              \
-         STRICT_CPP_INLINE STRICT_CPP_CONSTEXPR static T lowest      = std::numeric_limits<T>::lowest();                                                                           \
-         STRICT_CPP_INLINE STRICT_CPP_CONSTEXPR static T qNaN        = std::numeric_limits<T>::quiet_NaN();                                                                        \
-         STRICT_CPP_INLINE STRICT_CPP_CONSTEXPR static T sNaN        = std::numeric_limits<T>::signaling_NaN();                                                                    \
-         STRICT_CPP_INLINE STRICT_CPP_CONSTEXPR static T posInfinity = std::numeric_limits<T>::infinity();                                                                         \
-         STRICT_CPP_INLINE STRICT_CPP_CONSTEXPR static T negInfinity = -std::numeric_limits<T>::infinity();                                                                        \
-         STRICT_CPP_INLINE STRICT_CPP_CONSTEXPR static T epsilon     = std::numeric_limits<T>::epsilon();                                                                          \
-         STRICT_CPP_INLINE STRICT_CPP_CONSTEXPR static T roundError  = std::numeric_limits<T>::round_error();                                                                      \
-         STRICT_CPP_INLINE STRICT_CPP_CONSTEXPR static T denormal    = std::numeric_limits<T>::denorm_min();                                                                       \
+#define STRICT_CPP_DEFINE_FLOAT_TYPE(STRICT_CPP_TYPE, TYPE)                                                                                                                        \
+   struct STRICT_CPP_TYPE : STRICT_CPP_NAMESPACE::strict_type_base<TYPE>, STRICT_CPP_NAMESPACE::detail::strict_cpp_float_base_t {                                                  \
+         using STRICT_CPP_NAMESPACE::strict_type_base<TYPE>::strict_type_base;                                                                                                     \
                                                                                                                                                                                    \
-         using type = T;                                                                                                                                                           \
-         T value    = {};                                                                                                                                                          \
-                                                                                                                                                                                   \
-         STRICT_CPP_INLINE STRICT_CPP_CONSTEXPR STRICT_CPP_TYPE() STRICT_CPP_NOEXCEPT = default;                                                                                   \
-                                                                                                                                                                                   \
-         template <typename Other>                                                                                                                                                 \
-            requires STRICT_CPP_NAMESPACE::detail::is_qualified_implicit_constructor<T, Other>                                                                                     \
-         STRICT_CPP_INLINE STRICT_CPP_CONSTEXPR STRICT_CPP_TYPE(const Other& other) STRICT_CPP_NOEXCEPT : value(static_cast<T>(other)) { }                                         \
-                                                                                                                                                                                   \
-         template <typename Other>                                                                                                                                                 \
-            requires STRICT_CPP_NAMESPACE::detail::is_qualified_explicit_constructor<STRICT_CPP_TYPE, T, Other>                                                                    \
-         STRICT_CPP_INLINE STRICT_CPP_CONSTEXPR explicit STRICT_CPP_TYPE(const Other& other) STRICT_CPP_NOEXCEPT : value(static_cast<T>(other)) { }                                \
-                                                                                                                                                                                   \
-         template <typename Other>                                                                                                                                                 \
-            requires STRICT_CPP_NAMESPACE::detail::is_qualified_float_operator<STRICT_CPP_TYPE, Other>                                                                             \
-         STRICT_CPP_INLINE STRICT_CPP_CONSTEXPR STRICT_CPP_TYPE& operator=(const Other& other) STRICT_CPP_NOEXCEPT {                                                               \
-            this->value = other.value;                                                                                                                                             \
-            return *this;                                                                                                                                                          \
-         }                                                                                                                                                                         \
-                                                                                                                                                                                   \
-         STRICT_CPP_INLINE STRICT_CPP_CONSTEXPR operator T() const STRICT_CPP_NOEXCEPT { return this->value; }                                                                     \
-         STRICT_CPP_INLINE explicit             operator std::string() const { return this->to_string(); }                                                                         \
-         STRICT_CPP_INLINE explicit             operator std::wstring() const { return this->to_wstring(); }                                                                       \
-         STRICT_CPP_INLINE std::string          to_string() const { return std::to_string(value); }                                                                                \
-         STRICT_CPP_INLINE STRICT_CPP_CONSTEXPR std::string to_string_t() const STRICT_CPP_NOEXCEPT { return #T; }                                                                 \
-         STRICT_CPP_INLINE STRICT_CPP_CONSTEXPR std::string to_string_n() const STRICT_CPP_NOEXCEPT { return STRICT_CPP_XSTR(STRICT_CPP_NAMESPACE) "::" #STRICT_CPP_TYPE; }        \
-         STRICT_CPP_INLINE std::wstring         to_wstring() const { return std::to_wstring(value); }                                                                              \
-         STRICT_CPP_INLINE STRICT_CPP_CONSTEXPR std::wstring to_wstring_t() const STRICT_CPP_NOEXCEPT { return L#T; }                                                              \
-         STRICT_CPP_INLINE STRICT_CPP_CONSTEXPR std::wstring to_wstring_n() const STRICT_CPP_NOEXCEPT {                                                                            \
-            return STRICT_CPP_JOIN_XSTR(L, STRICT_CPP_XSTR(STRICT_CPP_NAMESPACE)) L"::" L#STRICT_CPP_TYPE;                                                                         \
-         }                                                                                                                                                                         \
+         STRICT_CPP_INLINE STRICT_CPP_CONSTEXPR static TYPE min         = std::numeric_limits<TYPE>::min();                                                                        \
+         STRICT_CPP_INLINE STRICT_CPP_CONSTEXPR static TYPE max         = std::numeric_limits<TYPE>::max();                                                                        \
+         STRICT_CPP_INLINE STRICT_CPP_CONSTEXPR static TYPE lowest      = std::numeric_limits<TYPE>::lowest();                                                                     \
+         STRICT_CPP_INLINE STRICT_CPP_CONSTEXPR static TYPE qNaN        = std::numeric_limits<TYPE>::quiet_NaN();                                                                  \
+         STRICT_CPP_INLINE STRICT_CPP_CONSTEXPR static TYPE sNaN        = std::numeric_limits<TYPE>::signaling_NaN();                                                              \
+         STRICT_CPP_INLINE STRICT_CPP_CONSTEXPR static TYPE posInfinity = std::numeric_limits<TYPE>::infinity();                                                                   \
+         STRICT_CPP_INLINE STRICT_CPP_CONSTEXPR static TYPE negInfinity = -std::numeric_limits<TYPE>::infinity();                                                                  \
+         STRICT_CPP_INLINE STRICT_CPP_CONSTEXPR static TYPE epsilon     = std::numeric_limits<TYPE>::epsilon();                                                                    \
+         STRICT_CPP_INLINE STRICT_CPP_CONSTEXPR static TYPE roundError  = std::numeric_limits<TYPE>::round_error();                                                                \
+         STRICT_CPP_INLINE STRICT_CPP_CONSTEXPR static TYPE denormal    = std::numeric_limits<TYPE>::denorm_min();                                                                 \
    };
 
 #pragma warning(disable : 4146)

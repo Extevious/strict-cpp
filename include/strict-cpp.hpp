@@ -210,7 +210,7 @@ namespace STRICT_CPP_NAMESPACE {
    template <typename Type>
       requires STRICT_CPP_NAMESPACE::detail::is_qualified_operator<Type>
    STRICT_CPP_INLINE STRICT_CPP_CONSTEXPR Type operator--(Type& value, auto) STRICT_CPP_NOEXCEPT {
-      return static_cast<Type>(value.value++);
+      return static_cast<Type>(value.value--);
    }
 
    template <typename Type>

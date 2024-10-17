@@ -44,13 +44,13 @@ namespace STRICT_CPP_NAMESPACE {
       concept is_convertible = std::is_convertible_v<Left, Right>;
 
       template <typename Derived>
-      concept is_strict_base = std::is_base_of_v<strict_cpp_base_t, Derived>;
+      concept is_strict_type = std::is_base_of_v<strict_cpp_base_t, Derived>;
 
       template <typename Derived>
-      concept is_strict_float_base = std::is_base_of_v<strict_cpp_float_base_t, Derived>;
+      concept is_strict_float_type = std::is_base_of_v<strict_cpp_float_base_t, Derived>;
 
       template <typename Derived>
-      concept is_strict_integral_base = std::is_base_of_v<strict_cpp_integral_base_t, Derived>;
+      concept is_strict_integral_type = std::is_base_of_v<strict_cpp_integral_base_t, Derived>;
 
       // Implicit casts from primitive types should always convert to the exact same encapsulated primitive type.
       template <typename From, typename To>
@@ -58,16 +58,22 @@ namespace STRICT_CPP_NAMESPACE {
 
       // Explicit casts are allowed to convert to any convertible type.
       template <typename From, typename To>
-      concept is_qualified_explicit_convertible = (is_convertible<From, To> || is_strict_base<To>) && (!is_qualified_implicit_convertible<From, To>);
+      concept is_qualified_explicit_convertible = (is_convertible<From, To> || is_strict_type<To>) && (!is_qualified_implicit_convertible<From, To>);
 
-      template <typename Type, typename Other>
-      concept is_qualified_implicit_constructor = is_qualified_implicit_convertible<Other, Type>;
+      template <typename Type, typename... QualifiedTypes>
+      concept is_qualified_implicit_qualified_types = (sizeof...(QualifiedTypes) > 0) && (is_qualified_implicit_convertible<Type, QualifiedTypes> || ...);
+
+      template <typename Type, typename... QualifiedTypes>
+      concept is_qualified_implicit_constructor = is_qualified_implicit_qualified_types<Type, QualifiedTypes...>;
 
       template <typename Type, typename Other>
       concept is_qualified_explicit_constructor = is_qualified_explicit_convertible<Other, Type>;
 
+      template <typename Type, typename... QualifiedTypes>
+      concept is_qualified_implicit_qualified_types_constructor = is_qualified_implicit_qualified_types<Type, QualifiedTypes...>;
+
       template <typename... Types>
-      concept is_qualified_operator = (is_strict_base<Types> && ...);
+      concept is_qualified_operator = (is_strict_type<Types> && ...);
 
       template <typename Left, typename Right>
       concept is_qualified_operator_left_only = (is_qualified_operator<Left> && is_scalar<Right>);
@@ -75,8 +81,11 @@ namespace STRICT_CPP_NAMESPACE {
       template <typename Left, typename Right>
       concept is_qualified_operator_right_only = (is_scalar<Left> && is_qualified_operator<Right>);
 
+      template <typename Type, typename... QualifiedTypes>
+      concept is_qualified_assignment_operator = is_qualified_implicit_qualified_types<Type, QualifiedTypes...>;
+
       template <typename... Types>
-      concept is_qualified_integral_operator = (is_strict_integral_base<Types> && ...);
+      concept is_qualified_integral_operator = (is_strict_integral_type<Types> && ...);
 
       template <typename Left, typename Right>
       concept is_qualified_integral_operator_left_only = (is_qualified_integral_operator<Left> && is_scalar<Right>);
@@ -85,13 +94,13 @@ namespace STRICT_CPP_NAMESPACE {
       concept is_qualified_integral_operator_right_only = (is_scalar<Left> && is_qualified_integral_operator<Right>);
 
       template <typename... Types>
-      concept is_qualified_float_operator = (is_strict_float_base<Types> && ...);
+      concept is_qualified_float_operator = (is_strict_float_type<Types> && ...);
 
       template <typename Left, typename Right>
-      concept is_qualified_float_operator_left_only = (is_qualified_float_operator<Left> && (is_arithmetic<Right> || is_strict_integral_base<Right>));
+      concept is_qualified_float_operator_left_only = (is_qualified_float_operator<Left> && (is_arithmetic<Right> || is_strict_integral_type<Right>));
 
       template <typename Left, typename Right>
-      concept is_qualified_float_operator_right_only = ((is_arithmetic<Left> || is_strict_integral_base<Left>) && is_qualified_float_operator<Right>);
+      concept is_qualified_float_operator_right_only = ((is_arithmetic<Left> || is_strict_integral_type<Left>) && is_qualified_float_operator<Right>);
    }
 
 #define STRICT_CPP_DEFINE_INTEGRAL_OPERATOR(OPERATOR_TYPE)                                                                                                                         \
@@ -327,8 +336,8 @@ namespace STRICT_CPP_NAMESPACE {
    STRICT_CPP_DEFINE_COMPOUND_FLOAT_OPERATOR(*=)
    STRICT_CPP_DEFINE_COMPOUND_FLOAT_OPERATOR(/=)
 
-   template <typename Type>
-   struct strict_type_base : STRICT_CPP_NAMESPACE::detail::strict_cpp_base_t {
+   template <typename Type, typename... QualifiedTypes>
+   struct strict_type : STRICT_CPP_NAMESPACE::detail::strict_cpp_base_t {
          STRICT_CPP_INLINE STRICT_CPP_CONSTEXPR static Type min = std::numeric_limits<Type>::min();
          STRICT_CPP_INLINE STRICT_CPP_CONSTEXPR static Type max = std::numeric_limits<Type>::max();
 
@@ -336,27 +345,27 @@ namespace STRICT_CPP_NAMESPACE {
          Type value = {};
 
          /// @brief Default constructor.
-         STRICT_CPP_INLINE STRICT_CPP_CONSTEXPR strict_type_base() STRICT_CPP_NOEXCEPT = default;
+         STRICT_CPP_INLINE STRICT_CPP_CONSTEXPR strict_type() STRICT_CPP_NOEXCEPT = default;
 
          /// @brief Implicit constructor.
-         /// @tparam Other The implicitly-constructable type.
+         /// @tparam Other The implicitly-constructable type from a range of qualified types.
          /// @param other The implicitly-constructable value.
          template <typename Other>
-            requires STRICT_CPP_NAMESPACE::detail::is_qualified_implicit_constructor<Type, Other>
-         STRICT_CPP_INLINE STRICT_CPP_CONSTEXPR strict_type_base(const Other& other) STRICT_CPP_NOEXCEPT : value(static_cast<Type>(other)) { }
+            requires STRICT_CPP_NAMESPACE::detail::is_qualified_implicit_constructor<Other, Type, QualifiedTypes...>
+         STRICT_CPP_INLINE STRICT_CPP_CONSTEXPR strict_type(const Other& other) STRICT_CPP_NOEXCEPT : value(static_cast<Type>(other)) { }
 
          /// @brief Explicit constructor.
          /// @tparam Other The explicitly-constructable type.
          /// @param other The explicitly-constructable value.
          template <typename Other>
             requires STRICT_CPP_NAMESPACE::detail::is_qualified_explicit_constructor<Type, Other>
-         STRICT_CPP_INLINE STRICT_CPP_CONSTEXPR explicit strict_type_base(const Other& other) STRICT_CPP_NOEXCEPT : value(static_cast<Type>(other)) { }
+         STRICT_CPP_INLINE STRICT_CPP_CONSTEXPR explicit strict_type(const Other& other) STRICT_CPP_NOEXCEPT : value(static_cast<Type>(other)) { }
 
          /// @brief Assignment operator.
          /// @tparam Other The assignment type.
          /// @returns auto&
          template <typename Other>
-            requires STRICT_CPP_NAMESPACE::detail::is_qualified_operator<Type, Other>
+            requires STRICT_CPP_NAMESPACE::detail::is_qualified_assignment_operator<Other, QualifiedTypes...>
          STRICT_CPP_INLINE STRICT_CPP_CONSTEXPR auto& operator=(const Other& other) STRICT_CPP_NOEXCEPT {
             this->value = other.value;
             return *this;
@@ -394,14 +403,14 @@ namespace STRICT_CPP_NAMESPACE {
    };
 }
 
-#define STRICT_CPP_DEFINE_INTEGRAL_TYPE(STRICT_CPP_TYPE, TYPE)                                                                                                                     \
-   struct STRICT_CPP_TYPE : STRICT_CPP_NAMESPACE::strict_type_base<TYPE>, STRICT_CPP_NAMESPACE::detail::strict_cpp_integral_base_t {                                               \
-         using STRICT_CPP_NAMESPACE::strict_type_base<TYPE>::strict_type_base;                                                                                                     \
+#define STRICT_CPP_DEFINE_INTEGRAL_TYPE(NAME, TYPE, QUALIFIED_TYPES...)                                                                                                            \
+   struct NAME : public STRICT_CPP_NAMESPACE::strict_type<TYPE, QUALIFIED_TYPES>, private STRICT_CPP_NAMESPACE::detail::strict_cpp_integral_base_t {                               \
+         using STRICT_CPP_NAMESPACE::strict_type<TYPE, QUALIFIED_TYPES>::strict_type;                                                                                              \
    };
 
-#define STRICT_CPP_DEFINE_FLOAT_TYPE(STRICT_CPP_TYPE, TYPE)                                                                                                                        \
-   struct STRICT_CPP_TYPE : STRICT_CPP_NAMESPACE::strict_type_base<TYPE>, STRICT_CPP_NAMESPACE::detail::strict_cpp_float_base_t {                                                  \
-         using STRICT_CPP_NAMESPACE::strict_type_base<TYPE>::strict_type_base;                                                                                                     \
+#define STRICT_CPP_DEFINE_FLOAT_TYPE(NAME, TYPE, QUALIFIED_TYPES...)                                                                                                               \
+   struct NAME : public STRICT_CPP_NAMESPACE::strict_type<TYPE, QUALIFIED_TYPES>, private STRICT_CPP_NAMESPACE::detail::strict_cpp_float_base_t {                                  \
+         using STRICT_CPP_NAMESPACE::strict_type<TYPE, QUALIFIED_TYPES>::strict_type;                                                                                              \
                                                                                                                                                                                    \
          STRICT_CPP_INLINE STRICT_CPP_CONSTEXPR static TYPE min         = std::numeric_limits<TYPE>::min();                                                                        \
          STRICT_CPP_INLINE STRICT_CPP_CONSTEXPR static TYPE max         = std::numeric_limits<TYPE>::max();                                                                        \
@@ -421,8 +430,8 @@ namespace STRICT_CPP_NAMESPACE {
 // Pre-defined types
 // =============================================================================
 
+// Common integral types:
 namespace STRICT_CPP_NAMESPACE {
-   // Common integral types:
    STRICT_CPP_DEFINE_INTEGRAL_TYPE(size_t, std::size_t);
 
    STRICT_CPP_DEFINE_INTEGRAL_TYPE(int8_t, std::int8_t);
@@ -473,8 +482,8 @@ namespace STRICT_CPP_NAMESPACE {
    STRICT_CPP_DEFINE_FLOAT_TYPE(double_t, double);
    STRICT_CPP_DEFINE_FLOAT_TYPE(long_double_t, long double);
 
-#if defined(STRICT_CPP_OPTIONAL_TYPES)
    // Optional integral types:
+#if defined(STRICT_CPP_OPTIONAL_TYPES)
    STRICT_CPP_DEFINE_INTEGRAL_TYPE(size8_t, std::uint8_t);
    STRICT_CPP_DEFINE_INTEGRAL_TYPE(size16_t, std::uint16_t);
    STRICT_CPP_DEFINE_INTEGRAL_TYPE(size32_t, std::uint32_t);
@@ -684,4 +693,6 @@ namespace STRICT_CPP_NAMESPACE {
    STRICT_CPP_DEFINE_INTEGRAL_TYPE(index32_t, std::uint32_t);
    STRICT_CPP_DEFINE_INTEGRAL_TYPE(index64_t, std::uint64_t);
 #endif
+
+   STRICT_CPP_DEFINE_INTEGRAL_TYPE(any_size_t, std::size_t, int, char, uint64_t);
 }

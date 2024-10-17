@@ -1,49 +1,79 @@
 ## strict-cpp
+
 Reduce ambiguity between methods and operators by using types provided by strict-cpp, a C++20 platform-agnostic project.
 
 ### Features:
- * Strict type wrappers encapsulating integral and floating-point types.
- * Singular header file.
- * [Meson Build](https://mesonbuild.com/) support.
- * MIT license.
+
+- Strict type wrappers encapsulating integral and floating-point types.
+- Singular header file.
+- [Meson Build](https://mesonbuild.com/) support.
+- MIT license.
 
 ### Can be used to...:
- * Reduce ambiguity between methods and operators.
- * Enforce more explicit type-safety.
- * Use method or operator overloads more freely with less ambiguity.
+
+- Reduce ambiguity between methods and operators.
+- Enforce more explicit type-safety.
+- Use method or operator overloads more freely with less ambiguity.
 
 ### Example:
+
 ```cpp
    // These could be ambiguous...
-   std::int16_t add(std::int16_t a, std::int16_t b) { return a + b; } // #1
-   std::int32_t add(std::int32_t a, std::int32_t b) { return a + b; } // #2
+   add(short, short); // #1
+   add(int, int);     // #2
 
    // ...but these are not!
-   strict::int16_t add(strict::int16_t a, strict::int16_t b) { return a + b; } // #3
-   strict::int32_t add(strict::int32_t a, strict::int32_t b) { return a + b; } // #4
+   add(strict::int16_t, strict::int16_t); // #3
+   add(strict::int32_t, strict::int32_t); // #4
 
    ...
 
-   // === If only the add() methods #1 and #2 existed ===
-   //
+   // If only the add() methods #1 and #2 existed:
+
    add(5, 6);   // This would call add() #2 as expected.
    add(5U, 6);  // This would also call add() #2 because of the 2nd argument qualifying.
    add(5U, 6U); // However this add() is ambiguous between #1 and #2.
 
-   // === ...but if only the strict-type add() methods #3 and #4 existed ===
-   //
+   // If only the strict-type add() methods #3 and #4 existed:
+
    add(5, 6);   // This would call add() #4 as expected.
    add(5U, 6);  // This would fail due to no implicit conversion available for the first argument.
    add(5U, 6U); // This would fail due to no implicit conversion available for both arguments.
+
+   ...
+
+   // You can define your own types:
+   //    - First parameter is the name of the type.
+   //    - Second parameter is the type.
+
+   STRICT_CPP_DEFINE_INTEGRAL_TYPE(buffer_size_t, std::size_t);
+   STRICT_CPP_DEFINE_FLOAT_TYPE(scale_t, float);
+
+   // You can also define your own types with a range of qualified types for implicit usage:
+   //    - First parameter is the name of the type.
+   //    - Second parameter is the type.
+   //    - All following types are the qualified types.
+
+   STRICT_CPP_DEFINE_INTEGRAL_TYPE(example_t, int, long, double, std::size_t);
+   STRICT_CPP_DEFINE_INTEGRAL_TYPE(some_int_t, int, long, unsigned int);
+
+   ...
+
+   // If you defined a method that has an example_t as a parameter you could do:
+   myMethod(5);
+   myMethod(60L);
+   myMethod(23U);
 ```
 
 ## How to include in your projects
 
 ### Cmake or Meson
+
 1. Clone or download this repo into your project.
 2. Include the `strict-cpp.hpp` file that is inside the `include` directory.
 
 ### Meson (as a .wrap dependency)
+
 1. Create a `strict-cpp.wrap` file in the `<project root>/subprojects` directory. Example `.wrap` file:
 
 ```cmake
@@ -97,20 +127,23 @@ Reduce ambiguity between methods and operators by using types provided by strict
 ### User-exposed:
 
 ```cpp
-// Macro to define integral types (needs to be in the STRICT_CPP_NAMESPACE namespace).
-//    STRICT_CPP_TYPE : your strict type's name.
-//    T               : the underlying type (int, char, size_t, etc).
-#define STRICT_CPP_DEFINE_INTEGRAL_TYPE(STRICT_CPP_TYPE, T)
+// Macro to define your own integral types.
+//    NAME            : the name of your strict type.
+//    TYPE            : the encapsulated primitive type (float, double, etc).
+//    QUALIFIED_TYPES : the optional range of types that are qualified for implicit usage.
+#define STRICT_CPP_DEFINE_INTEGRAL_TYPE(NAME, TYPE, QUALIFIED_TYPES...)
 
-// Macro to define floating-point types (needs to be in the STRICT_CPP_NAMESPACE namespace).
-//    STRICT_CPP_TYPE : your strict type's name.
-//    T               : the underlying type (float, double, etc).
-#define STRICT_CPP_DEFINE_FLOAT_TYPE(STRICT_CPP_TYPE, T)  
+// Macro to define your own floating-point types.
+//    NAME            : the name of your strict type.
+//    TYPE            : the encapsulated primitive type (float, double, etc).
+//    QUALIFIED_TYPES : the optional range of types that are qualified for implicit usage.
+#define STRICT_CPP_DEFINE_FLOAT_TYPE(NAME, TYPE, QUALIFIED_TYPES...)
 ```
 
 ## Available types
 
 ### Common:
+
 ```cpp
 // Integral types
 size_t               (std::size_t)
@@ -261,13 +294,9 @@ dst_offset32_t       (std::uint32_t)
 dst_offset64_t       (std::uint64_t)
 ```
 
-
 ## TODO
-* Add more types.
-* Aligned types.
-* Create types that are not arithmetic-based.
-* Maybe implement support for older versions of C++.
-* Tests.
-* Verify cross-platform support.
-* Implement support for [C++20 modules](https://en.cppreference.com/w/cpp/language/modules).
-* ???
+
+- Maybe implement support for older versions of C++.
+- Verify cross-platform support.
+- Implement support for [C++20 modules](https://en.cppreference.com/w/cpp/language/modules).
+- ???

@@ -103,15 +103,39 @@ int main() {
 
    output("Character: ", *character);
 
-   // to_string function is already provided, making stringification easy:
+   // to_string functions are already provided, making stringification easy:
    output(a.to_string());
 
    return 0;
 }
 
-// You can also define your own types (but it has to be in the STRICT_CPP_NAMESPACE namespace):
-namespace STRICT_CPP_NAMESPACE {
-   STRICT_CPP_DEFINE_INTEGRAL_TYPE(buffer_size_t, std::size_t);
-   STRICT_CPP_DEFINE_FLOAT_TYPE(scale_t, float);
-   STRICT_CPP_DEFINE_INTEGRAL_TYPE(some_totally_cool_type_t, long);
+// You can also define your own types:
+STRICT_CPP_DEFINE_INTEGRAL_TYPE(buffer_size_t, std::size_t);
+STRICT_CPP_DEFINE_FLOAT_TYPE(scale_t, float);
+STRICT_CPP_DEFINE_INTEGRAL_TYPE(some_totally_cool_type_t, long);
+
+// You can specify multiple qualified types, with the first type being the encapsulated type:
+STRICT_CPP_DEFINE_INTEGRAL_TYPE(some_ints_t, int, unsigned int, long, std::size_t);
+STRICT_CPP_DEFINE_FLOAT_TYPE(some_floats_t, float, double, long double);
+
+// Which means you can do stuff like this:
+void example0(some_floats_t) { }
+
+void example1(some_ints_t) { }
+
+void example1(strict::size_t) { } // Overload to demonstrate ambiguity.
+
+void test() {
+   // example0:
+   example0(5.0F);
+   example0(1.0L);
+   example0(3.);
+
+   // example1:
+   example1(5);
+   example1(10U);
+   example1(25L);
+
+   // Ambiguous between example1(some_ints_t) and example1(strict::size_t).
+   // example1(789ULL);
 }

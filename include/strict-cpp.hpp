@@ -404,12 +404,12 @@ namespace STRICT_CPP_NAMESPACE {
 }
 
 #define STRICT_CPP_DEFINE_INTEGRAL_TYPE(NAME, TYPE, QUALIFIED_TYPES...)                                                                                                            \
-   struct NAME : public STRICT_CPP_NAMESPACE::strict_type<TYPE, QUALIFIED_TYPES>, private STRICT_CPP_NAMESPACE::detail::strict_cpp_integral_base_t {                               \
+   struct NAME : STRICT_CPP_NAMESPACE::strict_type<TYPE, QUALIFIED_TYPES>, STRICT_CPP_NAMESPACE::detail::strict_cpp_integral_base_t {                                              \
          using STRICT_CPP_NAMESPACE::strict_type<TYPE, QUALIFIED_TYPES>::strict_type;                                                                                              \
    };
 
 #define STRICT_CPP_DEFINE_FLOAT_TYPE(NAME, TYPE, QUALIFIED_TYPES...)                                                                                                               \
-   struct NAME : public STRICT_CPP_NAMESPACE::strict_type<TYPE, QUALIFIED_TYPES>, private STRICT_CPP_NAMESPACE::detail::strict_cpp_float_base_t {                                  \
+   struct NAME : STRICT_CPP_NAMESPACE::strict_type<TYPE, QUALIFIED_TYPES>, STRICT_CPP_NAMESPACE::detail::strict_cpp_float_base_t {                                                 \
          using STRICT_CPP_NAMESPACE::strict_type<TYPE, QUALIFIED_TYPES>::strict_type;                                                                                              \
                                                                                                                                                                                    \
          STRICT_CPP_INLINE STRICT_CPP_CONSTEXPR static TYPE min         = std::numeric_limits<TYPE>::min();                                                                        \

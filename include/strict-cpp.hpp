@@ -15,15 +15,16 @@
 #include <type_traits>
 
 namespace STRICT_CPP_NAMESPACE {
+
    namespace detail {
       // Base type for integral or float type qualifications.
       struct strict_cpp_base_t { };
 
-      // Base type for float-only type qualifications.
-      struct strict_cpp_float_base_t { };
-
       // Base type for integer-only type qualifications.
-      struct strict_cpp_integral_base_t { };
+      struct strict_cpp_integer_base_t : strict_cpp_base_t { };
+
+      // Base type for float-only type qualifications.
+      struct strict_cpp_float_base_t : strict_cpp_base_t { };
 
       template <typename Type>
       concept is_integral = std::is_integral_v<Type>;
@@ -50,7 +51,7 @@ namespace STRICT_CPP_NAMESPACE {
       concept is_strict_float_type = std::is_base_of_v<strict_cpp_float_base_t, Derived>;
 
       template <typename Derived>
-      concept is_strict_integral_type = std::is_base_of_v<strict_cpp_integral_base_t, Derived>;
+      concept is_strict_integral_type = std::is_base_of_v<strict_cpp_integer_base_t, Derived>;
 
       // Implicit casts from primitive types should always convert to the exact same encapsulated primitive type.
       template <typename From, typename To>
@@ -337,7 +338,7 @@ namespace STRICT_CPP_NAMESPACE {
    STRICT_CPP_DEFINE_COMPOUND_FLOAT_OPERATOR(/=)
 
    template <typename Type, typename... QualifiedTypes>
-   struct strict_type : STRICT_CPP_NAMESPACE::detail::strict_cpp_base_t {
+   struct strict_integer_type : STRICT_CPP_NAMESPACE::detail::strict_cpp_integer_base_t {
          STRICT_CPP_INLINE STRICT_CPP_CONSTEXPR static Type min = std::numeric_limits<Type>::min();
          STRICT_CPP_INLINE STRICT_CPP_CONSTEXPR static Type max = std::numeric_limits<Type>::max();
 
@@ -345,21 +346,95 @@ namespace STRICT_CPP_NAMESPACE {
          Type value = {};
 
          /// @brief Default constructor.
-         STRICT_CPP_INLINE STRICT_CPP_CONSTEXPR strict_type() STRICT_CPP_NOEXCEPT = default;
+         STRICT_CPP_INLINE STRICT_CPP_CONSTEXPR strict_integer_type() STRICT_CPP_NOEXCEPT = default;
 
          /// @brief Implicit constructor.
          /// @tparam Other The implicitly-constructable type from a range of qualified types.
          /// @param other The implicitly-constructable value.
          template <typename Other>
             requires STRICT_CPP_NAMESPACE::detail::is_qualified_implicit_constructor<Other, Type, QualifiedTypes...>
-         STRICT_CPP_INLINE STRICT_CPP_CONSTEXPR strict_type(const Other& other) STRICT_CPP_NOEXCEPT : value(static_cast<Type>(other)) { }
+         STRICT_CPP_INLINE STRICT_CPP_CONSTEXPR strict_integer_type(const Other& other) STRICT_CPP_NOEXCEPT : value(static_cast<Type>(other)) { }
 
          /// @brief Explicit constructor.
          /// @tparam Other The explicitly-constructable type.
          /// @param other The explicitly-constructable value.
          template <typename Other>
             requires STRICT_CPP_NAMESPACE::detail::is_qualified_explicit_constructor<Type, Other>
-         STRICT_CPP_INLINE STRICT_CPP_CONSTEXPR explicit strict_type(const Other& other) STRICT_CPP_NOEXCEPT : value(static_cast<Type>(other)) { }
+         STRICT_CPP_INLINE STRICT_CPP_CONSTEXPR explicit strict_integer_type(const Other& other) STRICT_CPP_NOEXCEPT : value(static_cast<Type>(other)) { }
+
+         /// @brief Assignment operator.
+         /// @tparam Other The assignment type.
+         /// @returns auto&
+         template <typename Other>
+            requires STRICT_CPP_NAMESPACE::detail::is_qualified_assignment_operator<Other, QualifiedTypes...>
+         STRICT_CPP_INLINE STRICT_CPP_CONSTEXPR auto& operator=(const Other& other) STRICT_CPP_NOEXCEPT {
+            this->value = other.value;
+            return *this;
+         }
+
+         /// @brief Implicit conversion operator converts to the same encapsulated type only.
+         /// @returns Type
+         STRICT_CPP_INLINE STRICT_CPP_CONSTEXPR operator Type() const STRICT_CPP_NOEXCEPT { return this->value; }
+
+         /// @brief Explicit conversion operator.
+         /// @tparam Other The type to convert to.
+         /// @returns Other
+         template <typename Other>
+            requires STRICT_CPP_NAMESPACE::detail::is_convertible<Type, Other>
+         STRICT_CPP_INLINE STRICT_CPP_CONSTEXPR explicit operator Other() const STRICT_CPP_NOEXCEPT {
+            return static_cast<Other>(this->value);
+         }
+
+         /// @brief Conversion function.
+         /// @tparam Other The type to convert to.
+         /// @returns Other
+         template <typename Other>
+            requires STRICT_CPP_NAMESPACE::detail::is_qualified_operator<Other>
+         STRICT_CPP_INLINE STRICT_CPP_CONSTEXPR Other as() const STRICT_CPP_NOEXCEPT {
+            return static_cast<Other>(this->value);
+         }
+
+         /// @brief Converts to a human-readable string representing the current value.
+         /// @returns std::string
+         STRICT_CPP_INLINE std::string to_string() const { return std::to_string(value); }
+
+         /// @brief Converts to a human-readable wide string representing the current value.
+         /// @returns std::wstring
+         STRICT_CPP_INLINE std::wstring to_wstring() const { return std::to_wstring(value); }
+   };
+
+   template <typename Type, typename... QualifiedTypes>
+   struct strict_float_type : STRICT_CPP_NAMESPACE::detail::strict_cpp_float_base_t {
+         STRICT_CPP_INLINE STRICT_CPP_CONSTEXPR static Type min         = std::numeric_limits<Type>::min();
+         STRICT_CPP_INLINE STRICT_CPP_CONSTEXPR static Type max         = std::numeric_limits<Type>::max();
+         STRICT_CPP_INLINE STRICT_CPP_CONSTEXPR static Type lowest      = std::numeric_limits<Type>::lowest();
+         STRICT_CPP_INLINE STRICT_CPP_CONSTEXPR static Type qNaN        = std::numeric_limits<Type>::quiet_NaN();
+         STRICT_CPP_INLINE STRICT_CPP_CONSTEXPR static Type sNaN        = std::numeric_limits<Type>::signaling_NaN();
+         STRICT_CPP_INLINE STRICT_CPP_CONSTEXPR static Type posInfinity = std::numeric_limits<Type>::infinity();
+         STRICT_CPP_INLINE STRICT_CPP_CONSTEXPR static Type negInfinity = -std::numeric_limits<Type>::infinity();
+         STRICT_CPP_INLINE STRICT_CPP_CONSTEXPR static Type epsilon     = std::numeric_limits<Type>::epsilon();
+         STRICT_CPP_INLINE STRICT_CPP_CONSTEXPR static Type roundError  = std::numeric_limits<Type>::round_error();
+         STRICT_CPP_INLINE STRICT_CPP_CONSTEXPR static Type denormal    = std::numeric_limits<Type>::denorm_min();
+
+         using type = Type;
+         Type value = {};
+
+         /// @brief Default constructor.
+         STRICT_CPP_INLINE STRICT_CPP_CONSTEXPR strict_float_type() STRICT_CPP_NOEXCEPT = default;
+
+         /// @brief Implicit constructor.
+         /// @tparam Other The implicitly-constructable type from a range of qualified types.
+         /// @param other The implicitly-constructable value.
+         template <typename Other>
+            requires STRICT_CPP_NAMESPACE::detail::is_qualified_implicit_constructor<Other, Type, QualifiedTypes...>
+         STRICT_CPP_INLINE STRICT_CPP_CONSTEXPR strict_float_type(const Other& other) STRICT_CPP_NOEXCEPT : value(static_cast<Type>(other)) { }
+
+         /// @brief Explicit constructor.
+         /// @tparam Other The explicitly-constructable type.
+         /// @param other The explicitly-constructable value.
+         template <typename Other>
+            requires STRICT_CPP_NAMESPACE::detail::is_qualified_explicit_constructor<Type, Other>
+         STRICT_CPP_INLINE STRICT_CPP_CONSTEXPR explicit strict_float_type(const Other& other) STRICT_CPP_NOEXCEPT : value(static_cast<Type>(other)) { }
 
          /// @brief Assignment operator.
          /// @tparam Other The assignment type.
@@ -404,24 +479,13 @@ namespace STRICT_CPP_NAMESPACE {
 }
 
 #define STRICT_CPP_DEFINE_INTEGRAL_TYPE(NAME, TYPE, QUALIFIED_TYPES...)                                                                                                            \
-   struct NAME : STRICT_CPP_NAMESPACE::strict_type<TYPE, QUALIFIED_TYPES>, STRICT_CPP_NAMESPACE::detail::strict_cpp_integral_base_t {                                              \
-         using STRICT_CPP_NAMESPACE::strict_type<TYPE, QUALIFIED_TYPES>::strict_type;                                                                                              \
+   struct NAME : STRICT_CPP_NAMESPACE::strict_integer_type<TYPE, QUALIFIED_TYPES> {                                                                                                \
+         using STRICT_CPP_NAMESPACE::strict_integer_type<TYPE, QUALIFIED_TYPES>::strict_integer_type;                                                                              \
    };
 
 #define STRICT_CPP_DEFINE_FLOAT_TYPE(NAME, TYPE, QUALIFIED_TYPES...)                                                                                                               \
-   struct NAME : STRICT_CPP_NAMESPACE::strict_type<TYPE, QUALIFIED_TYPES>, STRICT_CPP_NAMESPACE::detail::strict_cpp_float_base_t {                                                 \
-         using STRICT_CPP_NAMESPACE::strict_type<TYPE, QUALIFIED_TYPES>::strict_type;                                                                                              \
-                                                                                                                                                                                   \
-         STRICT_CPP_INLINE STRICT_CPP_CONSTEXPR static TYPE min         = std::numeric_limits<TYPE>::min();                                                                        \
-         STRICT_CPP_INLINE STRICT_CPP_CONSTEXPR static TYPE max         = std::numeric_limits<TYPE>::max();                                                                        \
-         STRICT_CPP_INLINE STRICT_CPP_CONSTEXPR static TYPE lowest      = std::numeric_limits<TYPE>::lowest();                                                                     \
-         STRICT_CPP_INLINE STRICT_CPP_CONSTEXPR static TYPE qNaN        = std::numeric_limits<TYPE>::quiet_NaN();                                                                  \
-         STRICT_CPP_INLINE STRICT_CPP_CONSTEXPR static TYPE sNaN        = std::numeric_limits<TYPE>::signaling_NaN();                                                              \
-         STRICT_CPP_INLINE STRICT_CPP_CONSTEXPR static TYPE posInfinity = std::numeric_limits<TYPE>::infinity();                                                                   \
-         STRICT_CPP_INLINE STRICT_CPP_CONSTEXPR static TYPE negInfinity = -std::numeric_limits<TYPE>::infinity();                                                                  \
-         STRICT_CPP_INLINE STRICT_CPP_CONSTEXPR static TYPE epsilon     = std::numeric_limits<TYPE>::epsilon();                                                                    \
-         STRICT_CPP_INLINE STRICT_CPP_CONSTEXPR static TYPE roundError  = std::numeric_limits<TYPE>::round_error();                                                                \
-         STRICT_CPP_INLINE STRICT_CPP_CONSTEXPR static TYPE denormal    = std::numeric_limits<TYPE>::denorm_min();                                                                 \
+   struct NAME : STRICT_CPP_NAMESPACE::strict_float_type<TYPE, QUALIFIED_TYPES> {                                                                                                  \
+         using STRICT_CPP_NAMESPACE::strict_float_type<TYPE, QUALIFIED_TYPES>::strict_float_type;                                                                                  \
    };
 
 #pragma warning(disable : 4146)
@@ -693,6 +757,4 @@ namespace STRICT_CPP_NAMESPACE {
    STRICT_CPP_DEFINE_INTEGRAL_TYPE(index32_t, std::uint32_t);
    STRICT_CPP_DEFINE_INTEGRAL_TYPE(index64_t, std::uint64_t);
 #endif
-
-   STRICT_CPP_DEFINE_INTEGRAL_TYPE(any_size_t, std::size_t, int, char, uint64_t);
 }

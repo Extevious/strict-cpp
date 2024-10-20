@@ -12,11 +12,11 @@
 
 namespace STRICT_CPP_NAMESPACE {
    namespace detail {
-      // Base type for integer or float type qualifications.
+      // Base type for integral or float type qualifications.
       struct strict_cpp_base_t { };
 
-      // Base type for integer-only type qualifications.
-      struct strict_cpp_integer_base_t : strict_cpp_base_t { };
+      // Base type for integral-only type qualifications.
+      struct strict_cpp_integral_base_t : strict_cpp_base_t { };
 
       // Base type for float-only type qualifications.
       struct strict_cpp_float_base_t : strict_cpp_base_t { };
@@ -40,23 +40,23 @@ namespace STRICT_CPP_NAMESPACE {
 
       // Returns true if [Left] inherits from the [strict_cpp_base_t] type and Right is a scalar type.
       template <typename Left, typename Right>
-      concept is_qualified_operator_left_only = (is_qualified_operator<Left> && std::is_scalar_v<Right>);
+      concept is_qualified_operator_left_only = is_qualified_operator<Left> && std::is_scalar_v<Right>;
 
       // Returns true if [Left] is a scalar type and Right inherits from the [strict_cpp_base_t] type.
       template <typename Left, typename Right>
-      concept is_qualified_operator_right_only = (std::is_scalar_v<Left> && is_qualified_operator<Right>);
+      concept is_qualified_operator_right_only = std::is_scalar_v<Left> && is_qualified_operator<Right>;
 
-      // Returns true if any of [Types] inherits from the [strict_cpp_integer_base_t] type.
+      // Returns true if any of [Types] inherits from the [strict_cpp_integral_base_t] type.
       template <typename... Types>
-      concept is_qualified_integral_operator = (std::is_base_of_v<STRICT_CPP_NAMESPACE::detail::strict_cpp_integer_base_t, Types> && ...);
+      concept is_qualified_integral_operator = (std::is_base_of_v<STRICT_CPP_NAMESPACE::detail::strict_cpp_integral_base_t, Types> && ...);
 
-      // Returns true if [Left] inherits from the [strict_cpp_integer_base_t] type and [Right] is a scalar type.
+      // Returns true if [Left] inherits from the [strict_cpp_integral_base_t] type and [Right] is a scalar type.
       template <typename Left, typename Right>
-      concept is_qualified_integral_operator_left_only = (is_qualified_integral_operator<Left> && std::is_scalar_v<Right>);
+      concept is_qualified_integral_operator_left_only = is_qualified_integral_operator<Left> && std::is_scalar_v<Right>;
 
-      // Returns true if [Left] is a scalar type and [Right] inherits from the [strict_cpp_integer_base_t] type.
+      // Returns true if [Left] is a scalar type and [Right] inherits from the [strict_cpp_integral_base_t] type.
       template <typename Left, typename Right>
-      concept is_qualified_integral_operator_right_only = (std::is_scalar_v<Left> && is_qualified_integral_operator<Right>);
+      concept is_qualified_integral_operator_right_only = std::is_scalar_v<Left> && is_qualified_integral_operator<Right>;
 
       // Returns true if any of [Types] inherits from the [strict_cpp_float_base_t] type.
       template <typename... Types>
@@ -64,13 +64,13 @@ namespace STRICT_CPP_NAMESPACE {
 
       // Returns true if [Left] inherits from the [strict_cpp_float_base_t] type and [Right] is a arithmetic type.
       template <typename Left, typename Right>
-      concept is_qualified_float_operator_left_only =
-         (is_qualified_float_operator<Left> && (std::is_arithmetic_v<Right> || std::is_base_of_v<STRICT_CPP_NAMESPACE::detail::strict_cpp_integer_base_t, Right>));
+      concept is_qualified_float_operator_left_only = is_qualified_float_operator<Left> &&
+                                                      (std::is_arithmetic_v<Right> || std::is_base_of_v<STRICT_CPP_NAMESPACE::detail::strict_cpp_integral_base_t, Right>);
 
       // Returns true if [Left] is a arithmetic type and [Right] inherits from the [strict_cpp_float_base_t] type.
       template <typename Left, typename Right>
-      concept is_qualified_float_operator_right_only =
-         ((std::is_arithmetic_v<Left> || std::is_base_of_v<STRICT_CPP_NAMESPACE::detail::strict_cpp_integer_base_t, Left>) && is_qualified_float_operator<Right>);
+      concept is_qualified_float_operator_right_only = (std::is_arithmetic_v<Left> || std::is_base_of_v<STRICT_CPP_NAMESPACE::detail::strict_cpp_integral_base_t, Left>) &&
+                                                       is_qualified_float_operator<Right>;
 
       // Returns true if [Other] is the same as one of the [QualifiedTypes] and if [QualifiedTypes] is a non-zero length.
       template <typename Other, typename... QualifiedTypes>
@@ -312,7 +312,7 @@ namespace STRICT_CPP_NAMESPACE {
 
    template <typename Type, typename... QualifiedTypes>
       requires std::is_integral_v<Type>
-   struct strict_integer_type : STRICT_CPP_NAMESPACE::detail::strict_cpp_integer_base_t {
+   struct strict_integral_type : STRICT_CPP_NAMESPACE::detail::strict_cpp_integral_base_t {
          inline constexpr static Type min = std::numeric_limits<Type>::min();
          inline constexpr static Type max = std::numeric_limits<Type>::max();
 
@@ -320,14 +320,14 @@ namespace STRICT_CPP_NAMESPACE {
          Type value = {};
 
          /// @brief Default constructor.
-         inline constexpr strict_integer_type() noexcept = default;
+         inline constexpr strict_integral_type() noexcept = default;
 
          /// @brief Implicit constructor.
          /// @tparam Other The implicitly-convertible type.
          /// @param other The implicitly-convertible value.
          template <typename Other>
             requires STRICT_CPP_NAMESPACE::detail::is_qualified_implicit_constructor<Other, Type, QualifiedTypes...>
-         inline constexpr strict_integer_type(const Other& other) noexcept :
+         inline constexpr strict_integral_type(const Other& other) noexcept :
             value(static_cast<Type>(other)) { }
 
          /// @brief Explicit constructor.
@@ -335,7 +335,7 @@ namespace STRICT_CPP_NAMESPACE {
          /// @param other The explicitly-convertible value.
          template <typename Other>
             requires STRICT_CPP_NAMESPACE::detail::is_qualified_explicit_constructor<Other, Type>
-         inline constexpr explicit strict_integer_type(const Other& other) noexcept :
+         inline constexpr explicit strict_integral_type(const Other& other) noexcept :
             value(static_cast<Type>(other)) { }
 
          /// @brief Assignment operator.
@@ -458,8 +458,8 @@ namespace STRICT_CPP_NAMESPACE {
 }
 
 #define STRICT_CPP_DEFINE_INTEGRAL_TYPE(NAME, TYPE, QUALIFIED_TYPES...)                                                                                                            \
-   struct NAME : STRICT_CPP_NAMESPACE::strict_integer_type<TYPE, QUALIFIED_TYPES> {                                                                                                \
-         using STRICT_CPP_NAMESPACE::strict_integer_type<TYPE, QUALIFIED_TYPES>::strict_integer_type;                                                                              \
+   struct NAME : STRICT_CPP_NAMESPACE::strict_integral_type<TYPE, QUALIFIED_TYPES> {                                                                                               \
+         using STRICT_CPP_NAMESPACE::strict_integral_type<TYPE, QUALIFIED_TYPES>::strict_integral_type;                                                                            \
    };
 
 #define STRICT_CPP_DEFINE_FLOAT_TYPE(NAME, TYPE, QUALIFIED_TYPES...)                                                                                                               \

@@ -119,23 +119,40 @@ STRICT_CPP_DEFINE_INTEGRAL_TYPE(some_ints_t, int, unsigned int, long, std::size_
 STRICT_CPP_DEFINE_FLOAT_TYPE(some_floats_t, float, double, long double);
 
 // Which means you can do stuff like this:
+// #1
 void example0(some_floats_t) { }
 
-void example1(some_ints_t) { }
+// #2
+void example0(some_ints_t) { }
 
-void example1(strict::size_t) { } // Overload to demonstrate ambiguity.
+// #3
+void example0(strict::size_t) { } // Overloaded to demonstrate ambiguity.
+
+// #4
+void example1(strict::any_size_t) { }
+
+// #5
+void example1(strict::any_int_t) { }
 
 void test() {
    // example0:
-   example0(5.0F);
-   example0(1.0L);
-   example0(3.);
+   example0(5.0F); // Calls #1
+   example0(1.0L); // Calls #1
+   example0(3.);   // Calls #1
 
    // example1:
-   example1(5);
-   example1(10U);
-   example1(25L);
+   example0(5);   // Calls #2
+   example0(10U); // Calls #2
+   example0(25L); // Calls #2
 
-   // Ambiguous between example1(some_ints_t) and example1(strict::size_t).
-   // example1(789ULL);
+   // Ambiguous as implicit conversion is possible for both some_ints_t and strict::size_t.
+   // example0(789ULL);
+
+   // Some pre-defined "any" types exist:
+   example1(strict::size_t(20)); // Calls #4
+   example1(strict::size8_t(5)); // Calls #4
+   example1(5);                  // Calls #5
+
+   // Ambiguous as implicit conversion is possible for both any_size_t and any_int_t.
+   // example1(4ULL);
 }

@@ -553,47 +553,53 @@ namespace STRICT_CPP_NAMESPACE {
 // Pre-defined types
 // =============================================================================
 
-// Common integral types:
 namespace STRICT_CPP_NAMESPACE {
+   // Common integral types:
    STRICT_CPP_DEFINE_INTEGRAL_TYPE(char_t, char);
-   STRICT_CPP_DEFINE_INTEGRAL_TYPE(short_t, std::int16_t);
-   STRICT_CPP_DEFINE_INTEGRAL_TYPE(int_t, std::int32_t);
-   STRICT_CPP_DEFINE_INTEGRAL_TYPE(long_t, std::int64_t);
-
    STRICT_CPP_DEFINE_INTEGRAL_TYPE(schar_t, signed char);
-
    STRICT_CPP_DEFINE_INTEGRAL_TYPE(uchar_t, unsigned char);
+   STRICT_CPP_DEFINE_INTEGRAL_TYPE(short_t, std::int16_t);
    STRICT_CPP_DEFINE_INTEGRAL_TYPE(ushort_t, std::uint16_t);
-   STRICT_CPP_DEFINE_INTEGRAL_TYPE(uint_t, std::uint32_t);
+   STRICT_CPP_DEFINE_INTEGRAL_TYPE(long_t, std::int64_t);
    STRICT_CPP_DEFINE_INTEGRAL_TYPE(ulong_t, std::uint64_t);
 
    STRICT_CPP_DEFINE_INTEGRAL_TYPE(size_t, std::size_t);
+   STRICT_CPP_DEFINE_INTEGRAL_TYPE(size8_t, std::uint8_t);
+   STRICT_CPP_DEFINE_INTEGRAL_TYPE(size16_t, std::uint16_t);
+   STRICT_CPP_DEFINE_INTEGRAL_TYPE(size32_t, std::uint32_t);
+   STRICT_CPP_DEFINE_INTEGRAL_TYPE(size64_t, std::uint64_t);
 
+   STRICT_CPP_DEFINE_INTEGRAL_TYPE(int_t, std::int64_t);
    STRICT_CPP_DEFINE_INTEGRAL_TYPE(int8_t, std::int8_t);
    STRICT_CPP_DEFINE_INTEGRAL_TYPE(int16_t, std::int16_t);
    STRICT_CPP_DEFINE_INTEGRAL_TYPE(int32_t, std::int32_t);
    STRICT_CPP_DEFINE_INTEGRAL_TYPE(int64_t, std::int64_t);
 
+   STRICT_CPP_DEFINE_INTEGRAL_TYPE(int_least_t, std::int_least64_t);
    STRICT_CPP_DEFINE_INTEGRAL_TYPE(int_least8_t, std::int_least8_t);
    STRICT_CPP_DEFINE_INTEGRAL_TYPE(int_least16_t, std::int_least16_t);
    STRICT_CPP_DEFINE_INTEGRAL_TYPE(int_least32_t, std::int_least32_t);
    STRICT_CPP_DEFINE_INTEGRAL_TYPE(int_least64_t, std::int_least64_t);
 
+   STRICT_CPP_DEFINE_INTEGRAL_TYPE(int_fast_t, std::int_fast64_t);
    STRICT_CPP_DEFINE_INTEGRAL_TYPE(int_fast8_t, std::int_fast8_t);
    STRICT_CPP_DEFINE_INTEGRAL_TYPE(int_fast16_t, std::int_fast16_t);
    STRICT_CPP_DEFINE_INTEGRAL_TYPE(int_fast32_t, std::int_fast32_t);
    STRICT_CPP_DEFINE_INTEGRAL_TYPE(int_fast64_t, std::int_fast64_t);
 
+   STRICT_CPP_DEFINE_INTEGRAL_TYPE(uint_t, std::uint64_t);
    STRICT_CPP_DEFINE_INTEGRAL_TYPE(uint8_t, std::uint8_t);
    STRICT_CPP_DEFINE_INTEGRAL_TYPE(uint16_t, std::uint16_t);
    STRICT_CPP_DEFINE_INTEGRAL_TYPE(uint32_t, std::uint32_t);
    STRICT_CPP_DEFINE_INTEGRAL_TYPE(uint64_t, std::uint64_t);
 
+   STRICT_CPP_DEFINE_INTEGRAL_TYPE(uint_least_t, std::uint_least64_t);
    STRICT_CPP_DEFINE_INTEGRAL_TYPE(uint_least8_t, std::uint_least8_t);
    STRICT_CPP_DEFINE_INTEGRAL_TYPE(uint_least16_t, std::uint_least16_t);
    STRICT_CPP_DEFINE_INTEGRAL_TYPE(uint_least32_t, std::uint_least32_t);
    STRICT_CPP_DEFINE_INTEGRAL_TYPE(uint_least64_t, std::uint_least64_t);
 
+   STRICT_CPP_DEFINE_INTEGRAL_TYPE(uint_fast_t, std::uint_fast64_t);
    STRICT_CPP_DEFINE_INTEGRAL_TYPE(uint_fast8_t, std::uint_fast8_t);
    STRICT_CPP_DEFINE_INTEGRAL_TYPE(uint_fast16_t, std::uint_fast16_t);
    STRICT_CPP_DEFINE_INTEGRAL_TYPE(uint_fast32_t, std::uint_fast32_t);
@@ -608,43 +614,231 @@ namespace STRICT_CPP_NAMESPACE {
    STRICT_CPP_DEFINE_INTEGRAL_TYPE(byte_t, std::uint8_t);
    STRICT_CPP_DEFINE_INTEGRAL_TYPE(sbyte_t, std::int8_t);
 
-   // Common floating-point types:
-   STRICT_CPP_DEFINE_FLOAT_TYPE(float_t, std::float_t);
-   STRICT_CPP_DEFINE_FLOAT_TYPE(double_t, std::double_t);
+   // Integral "any" types:
+   STRICT_CPP_DEFINE_INTEGRAL_TYPE(
+      any_int_t,
+      std::size_t,
+      char,
+      std::int8_t,
+      std::int16_t,
+      std::int32_t,
+      std::int64_t,
+      std::uint8_t,
+      std::uint16_t,
+      std::uint32_t,
+      std::uint64_t,
+      STRICT_CPP_NAMESPACE::char_t,
+      STRICT_CPP_NAMESPACE::schar_t,
+      STRICT_CPP_NAMESPACE::uchar_t,
+      STRICT_CPP_NAMESPACE::short_t,
+      STRICT_CPP_NAMESPACE::ushort_t,
+      STRICT_CPP_NAMESPACE::long_t,
+      STRICT_CPP_NAMESPACE::ulong_t,
+      STRICT_CPP_NAMESPACE::int_t,
+      STRICT_CPP_NAMESPACE::int8_t,
+      STRICT_CPP_NAMESPACE::int16_t,
+      STRICT_CPP_NAMESPACE::int32_t,
+      STRICT_CPP_NAMESPACE::int64_t,
+      STRICT_CPP_NAMESPACE::uint_t,
+      STRICT_CPP_NAMESPACE::uint8_t,
+      STRICT_CPP_NAMESPACE::uint16_t,
+      STRICT_CPP_NAMESPACE::uint32_t,
+      STRICT_CPP_NAMESPACE::uint64_t
+   );
 
-   // Float short-hand aliases
-   STRICT_CPP_DEFINE_FLOAT_TYPE(f32_t, std::float_t);
-   STRICT_CPP_DEFINE_FLOAT_TYPE(f64_t, std::double_t);
+   STRICT_CPP_DEFINE_INTEGRAL_TYPE(
+      any_size_t,
+      std::size_t,
+      STRICT_CPP_NAMESPACE::size_t,
+      STRICT_CPP_NAMESPACE::size8_t,
+      STRICT_CPP_NAMESPACE::size16_t,
+      STRICT_CPP_NAMESPACE::size32_t,
+      STRICT_CPP_NAMESPACE::size64_t
+   );
+
+   STRICT_CPP_DEFINE_INTEGRAL_TYPE(
+      any_signed_int_t,
+      std::int64_t,
+      std::int8_t,
+      std::int16_t,
+      std::int32_t,
+      std::int64_t,
+      STRICT_CPP_NAMESPACE::int_t,
+      STRICT_CPP_NAMESPACE::int8_t,
+      STRICT_CPP_NAMESPACE::int16_t,
+      STRICT_CPP_NAMESPACE::int32_t,
+      STRICT_CPP_NAMESPACE::int64_t
+   );
+
+   STRICT_CPP_DEFINE_INTEGRAL_TYPE(
+      any_unsigned_int_t,
+      std::uint64_t,
+      std::uint8_t,
+      std::uint16_t,
+      std::uint32_t,
+      std::uint64_t,
+      STRICT_CPP_NAMESPACE::uint_t,
+      STRICT_CPP_NAMESPACE::uint8_t,
+      STRICT_CPP_NAMESPACE::uint16_t,
+      STRICT_CPP_NAMESPACE::uint32_t,
+      STRICT_CPP_NAMESPACE::uint64_t
+   );
+
+   STRICT_CPP_DEFINE_INTEGRAL_TYPE(
+      any_int_least_t,
+      std::int_least64_t,
+      std::int_least8_t,
+      std::int_least16_t,
+      std::int_least32_t,
+      std::int_least64_t,
+      STRICT_CPP_NAMESPACE::int_least8_t,
+      STRICT_CPP_NAMESPACE::int_least16_t,
+      STRICT_CPP_NAMESPACE::int_least32_t,
+      STRICT_CPP_NAMESPACE::int_least64_t
+   );
+
+   STRICT_CPP_DEFINE_INTEGRAL_TYPE(
+      any_int_fast_t,
+      std::int_fast64_t,
+      std::int_fast8_t,
+      std::int_fast16_t,
+      std::int_fast32_t,
+      std::int_fast64_t,
+      STRICT_CPP_NAMESPACE::int_fast8_t,
+      STRICT_CPP_NAMESPACE::int_fast16_t,
+      STRICT_CPP_NAMESPACE::int_fast32_t,
+      STRICT_CPP_NAMESPACE::int_fast64_t
+   );
+
+   STRICT_CPP_DEFINE_INTEGRAL_TYPE(
+      any_uint_least_t,
+      std::uint_least64_t,
+      std::uint_least8_t,
+      std::uint_least16_t,
+      std::uint_least32_t,
+      std::uint_least64_t,
+      STRICT_CPP_NAMESPACE::uint_least8_t,
+      STRICT_CPP_NAMESPACE::uint_least16_t,
+      STRICT_CPP_NAMESPACE::uint_least32_t,
+      STRICT_CPP_NAMESPACE::uint_least64_t
+   );
+
+   STRICT_CPP_DEFINE_INTEGRAL_TYPE(
+      any_uint_fast_t,
+      std::uint_fast64_t,
+      std::uint_fast8_t,
+      std::uint_fast16_t,
+      std::uint_fast32_t,
+      std::uint_fast64_t,
+      STRICT_CPP_NAMESPACE::uint_fast8_t,
+      STRICT_CPP_NAMESPACE::uint_fast16_t,
+      STRICT_CPP_NAMESPACE::uint_fast32_t,
+      STRICT_CPP_NAMESPACE::uint_fast64_t
+   );
+
+   STRICT_CPP_DEFINE_INTEGRAL_TYPE(any_intmax_t, std::uintmax_t, STRICT_CPP_NAMESPACE::intmax_t, STRICT_CPP_NAMESPACE::uintmax_t);
+   STRICT_CPP_DEFINE_INTEGRAL_TYPE(any_intptr_t, std::uintptr_t, STRICT_CPP_NAMESPACE::intptr_t, STRICT_CPP_NAMESPACE::uintptr_t);
+   STRICT_CPP_DEFINE_INTEGRAL_TYPE(any_byte_t, std::uint8_t, STRICT_CPP_NAMESPACE::byte_t, STRICT_CPP_NAMESPACE::sbyte_t);
+
+   // Common floating-point types:
+   STRICT_CPP_DEFINE_FLOAT_TYPE(float_t, float);
+   STRICT_CPP_DEFINE_FLOAT_TYPE(double_t, double);
+   STRICT_CPP_DEFINE_FLOAT_TYPE(long_double_t, long double);
+   STRICT_CPP_DEFINE_FLOAT_TYPE(float32_t, std::float_t);
+   STRICT_CPP_DEFINE_FLOAT_TYPE(float64_t, std::double_t);
+
+   // Float "any" types:
+   STRICT_CPP_DEFINE_FLOAT_TYPE(
+      any_float_t,
+      std::double_t,
+      STRICT_CPP_NAMESPACE::float_t,
+      STRICT_CPP_NAMESPACE::double_t,
+      STRICT_CPP_NAMESPACE::long_double_t,
+      STRICT_CPP_NAMESPACE::float32_t,
+      STRICT_CPP_NAMESPACE::float64_t
+   );
 
    // Optional integral types:
 #if defined(STRICT_CPP_OPTIONAL_TYPES)
-   STRICT_CPP_DEFINE_INTEGRAL_TYPE(size8_t, std::uint8_t);
-   STRICT_CPP_DEFINE_INTEGRAL_TYPE(size16_t, std::uint16_t);
-   STRICT_CPP_DEFINE_INTEGRAL_TYPE(size32_t, std::uint32_t);
-   STRICT_CPP_DEFINE_INTEGRAL_TYPE(size64_t, std::uint64_t);
+   #define STRICT_CPP_DEFINE_OPTIONAL_TYPE_UNSIGNED(NAME)                                                                                                                          \
+      STRICT_CPP_DEFINE_INTEGRAL_TYPE(NAME##_t, std::size_t);                                                                                                                      \
+      STRICT_CPP_DEFINE_INTEGRAL_TYPE(NAME##8_t, std::uint8_t);                                                                                                                    \
+      STRICT_CPP_DEFINE_INTEGRAL_TYPE(NAME##16_t, std::uint16_t);                                                                                                                  \
+      STRICT_CPP_DEFINE_INTEGRAL_TYPE(NAME##32_t, std::uint32_t);                                                                                                                  \
+      STRICT_CPP_DEFINE_INTEGRAL_TYPE(NAME##64_t, std::uint64_t);                                                                                                                  \
+      STRICT_CPP_DEFINE_INTEGRAL_TYPE(                                                                                                                                             \
+         any_##NAME##_t,                                                                                                                                                           \
+         std::uint64_t,                                                                                                                                                            \
+         std::uint8_t,                                                                                                                                                             \
+         std::uint16_t,                                                                                                                                                            \
+         std::uint32_t,                                                                                                                                                            \
+         std::uint64_t,                                                                                                                                                            \
+         STRICT_CPP_NAMESPACE::NAME##_t,                                                                                                                                           \
+         STRICT_CPP_NAMESPACE::NAME##8_t,                                                                                                                                          \
+         STRICT_CPP_NAMESPACE::NAME##16_t,                                                                                                                                         \
+         STRICT_CPP_NAMESPACE::NAME##32_t,                                                                                                                                         \
+         STRICT_CPP_NAMESPACE::NAME##64_t                                                                                                                                          \
+      );
 
-   STRICT_CPP_DEFINE_INTEGRAL_TYPE(count_t, std::size_t);
-   STRICT_CPP_DEFINE_INTEGRAL_TYPE(count8_t, std::uint8_t);
-   STRICT_CPP_DEFINE_INTEGRAL_TYPE(count16_t, std::uint16_t);
-   STRICT_CPP_DEFINE_INTEGRAL_TYPE(count32_t, std::uint32_t);
-   STRICT_CPP_DEFINE_INTEGRAL_TYPE(count64_t, std::uint64_t);
+   // size_t
+   STRICT_CPP_DEFINE_OPTIONAL_TYPE_UNSIGNED(offset_size);
+   STRICT_CPP_DEFINE_OPTIONAL_TYPE_UNSIGNED(begin_size);
+   STRICT_CPP_DEFINE_OPTIONAL_TYPE_UNSIGNED(begin_offset_size);
+   STRICT_CPP_DEFINE_OPTIONAL_TYPE_UNSIGNED(end_size);
+   STRICT_CPP_DEFINE_OPTIONAL_TYPE_UNSIGNED(end_offset_size);
+   STRICT_CPP_DEFINE_OPTIONAL_TYPE_UNSIGNED(src_size);
+   STRICT_CPP_DEFINE_OPTIONAL_TYPE_UNSIGNED(src_offset_size);
+   STRICT_CPP_DEFINE_OPTIONAL_TYPE_UNSIGNED(dst_size);
+   STRICT_CPP_DEFINE_OPTIONAL_TYPE_UNSIGNED(dst_offset_size);
+   STRICT_CPP_DEFINE_OPTIONAL_TYPE_UNSIGNED(lhs_size);
+   STRICT_CPP_DEFINE_OPTIONAL_TYPE_UNSIGNED(lhs_offset_size);
+   STRICT_CPP_DEFINE_OPTIONAL_TYPE_UNSIGNED(rhs_size);
+   STRICT_CPP_DEFINE_OPTIONAL_TYPE_UNSIGNED(rhs_offset_size);
 
-   STRICT_CPP_DEFINE_INTEGRAL_TYPE(offset_t, std::size_t);
-   STRICT_CPP_DEFINE_INTEGRAL_TYPE(offset8_t, std::uint8_t);
-   STRICT_CPP_DEFINE_INTEGRAL_TYPE(offset16_t, std::uint16_t);
-   STRICT_CPP_DEFINE_INTEGRAL_TYPE(offset32_t, std::uint32_t);
-   STRICT_CPP_DEFINE_INTEGRAL_TYPE(offset64_t, std::uint64_t);
+   // count_t
+   STRICT_CPP_DEFINE_OPTIONAL_TYPE_UNSIGNED(count);
+   STRICT_CPP_DEFINE_OPTIONAL_TYPE_UNSIGNED(offset_count);
+   STRICT_CPP_DEFINE_OPTIONAL_TYPE_UNSIGNED(src_count);
+   STRICT_CPP_DEFINE_OPTIONAL_TYPE_UNSIGNED(src_offset_count);
+   STRICT_CPP_DEFINE_OPTIONAL_TYPE_UNSIGNED(begin_count);
+   STRICT_CPP_DEFINE_OPTIONAL_TYPE_UNSIGNED(begin_offset_count);
+   STRICT_CPP_DEFINE_OPTIONAL_TYPE_UNSIGNED(lhs_count);
+   STRICT_CPP_DEFINE_OPTIONAL_TYPE_UNSIGNED(lhs_offset_count);
+   STRICT_CPP_DEFINE_OPTIONAL_TYPE_UNSIGNED(dst_count);
+   STRICT_CPP_DEFINE_OPTIONAL_TYPE_UNSIGNED(dst_offset_count);
+   STRICT_CPP_DEFINE_OPTIONAL_TYPE_UNSIGNED(end_count);
+   STRICT_CPP_DEFINE_OPTIONAL_TYPE_UNSIGNED(end_offset_count);
+   STRICT_CPP_DEFINE_OPTIONAL_TYPE_UNSIGNED(rhs_count);
+   STRICT_CPP_DEFINE_OPTIONAL_TYPE_UNSIGNED(rhs_offset_count);
 
-   STRICT_CPP_DEFINE_INTEGRAL_TYPE(capacity_t, std::size_t);
-   STRICT_CPP_DEFINE_INTEGRAL_TYPE(capacity8_t, std::uint8_t);
-   STRICT_CPP_DEFINE_INTEGRAL_TYPE(capacity16_t, std::uint16_t);
-   STRICT_CPP_DEFINE_INTEGRAL_TYPE(capacity32_t, std::uint32_t);
-   STRICT_CPP_DEFINE_INTEGRAL_TYPE(capacity64_t, std::uint64_t);
+   // offset_t
+   STRICT_CPP_DEFINE_OPTIONAL_TYPE_UNSIGNED(offset);
+   STRICT_CPP_DEFINE_OPTIONAL_TYPE_UNSIGNED(begin_offset);
+   STRICT_CPP_DEFINE_OPTIONAL_TYPE_UNSIGNED(end_offset);
+   STRICT_CPP_DEFINE_OPTIONAL_TYPE_UNSIGNED(src_offset);
+   STRICT_CPP_DEFINE_OPTIONAL_TYPE_UNSIGNED(dst_offset);
+   STRICT_CPP_DEFINE_OPTIONAL_TYPE_UNSIGNED(lhs_offset);
+   STRICT_CPP_DEFINE_OPTIONAL_TYPE_UNSIGNED(rhs_offset);
 
-   STRICT_CPP_DEFINE_INTEGRAL_TYPE(index_t, std::size_t);
-   STRICT_CPP_DEFINE_INTEGRAL_TYPE(index8_t, std::uint8_t);
-   STRICT_CPP_DEFINE_INTEGRAL_TYPE(index16_t, std::uint16_t);
-   STRICT_CPP_DEFINE_INTEGRAL_TYPE(index32_t, std::uint32_t);
-   STRICT_CPP_DEFINE_INTEGRAL_TYPE(index64_t, std::uint64_t);
+   // index_t
+   STRICT_CPP_DEFINE_OPTIONAL_TYPE_UNSIGNED(index);
+   STRICT_CPP_DEFINE_OPTIONAL_TYPE_UNSIGNED(index_offset);
+   STRICT_CPP_DEFINE_OPTIONAL_TYPE_UNSIGNED(begin_index);
+   STRICT_CPP_DEFINE_OPTIONAL_TYPE_UNSIGNED(begin_index_offset);
+   STRICT_CPP_DEFINE_OPTIONAL_TYPE_UNSIGNED(end_index);
+   STRICT_CPP_DEFINE_OPTIONAL_TYPE_UNSIGNED(end_index_offset);
+   STRICT_CPP_DEFINE_OPTIONAL_TYPE_UNSIGNED(src_index);
+   STRICT_CPP_DEFINE_OPTIONAL_TYPE_UNSIGNED(src_index_offset);
+   STRICT_CPP_DEFINE_OPTIONAL_TYPE_UNSIGNED(dst_index);
+   STRICT_CPP_DEFINE_OPTIONAL_TYPE_UNSIGNED(dst_index_offset);
+   STRICT_CPP_DEFINE_OPTIONAL_TYPE_UNSIGNED(lhs_index);
+   STRICT_CPP_DEFINE_OPTIONAL_TYPE_UNSIGNED(lhs_index_offset);
+   STRICT_CPP_DEFINE_OPTIONAL_TYPE_UNSIGNED(rhs_index);
+   STRICT_CPP_DEFINE_OPTIONAL_TYPE_UNSIGNED(rhs_index_offset);
+
+   // capacity_t
+   STRICT_CPP_DEFINE_OPTIONAL_TYPE_UNSIGNED(capacity);
+
+   #undef STRICT_CPP_DEFINE_OPTIONAL_TYPE_UNSIGNED
 #endif
 }

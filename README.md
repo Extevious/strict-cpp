@@ -13,7 +13,8 @@ Reduce ambiguity between methods and operators by using types provided by strict
 
 - Reduce ambiguity between methods and operators.
 - Enforce more explicit type-safety.
-- Use method or operator overloads more freely with less ambiguity.
+- Use method or operator overloads avoiding swapped parameters, wrong parameter types, etc.
+- Strict-alias types for similar method or operator overloads while avoiding ambiguity.
 
 ### Example:
 
@@ -48,14 +49,14 @@ Reduce ambiguity between methods and operators by using types provided by strict
 
    // You can define your own types:
    //    - First parameter is the name of the type.
-   //    - Second parameter is the type.
+   //    - Second parameter is the encapsulated type.
 
    STRICT_CPP_DEFINE_INTEGRAL_TYPE(buffer_size_t, std::size_t);
    STRICT_CPP_DEFINE_FLOAT_TYPE(scale_t, float);
 
    // You can also define your own types with a range of qualified types for implicit usage:
    //    - First parameter is the name of the type.
-   //    - Second parameter is the type.
+   //    - Second parameter is the encapsulated type.
    //    - All following types are the qualified types.
 
    STRICT_CPP_DEFINE_INTEGRAL_TYPE(example_t, int, long, double, std::size_t);
@@ -74,15 +75,15 @@ Reduce ambiguity between methods and operators by using types provided by strict
    // Alias types
    // =======================================================================
 
-   // Defining an alias type is easy:
-   //    Note: if you need a comma (ex; for std::map<A,B>) it will need to be defined as a macro.
+   // Defining a strict-alias type is easy:
+   //    Note: if you need a comma (ex; for std::map<A,B>) the comma will need to be defined as a macro.
    STRICT_CPP_DEFINE_ALIAS_TYPE(some_string_A, std::string);
    STRICT_CPP_DEFINE_ALIAS_TYPE(some_string_B, std::string);
 
    ...
 
-   void example0(const some_string_A& string); // #1
-   void example0(const some_string_B& string); // #2
+   void example0(some_string_A string); // #1
+   void example0(some_string_B string); // #2
 
    const some_string_A string0 = "some simple string A";
    const some_string_B string1 = "some simple string B";
@@ -97,25 +98,25 @@ Reduce ambiguity between methods and operators by using types provided by strict
    ...
 
    // If you've ever had methods or constructors with similar or same parameters that differ
-   // only in parameter name, using strict-aliases can significantly reduce that ambiguity.
+   // only in parameter name, using strict-aliases can significantly reduce ambiguity.
 
    // You might accidentally swap a and b:
-   void example1(const std::string& a, const std::string& b);
+   void example1(std::string a, std::string b);
 
    // But this is impossible to swap, unless you're implicitly converting from the encapsulated type:
-   void example1(const some_string_A& a, const some_string_B& b);
+   void example1(some_string_A a, some_string_B b);
 ```
 
 ## How to include in your projects
 
-### Cmake or Meson
+### Cmake, Meson, or directly from GitHub
 
 1. Clone or download this repo into your project.
 2. Include the `strict-cpp.hpp` file that is inside the `include` directory.
 
 ### Meson (as a .wrap dependency)
 
-1. Create a `strict-cpp.wrap` file in the `<project root>/subprojects` directory. Example `.wrap` file:
+1. Create a `strict-cpp.wrap` file in the `<project root>/subprojects` directory (if the directory doesn't exist, create one). An example `.wrap` file:
 
 ```cmake
    [wrap-git]
@@ -161,7 +162,7 @@ Reduce ambiguity between methods and operators by using types provided by strict
 // Default namespace name.
 #define STRICT_CPP_NAMESPACE strict
 
-// Expose optional pre-defined types.
+// When defined, exposes pre-defined optional types.
 #define STRICT_CPP_OPTIONAL_TYPES
 ```
 
@@ -170,7 +171,7 @@ Reduce ambiguity between methods and operators by using types provided by strict
 ```cpp
 // Macro to define your own integral types.
 //    NAME            : the name of your strict type.
-//    TYPE            : the encapsulated primitive type (float, double, etc).
+//    TYPE            : the encapsulated primitive type (int, long, etc).
 //    QUALIFIED_TYPES : the optional range of types that are qualified for implicit usage.
 #define STRICT_CPP_DEFINE_INTEGRAL_TYPE(NAME, TYPE, QUALIFIED_TYPES...)
 
@@ -186,163 +187,86 @@ Reduce ambiguity between methods and operators by using types provided by strict
 #define STRICT_CPP_DEFINE_ALIAS_TYPE(NAME, TYPE)
 ```
 
-## Available types
-
-### Common:
+## Available pre-defined types
 
 ```cpp
-// Integral types
-size_t               (std::size_t)
+   Name:                  Encapsulated Type:
+    char_t                 char
+    schar_t                signed char
+    uchar_t                unsigned char
+    short_t                std::int16_t
+    ushort_t               std::uint16_t
+    long_t                 std::int64_t
+    ulong_t                std::uint64_t
+    size_t                 std::size_t
+    size8_t                std::uint8_t
+    size16_t               std::uint16_t
+    size32_t               std::uint32_t
+    size64_t               std::uint64_t
+    int_t                  std::int64_t
+    int8_t                 std::int8_t
+    int16_t                std::int16_t
+    int32_t                std::int32_t
+    int64_t                std::int64_t
+    int_least_t            std::int_least64_t
+    int_least8_t           std::int_least8_t
+    int_least16_t          std::int_least16_t
+    int_least32_t          std::int_least32_t
+    int_least64_t          std::int_least64_t
+    int_fast_t             std::int_fast64_t
+    int_fast8_t            std::int_fast8_t
+    int_fast16_t           std::int_fast16_t
+    int_fast32_t           std::int_fast32_t
+    int_fast64_t           std::int_fast64_t
+    uint_t                 std::uint64_t
+    uint8_t                std::uint8_t
+    uint16_t               std::uint16_t
+    uint32_t               std::uint32_t
+    uint64_t               std::uint64_t
+    uint_least_t           std::uint_least64_t
+    uint_least8_t          std::uint_least8_t
+    uint_least16_t         std::uint_least16_t
+    uint_least32_t         std::uint_least32_t
+    uint_least64_t         std::uint_least64_t
+    uint_fast_t            std::uint_fast64_t
+    uint_fast8_t           std::uint_fast8_t
+    uint_fast16_t          std::uint_fast16_t
+    uint_fast32_t          std::uint_fast32_t
+    uint_fast64_t          std::uint_fast64_t
+    intmax_t               std::intmax_t
+    uintmax_t              std::uintmax_t
+    intptr_t               std::intptr_t
+    uintptr_t              std::uintptr_t
+    byte_t                 std::uint8_t
+    sbyte_t                std::int8_t
 
-int8_t               (std::int8_t)
-int16_t              (std::int16_t)
-int32_t              (std::int32_t)
-int64_t              (std::int64_t)
+    any_int_t              ...
+    any_size_t             ...
+    any_signed_int_t       ...
+    any_unsigned_int_t     ...
+    any_int_least_t        ...
+    any_int_fast_t         ...
+    any_uint_least_t       ...
+    any_uint_fast_t        ...
+    any_intmax_t           ...
+    any_intptr_t           ...
+    any_byte_t             ...
 
-int_least8_t         (std::int_least8_t)
-int_least16_t        (std::int_least16_t)
-int_least32_t        (std::int_least32_t)
-int_least64_t        (std::int_least64_t)
+    float_t                float
+    double_t               double
+    long_double_t          long double
+    float32_t              std::float_t
+    float64_t              std::double_t
 
-int_fast8_t          (std::int_fast8_t)
-int_fast16_t         (std::int_fast16_t)
-int_fast32_t         (std::int_fast32_t)
-int_fast64_t         (std::int_fast64_t)
+    any_float_t            ...
 
-uint8_t              (std::uint8_t)
-uint16_t             (std::uint16_t)
-uint32_t             (std::uint32_t)
-uint64_t             (std::uint64_t)
-
-uint_least8_t        (std::uint_least8_t)
-uint_least16_t       (std::uint_least16_t)
-uint_least32_t       (std::uint_least32_t)
-uint_least64_t       (std::uint_least64_t)
-
-uint_fast8_t         (std::uint_fast8_t)
-uint_fast16_t        (std::uint_fast16_t)
-uint_fast32_t        (std::uint_fast32_t)
-uint_fast64_t        (std::uint_fast64_t)
-
-intmax_t             (std::intmax_t)
-uintmax_t            (std::uintmax_t)
-
-intptr_t             (std::intptr_t)
-uintptr_t            (std::uintptr_t)
-
-char_t               (char)
-schar_t              (signed char)
-uchar_t              (unsigned char)
-
-// Floating-point types
-float_t              (float)
-double_t             (double)
-long_double_t        (long double)
 ```
 
-### Optional:
-
-```cpp
-// Integral types
-size8_t              (std::uint8_t)
-size16_t             (std::uint16_t)
-size32_t             (std::uint32_t)
-size64_t             (std::uint64_t)
-
-src_size_t           (std::size_t)
-src_size8_t          (std::uint8_t)
-src_size16_t         (std::uint16_t)
-src_size32_t         (std::uint32_t)
-src_size64_t         (std::uint64_t)
-
-src_offset_size_t    (std::size_t)
-src_offset_size8_t   (std::uint8_t)
-src_offset_size16_t  (std::uint16_t)
-src_offset_size32_t  (std::uint32_t)
-src_offset_size64_t  (std::uint64_t)
-
-dst_size_t           (std::size_t)
-dst_size8_t          (std::uint8_t)
-dst_size16_t         (std::uint16_t)
-dst_size32_t         (std::uint32_t)
-dst_size64_t         (std::uint64_t)
-
-dst_offset_size_t    (std::size_t)
-dst_offset_size8_t   (std::uint8_t)
-dst_offset_size16_t  (std::uint16_t)
-dst_offset_size32_t  (std::uint32_t)
-dst_offset_size64_t  (std::uint64_t)
-
-capacity_t           (std::size_t)
-capacity8_t          (std::uint8_t)
-capacity16_t         (std::uint16_t)
-capacity32_t         (std::uint32_t)
-capacity64_t         (std::uint64_t)
-
-count_t              (std::size_t)
-count8_t             (std::uint8_t)
-count16_t            (std::uint16_t)
-count32_t            (std::uint32_t)
-count64_t            (std::uint64_t)
-
-offset_count_t       (std::size_t)
-offset_count8_t      (std::uint8_t)
-offset_count16_t     (std::uint16_t)
-offset_count32_t     (std::uint32_t)
-offset_count64_t     (std::uint64_t)
-
-src_count_t          (std::size_t)
-src_count8_t         (std::uint8_t)
-src_count16_t        (std::uint16_t)
-src_count32_t        (std::uint32_t)
-src_count64_t        (std::uint64_t)
-
-src_offset_count_t    (std::size_t)
-src_offset_count8_t   (std::uint8_t)
-src_offset_count16_t  (std::uint16_t)
-src_offset_count32_t  (std::uint32_t)
-src_offset_count64_t  (std::uint64_t)
-
-dst_count_t          (std::size_t)
-dst_count8_t         (std::uint8_t)
-dst_count16_t        (std::uint16_t)
-dst_count32_t        (std::uint32_t)
-dst_count64_t        (std::uint64_t)
-
-dst_offset_count_t    (std::size_t)
-dst_offset_count8_t   (std::uint8_t)
-dst_offset_count16_t  (std::uint16_t)
-dst_offset_count32_t  (std::uint32_t)
-dst_offset_count64_t  (std::uint64_t)
-
-index_t              (std::size_t)
-index8_t             (std::uint8_t)
-index16_t            (std::uint16_t)
-index32_t            (std::uint32_t)
-index64_t            (std::uint64_t)
-
-offset_t             (std::size_t)
-offset8_t            (std::uint8_t)
-offset16_t           (std::uint16_t)
-offset32_t           (std::uint32_t)
-offset64_t           (std::uint64_t)
-
-src_offset_t         (std::size_t)
-src_offset8_t        (std::uint8_t)
-src_offset16_t       (std::uint16_t)
-src_offset32_t       (std::uint32_t)
-src_offset64_t       (std::uint64_t)
-
-dst_offset_t         (std::size_t)
-dst_offset8_t        (std::uint8_t)
-dst_offset16_t       (std::uint16_t)
-dst_offset32_t       (std::uint32_t)
-dst_offset64_t       (std::uint64_t)
-```
+<i><b>Note:</b> optional types available by defining the STRICT_CPP_OPTIONAL_TYPES macro (too many to list here).</i>
 
 ## TODO
 
-- Maybe implement support for older versions of C++.
 - Verify cross-platform support.
 - Implement support for [C++20 modules](https://en.cppreference.com/w/cpp/language/modules).
+- CMake build file(s).
 - ???

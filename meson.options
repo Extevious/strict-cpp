@@ -1,2 +1,20 @@
-option('optional_types', type : 'boolean', value : false, description : 'If pre-defined optional types should be exposed.')
-option('examples',       type : 'boolean', value : false, description : 'If examples should be built.')
+option(
+   'namespace',
+   type: 'string',
+   value: 'strict',
+   description: 'The namespace for strict types.',
+)
+
+option(
+   'enable_optional_types',
+   type: 'boolean',
+   value: false,
+   description: 'If pre-defined optional types should be exposed.',
+)
+
+option(
+   'build_examples',
+   type: 'boolean',
+   value: false,
+   description: 'If examples should be built.',
+)

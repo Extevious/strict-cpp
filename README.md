@@ -4,7 +4,7 @@ Reduce ambiguity between methods and operators by using types provided by strict
 
 ### Features:
 
-- Strict type wrappers encapsulating integral and floating-point types.
+- Strict type wrappers encapsulating integral, floating-point, and alias types.
 - Singular header file.
 - [Meson Build](https://mesonbuild.com/) support.
 - MIT license.
@@ -18,6 +18,10 @@ Reduce ambiguity between methods and operators by using types provided by strict
 ### Example:
 
 ```cpp
+   // =======================================================================
+   // Integral and Floating-point types
+   // =======================================================================
+
    // These could be ambiguous...
    add(short, short); // #1
    add(int, int);     // #2
@@ -63,6 +67,43 @@ Reduce ambiguity between methods and operators by using types provided by strict
    myMethod(5);
    myMethod(60L);
    myMethod(23U);
+```
+
+```cpp
+   // =======================================================================
+   // Alias types
+   // =======================================================================
+
+   // Defining an alias type is easy:
+   //    Note: if you need a comma (ex; for std::map<A,B>) it will need to be defined as a macro.
+   STRICT_CPP_DEFINE_ALIAS_TYPE(some_string_A, std::string);
+   STRICT_CPP_DEFINE_ALIAS_TYPE(some_string_B, std::string);
+
+   ...
+
+   void example0(const some_string_A& string); // #1
+   void example0(const some_string_B& string); // #2
+
+   const some_string_A string0 = "some simple string A";
+   const some_string_B string1 = "some simple string B";
+   const std::string   string2 = "I'm ambiguous!";
+
+   example0(string0); // Calls #1
+   example0(string1); // Calls #2
+
+   // This is ambiguous due to the implicit conversion to both some_string_A or some_string_B types:
+   example0(string2);
+
+   ...
+
+   // If you've ever had methods or constructors with similar or same parameters that differ
+   // only in parameter name, using strict-aliases can significantly reduce that ambiguity.
+
+   // You might accidentally swap a and b:
+   void example1(const std::string& a, const std::string& b);
+
+   // But this is impossible to swap, unless you're implicitly converting from the encapsulated type:
+   void example1(const some_string_A& a, const some_string_B& b);
 ```
 
 ## How to include in your projects
@@ -138,6 +179,11 @@ Reduce ambiguity between methods and operators by using types provided by strict
 //    TYPE            : the encapsulated primitive type (float, double, etc).
 //    QUALIFIED_TYPES : the optional range of types that are qualified for implicit usage.
 #define STRICT_CPP_DEFINE_FLOAT_TYPE(NAME, TYPE, QUALIFIED_TYPES...)
+
+// Macro to define your own alias types.
+//    NAME            : the name of your strict type.
+//    TYPE            : the encapsulated type (std::string, std::vector<>, etc).
+#define STRICT_CPP_DEFINE_ALIAS_TYPE(NAME, TYPE)
 ```
 
 ## Available types

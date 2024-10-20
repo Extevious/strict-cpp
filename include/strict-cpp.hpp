@@ -15,6 +15,9 @@ namespace STRICT_CPP_NAMESPACE {
       // Base type for integral or float type qualifications.
       struct strict_cpp_base_t { };
 
+      // Base type for alias-only type qualifications.
+      struct strict_cpp_alias_base_t { };
+
       // Base type for integral-only type qualifications.
       struct strict_cpp_integral_base_t : strict_cpp_base_t { };
 
@@ -455,6 +458,78 @@ namespace STRICT_CPP_NAMESPACE {
          /// @returns std::wstring
          inline std::wstring to_wstring() const { return std::to_wstring(value); }
    };
+
+   template <typename Type, typename... QualifiedTypes>
+   struct strict_alias_type : STRICT_CPP_NAMESPACE::detail::strict_cpp_alias_base_t {
+         using type = Type;
+         Type value = {};
+
+         /// @brief Default constructor.
+         inline constexpr strict_alias_type() noexcept = default;
+
+         /// @brief Move constructor.
+         /// @tparam Other The moveable type.
+         /// @param other The value to move.
+         template <typename Other>
+            requires std::is_convertible_v<Other, Type>
+         inline constexpr strict_alias_type(Other&& other) noexcept :
+            value(std::move(other)) { }
+
+         /// @brief Copy constructor.
+         /// @tparam Other The copyable type.
+         /// @param other The value to copy.
+         template <typename Other>
+            requires std::is_convertible_v<Other, Type>
+         inline constexpr strict_alias_type(const Other& other) noexcept :
+            value(static_cast<Type>(other)) { }
+
+         /// @brief Move-assignment operator.
+         /// @tparam Other The assignment type.
+         /// @param other The move-assignment value.
+         /// @returns auto&
+         template <typename Other>
+            requires std::is_convertible_v<Other, Type>
+         inline constexpr auto& operator=(Other&& other) noexcept {
+            this->value = std::move(other.value);
+            return *this;
+         }
+
+         /// @brief Copy-assignment operator.
+         /// @tparam Other The assignment type.
+         /// @param other The copy-assignment value.
+         /// @returns auto&
+         template <typename Other>
+            requires std::is_convertible_v<Other, Type>
+         inline constexpr auto& operator=(const Other& other) noexcept {
+            this->value = other.value;
+            return *this;
+         }
+
+         /// @brief Implicit ref conversion operator converts to the same encapsulated type only.
+         /// @returns Type&
+         inline constexpr operator Type&() noexcept { return this->value; }
+
+         /// @brief Implicit ref conversion operator converts to the same encapsulated type only.
+         /// @returns Type&
+         inline constexpr operator Type&() const noexcept { return this->value; }
+
+         /// @brief Indirect member access operator.
+         /// @returns Type&
+         inline constexpr Type* operator->() noexcept { return &this->value; }
+
+         /// @brief Indirect member access operator.
+         /// @returns Type&
+         inline constexpr Type* operator->() const noexcept { return &this->value; }
+
+         /// @brief Explicit copy conversion operator.
+         /// @tparam Other The type to convert to.
+         /// @returns Other
+         template <typename Other>
+            requires std::is_convertible_v<Type, Other>
+         inline constexpr explicit operator Other() const noexcept {
+            return static_cast<Other>(this->value);
+         }
+   };
 }
 
 #define STRICT_CPP_DEFINE_INTEGRAL_TYPE(NAME, TYPE, QUALIFIED_TYPES...)                                                                                                            \
@@ -465,6 +540,11 @@ namespace STRICT_CPP_NAMESPACE {
 #define STRICT_CPP_DEFINE_FLOAT_TYPE(NAME, TYPE, QUALIFIED_TYPES...)                                                                                                               \
    struct NAME : STRICT_CPP_NAMESPACE::strict_float_type<TYPE, QUALIFIED_TYPES> {                                                                                                  \
          using STRICT_CPP_NAMESPACE::strict_float_type<TYPE, QUALIFIED_TYPES>::strict_float_type;                                                                                  \
+   };
+
+#define STRICT_CPP_DEFINE_ALIAS_TYPE(NAME, TYPE)                                                                                                                                   \
+   struct NAME : STRICT_CPP_NAMESPACE::strict_alias_type<TYPE> {                                                                                                                   \
+         using STRICT_CPP_NAMESPACE::strict_alias_type<TYPE>::strict_alias_type;                                                                                                   \
    };
 
 #pragma warning(disable : 4146)

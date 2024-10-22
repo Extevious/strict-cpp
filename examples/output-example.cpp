@@ -17,8 +17,8 @@ void nl() { std::cout << '\n'; }
 void integral() {
    output("=== Integral ===");
 
-   strict::size_t  a = 40ULL;
-   strict::count_t b = strict::count_t(5.0f);
+   STRICT_CPP_NAMESPACE::size_t  a = 40ULL;
+   STRICT_CPP_NAMESPACE::count_t b = STRICT_CPP_NAMESPACE::count_t(5.0f);
 
    output("a: ", a);
    output("b: ", b);
@@ -84,10 +84,10 @@ void integral() {
 
    output("Casting operators:");
 
-   std::size_t       s = a;
-   int               i = (int)a;
-   float             f = (float)a;
-   strict::count32_t c = a.as<strict::count32_t>();
+   std::size_t                     s = a;
+   int                             i = (int)a;
+   float                           f = (float)a;
+   STRICT_CPP_NAMESPACE::count32_t c = a.as<STRICT_CPP_NAMESPACE::count32_t>();
 
    output("s: ", s);
    output("i: ", i);
@@ -95,7 +95,7 @@ void integral() {
    output("c: ", c);
    nl();
 
-   strict::schar_t schar0 = {};
+   STRICT_CPP_NAMESPACE::schar_t schar0 = {};
 
    output("Small types (char, short, etc):");
    output("schar0: ", schar0);
@@ -106,14 +106,15 @@ void integral() {
    output("a: ", a);
    output("a.to_string(): ", a.to_string());
    w_output("a.to_wstring(): ", a.to_wstring());
+   output(std::format("Numbers: {0}, {1}, {2}", a, b, 6789));
    nl();
 }
 
 void floating() {
    output("=== Floating ===");
 
-   strict::float_t a = 10.0f;
-   strict::float_t b = strict::float_t(5.4l);
+   STRICT_CPP_NAMESPACE::float_t a = 10.0f;
+   STRICT_CPP_NAMESPACE::float_t b = STRICT_CPP_NAMESPACE::float_t(5.4l);
 
    output("Unary operators:");
    output("+a: ", +a);
@@ -161,10 +162,10 @@ void floating() {
 
    output("Casting operators:");
 
-   float             f = a;
-   std::size_t       s = (std::size_t)a;
-   int               i = (int)a;
-   strict::count32_t c = a.as<strict::count32_t>();
+   float                           f = a;
+   std::size_t                     s = (std::size_t)a;
+   int                             i = (int)a;
+   STRICT_CPP_NAMESPACE::count32_t c = a.as<STRICT_CPP_NAMESPACE::count32_t>();
 
    output("f: ", f);
    output("s: ", s);
@@ -176,6 +177,7 @@ void floating() {
    output("a: ", a);
    output("a.to_string(): ", a.to_string());
    w_output("a.to_wstring(): ", a.to_wstring());
+   output(std::format("Numbers: {0}, {1}, {2}", a, b, 6789));
    nl();
 }
 

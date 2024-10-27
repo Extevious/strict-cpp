@@ -11,44 +11,44 @@ void output(const auto&... out) { (std::cout << ... << out) << '\n'; }
 // === Addition ===
 
 // #1
-void add(STRICT_CPP_NAMESPACE::int32_t a, STRICT_CPP_NAMESPACE::int32_t b) { output("add() #1: ", a + b); }
+void add(STRICT_CPP_NAMESPACE::int32_t a, STRICT_CPP_NAMESPACE::int32_t b) { output("add() #1 was called: ", a + b); }
 
 // #2
-void add(STRICT_CPP_NAMESPACE::int32_t a, STRICT_CPP_NAMESPACE::uint32_t b) { output("add() #2: ", a + b); }
+void add(STRICT_CPP_NAMESPACE::int32_t a, STRICT_CPP_NAMESPACE::uint32_t b) { output("add() #2 was called: ", a + b); }
 
 // #3
-void add(STRICT_CPP_NAMESPACE::int64_t a, STRICT_CPP_NAMESPACE::int32_t b) { output("add() #3: ", a + b); }
+void add(STRICT_CPP_NAMESPACE::int64_t a, STRICT_CPP_NAMESPACE::int32_t b) { output("add() #3 was called: ", a + b); }
 
 // #4
-void add(STRICT_CPP_NAMESPACE::int8_t a, STRICT_CPP_NAMESPACE::int8_t b) { output("add() #4: ", a + b); }
+void add(STRICT_CPP_NAMESPACE::int8_t a, STRICT_CPP_NAMESPACE::int8_t b) { output("add() #4 was called: ", a + b); }
 
 // #5
-void add(STRICT_CPP_NAMESPACE::int16_t a, short b) { output("add() #5: ", a + b); }
+void add(STRICT_CPP_NAMESPACE::int16_t a, short b) { output("add() #5 was called: ", a + b); }
 
 // === Subtraction ===
 
-// #6
-void subtract(STRICT_CPP_NAMESPACE::size_t a, STRICT_CPP_NAMESPACE::size_t b) { output("subtract() #6: ", a - b); }
+// #1
+void subtract(STRICT_CPP_NAMESPACE::size_t a, STRICT_CPP_NAMESPACE::size_t b) { output("subtract() #1 was called: ", a - b); }
 
-// #7
-void subtract(STRICT_CPP_NAMESPACE::count_t a, STRICT_CPP_NAMESPACE::count_t b) { output("subtract() #7: ", a - b); }
+// #2
+void subtract(STRICT_CPP_NAMESPACE::count_t a, STRICT_CPP_NAMESPACE::count_t b) { output("subtract() #2 was called: ", a - b); }
 
-// #8
-void subtract(STRICT_CPP_NAMESPACE::count_t a, STRICT_CPP_NAMESPACE::size_t b) { output("subtract() #8: ", a - b); }
+// #3
+void subtract(STRICT_CPP_NAMESPACE::count_t a, STRICT_CPP_NAMESPACE::size_t b) { output("subtract() #3 was called: ", a - b); }
 
 // === Multiplication ===
 
-// #9
-void multiply(STRICT_CPP_NAMESPACE::float_t a, STRICT_CPP_NAMESPACE::float_t b) { output("multiply() #9: ", a * b); }
+// #1
+void multiply(STRICT_CPP_NAMESPACE::float_t a, STRICT_CPP_NAMESPACE::float_t b) { output("multiply() #1 was called: ", a * b); }
 
-// #10
-void multiply(STRICT_CPP_NAMESPACE::float_t a, STRICT_CPP_NAMESPACE::double_t b) { output("multiply() #10: ", a * b); }
+// #2
+void multiply(STRICT_CPP_NAMESPACE::float_t a, STRICT_CPP_NAMESPACE::double_t b) { output("multiply() #2 was called: ", a * b); }
 
-// #11
-void multiply(STRICT_CPP_NAMESPACE::long_double_t a, STRICT_CPP_NAMESPACE::double_t b) { output("multiply() #11: ", a * b); }
+// #3
+void multiply(STRICT_CPP_NAMESPACE::long_double_t a, STRICT_CPP_NAMESPACE::double_t b) { output("multiply() #3 was called: ", a * b); }
 
-// #12
-void multiply(STRICT_CPP_NAMESPACE::float_t a, STRICT_CPP_NAMESPACE::size_t b) { output("multiply() #12: ", a * b); }
+// #4
+void multiply(STRICT_CPP_NAMESPACE::float_t a, STRICT_CPP_NAMESPACE::size_t b) { output("multiply() #4 was called: ", a * b); }
 
 // === Main ===
 
@@ -60,37 +60,35 @@ int main() {
    std::int32_t b = -34;
 
    // Implicit conversions are possible for the encapsulated-type only, for example:
-   add(a, b);                                    // Calls #1
-   add(a, 4);                                    // Calls #1
-   add(45, 56);                                  // Calls #1
-   add(a, 5U);                                   // Calls #2
-   add(STRICT_CPP_NAMESPACE::int64_t(5.0f), 22); // Calls #3
-   add((std::int8_t)41, (std::int8_t)65);        // Calls #4
-   add((short)a, (short)12);                     // Calls #5
+   add(45, 56);                                  // Calls add #1
+   add(a, 4);                                    // Calls add #1
+   add(a, b);                                    // Calls add #1
+   add(a, 5U);                                   // Calls add #2
+   add(STRICT_CPP_NAMESPACE::int64_t(5.0f), 22); // Calls add #3
+   add((std::int8_t)41, (std::int8_t)65);        // Calls add #4
+   add((short)a, (short)12);                     // Calls add #5
 
    // This doesn't work because they're both unsigned ints as there is no overload available:
    //
    //    add(5U, 9U);
    //
-   // ...but this works because the constructors are being called explicitly.
+
+   // Explicit constructors can be called so long as the type being passed to the constructor can be converted:
    add(STRICT_CPP_NAMESPACE::int32_t(5U), STRICT_CPP_NAMESPACE::int32_t(9U)); // Calls #1
 
    // Unfortunately, there is some overlap between types when it comes to implicit
    // conversions due to both STRICT_CPP_NAMESPACE::size_t and STRICT_CPP_NAMESPACE::count_t having the same
-   // encapsulated type (std::size_t) resulting in ambiguity between #6, #7, and #8.
-   //
-   //   subtract(234ULL, 78ULL);
-   //
-   // To get around this issue, simply convert to the desired type:
-   subtract((STRICT_CPP_NAMESPACE::size_t)234ULL, 78ULL);                                // Calls #6
-   subtract(234ULL, (STRICT_CPP_NAMESPACE::count_t)78ULL);                               // Calls #7
-   subtract((STRICT_CPP_NAMESPACE::count_t)234ULL, (STRICT_CPP_NAMESPACE::size_t)78ULL); // Calls #8
+   // encapsulated type (std::size_t) resulting in ambiguity between #1, #2, and #3.
+   // To get around this, cast to the desired strict type:
+   subtract((STRICT_CPP_NAMESPACE::size_t)234ULL, 78ULL);                                // Calls subtract #1
+   subtract(234ULL, (STRICT_CPP_NAMESPACE::count_t)78ULL);                               // Calls subtract #2
+   subtract((STRICT_CPP_NAMESPACE::count_t)234ULL, (STRICT_CPP_NAMESPACE::size_t)78ULL); // Calls subtract #3
 
    // Floats are supported like you'd normally expect them to work:
-   multiply(1.0f, 6.34f);                                // Calls #9
-   multiply(3.5f, STRICT_CPP_NAMESPACE::double_t(6.34)); // Calls #10
-   multiply(2.0L, (STRICT_CPP_NAMESPACE::double_t)6.34); // Calls #11
-   multiply(2.0f, STRICT_CPP_NAMESPACE::size_t(45));     // Calls #12
+   multiply(1.0f, 6.34f);                                // Calls multiply() #1
+   multiply(3.5f, STRICT_CPP_NAMESPACE::double_t(6.34)); // Calls multiply() #2
+   multiply(2.0L, (STRICT_CPP_NAMESPACE::double_t)6.34); // Calls multiply() #3
+   multiply(2.0f, STRICT_CPP_NAMESPACE::size_t(45));     // Calls multiply() #4
 
    // Strict types can still be used on pointers like you normally would:
    constexpr const char* someMessage = "I'm a totally cool message..!";
@@ -112,50 +110,76 @@ int main() {
    return 0;
 }
 
-// You can also define your own types:
+// You can define your own types:
 STRICT_CPP_DEFINE_INTEGRAL_TYPE(buffer_size_t, std::size_t);
 STRICT_CPP_DEFINE_FLOAT_TYPE(scale_t, float);
 STRICT_CPP_DEFINE_INTEGRAL_TYPE(some_totally_cool_type_t, long);
 
-// You can specify multiple qualified types, with the first type being the encapsulated type:
+// You can define your own types with multiple qualified types, (the second type being the encapsulated type):
 STRICT_CPP_DEFINE_INTEGRAL_TYPE(some_ints_t, int, unsigned int, long, std::size_t);
-STRICT_CPP_DEFINE_FLOAT_TYPE(some_floats_t, float, double, long double);
+STRICT_CPP_DEFINE_FLOAT_TYPE(some_floats_t, float, double, long double, STRICT_CPP_NAMESPACE::float64_t);
 
 // Which means you can do stuff like this:
 // #1
-void example0(STRICT_CPP_NAMESPACE::some_floats_t) { }
+void customTypeExample(const STRICT_CPP_NAMESPACE::some_floats_t v) { output("customTypeExample() #1 was called: ", v); }
 
 // #2
-void example0(STRICT_CPP_NAMESPACE::some_ints_t) { }
+void customTypeExample(const STRICT_CPP_NAMESPACE::some_ints_t v) { output("customTypeExample() #2 was called: ", v); }
 
 // #3
-void example0(STRICT_CPP_NAMESPACE::size_t) { } // Overloaded to demonstrate ambiguity.
+void customTypeExample(const STRICT_CPP_NAMESPACE::size_t v) { output("customTypeExample() #3 was called: ", v); } // Overloaded to demonstrate ambiguity.
 
-// #4
-void example1(STRICT_CPP_NAMESPACE::any_size_t) { }
+// Dynamic types are handy for when you have a small selection of functions
+// or operator overloads that are unique enough that even with a range of qualified types wont be ambiguous,
+// but you want to specify the encapsulated type:
 
-// #5
-void example1(STRICT_CPP_NAMESPACE::any_int_t) { }
+// #1
+void explicitDynamicTypeExample(const STRICT_CPP_NAMESPACE::any_size_t<std::uint16_t> v) { output("explicitDynamicTypeExample() #1 was called: ", v); }
+
+// #2
+void explicitDynamicTypeExample(const STRICT_CPP_NAMESPACE::any_int_t<long long> v) { output("explicitDynamicTypeExample() #2 was called: ", v); }
+
+// #1
+template <typename T>
+void dynamicTypeExample(const STRICT_CPP_NAMESPACE::any_int_t<T> v) {
+   output("dynamicTypeExample<T>() #1 was called: ", v);
+}
+
+// #2
+template <typename T>
+void dynamicTypeExample(const STRICT_CPP_NAMESPACE::any_float_t<T> v) {
+   output("dynamicTypeExample<T>() #2 was called: ", v);
+}
 
 void test() {
-   // example0:
-   example0(5.0F); // Calls #1
-   example0(1.0L); // Calls #1
-   example0(3.);   // Calls #1
+   customTypeExample(5.0F); // Calls customTypeExample() #1
+   customTypeExample(1.0L); // Calls customTypeExample() #1
+   customTypeExample(3.);   // Calls customTypeExample() #1
 
-   // example1:
-   example0(5);   // Calls #2
-   example0(10U); // Calls #2
-   example0(25L); // Calls #2
+   customTypeExample(5);   // Calls customTypeExample() #2
+   customTypeExample(10U); // Calls customTypeExample() #2
+   customTypeExample(25L); // Calls customTypeExample() #2
 
    // Ambiguous as implicit conversion is possible for both some_ints_t and STRICT_CPP_NAMESPACE::size_t.
-   // example0(789ULL);
+   //
+   //    customTypeExample(789ULL);
+   //
 
-   // Some pre-defined "any" types exist:
-   example1(STRICT_CPP_NAMESPACE::size_t(20)); // Calls #4
-   example1(STRICT_CPP_NAMESPACE::size8_t(5)); // Calls #4
-   example1(5);                                // Calls #5
+   explicitDynamicTypeExample(STRICT_CPP_NAMESPACE::size_t(20)); // Calls explicitDynamicTypeExample() #1
+   explicitDynamicTypeExample(STRICT_CPP_NAMESPACE::size8_t(5)); // Calls explicitDynamicTypeExample() #1
+   explicitDynamicTypeExample(5);                                // Calls explicitDynamicTypeExample() #2
 
-   // Ambiguous as implicit conversion is possible for both any_size_t and any_int_t.
-   // example1(4ULL);
+   // This is ambiguous because there's an implicit conversion possible for both any_size_t and any_int_t.
+   //
+   //    explicitDynamicTypeExample(4ULL);
+   //
+
+   // Calling a function with a dynamically-qualified type is easy:
+   dynamicTypeExample<long>(34);
+   dynamicTypeExample<double>(500.0f);
+
+   // This doesn't work due to the encapsulated type being an integer and the provided type being a float.
+   //
+   //    dynamicTypeExample<long>(123.0f);
+   //
 }

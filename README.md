@@ -31,7 +31,7 @@ Reduce ambiguity between methods and operators by using types provided by strict
    add(strict::int16_t, strict::int16_t); // #3
    add(strict::int32_t, strict::int32_t); // #4
 
-   ...
+...
 
    // If only the add() methods #1 and #2 existed:
 
@@ -45,29 +45,48 @@ Reduce ambiguity between methods and operators by using types provided by strict
    add(5U, 6);  // This would fail due to no implicit conversion available for the first argument.
    add(5U, 6U); // This would fail due to no implicit conversion available for both arguments.
 
-   ...
+...
 
    // You can define your own types:
    //    - First parameter is the name of the type.
    //    - Second parameter is the encapsulated type.
 
-   STRICT_CPP_DEFINE_INTEGRAL_TYPE(buffer_size_t, std::size_t);
-   STRICT_CPP_DEFINE_FLOAT_TYPE(scale_t, float);
+   STRICT_CPP_DEFINE_INTEGRAL_TYPE(strict::buffer_size_t, std::size_t);
+   STRICT_CPP_DEFINE_FLOAT_TYPE(strict::scale_t, float);
 
    // You can also define your own types with a range of qualified types for implicit usage:
    //    - First parameter is the name of the type.
    //    - Second parameter is the encapsulated type.
    //    - All following types are the qualified types.
 
-   STRICT_CPP_DEFINE_INTEGRAL_TYPE(example_t, int, long, double, std::size_t);
-   STRICT_CPP_DEFINE_INTEGRAL_TYPE(some_int_t, int, long, unsigned int);
+   STRICT_CPP_DEFINE_INTEGRAL_TYPE(strict::example_t, int, long, double, std::size_t);
+   STRICT_CPP_DEFINE_INTEGRAL_TYPE(strict::some_int_t, int, long, unsigned int);
 
-   ...
+...
 
    // If you defined a method that has an example_t as a parameter you could do:
    myMethod(5);
    myMethod(60L);
    myMethod(23U);
+
+...
+
+   // =======================================================================
+   // Integral and Floating-point dynamic types
+   // =======================================================================
+
+   // Functions can also use dynamic strict types:
+   someFunction(strict::any_signed_int_t<int>); // Takes any signed integer, and the encapsulated type is explicitly an int.
+
+   // Using a template to define the encapsulated type when calling the function:
+   template<typename T>
+   someFunction(strict::any_float_t<T>); // Takes any float type, but the encapsulated type dynamically is T.
+
+   // Of course you can define your own dynamic type, but there is a slight difference:
+   //    - First parameter is the name of the type.
+   //    - All following types are the qualified types.
+
+   STRICT_CPP_DEFINE_DYNAMIC_INTEGRAL_TYPE(strict::any_example_t, char, int, std::int64_t);
 ```
 
 ```cpp
@@ -82,11 +101,11 @@ Reduce ambiguity between methods and operators by using types provided by strict
 
    ...
 
-   void example0(some_string_A string); // #1
-   void example0(some_string_B string); // #2
+   void example0(strict::some_string_A string); // #1
+   void example0(strict::some_string_B string); // #2
 
-   const some_string_A string0 = "some simple string A";
-   const some_string_B string1 = "some simple string B";
+   const strict::some_string_A string0 = "some simple string A";
+   const strict::some_string_B string1 = "some simple string B";
    const std::string   string2 = "I'm ambiguous!";
 
    example0(string0); // Calls #1
@@ -104,7 +123,7 @@ Reduce ambiguity between methods and operators by using types provided by strict
    void example1(std::string a, std::string b);
 
    // But this is impossible to swap, unless you're implicitly converting from the encapsulated type:
-   void example1(some_string_A a, some_string_B b);
+   void example1(strict::some_string_A a, strict::some_string_B b);
 ```
 
 ## How to include in your projects

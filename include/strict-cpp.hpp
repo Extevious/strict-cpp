@@ -120,24 +120,45 @@ namespace STRICT_CPP_NAMESPACE {
       /// @tparam Type The encapsulated type.
       template <typename Type>
          requires std::is_integral_v<Type>
-      struct integral_value_t : STRICT_CPP_NAMESPACE::detail::strict_cpp_integral_base_t {
+      struct strict_integral_value_t : STRICT_CPP_NAMESPACE::detail::strict_cpp_integral_base_t {
             inline constexpr static Type min = std::numeric_limits<Type>::min();
             inline constexpr static Type max = std::numeric_limits<Type>::max();
 
             using type = Type;
             Type value = {};
 
-            inline constexpr integral_value_t() noexcept = default;
+            inline constexpr strict_integral_value_t() noexcept = default;
 
-            inline constexpr integral_value_t(const Type& value) noexcept :
+            inline constexpr strict_integral_value_t(const Type& value) noexcept :
                value(value) { }
+
+            /// @brief Implicit conversion operator converts to the same encapsulated type only.
+            /// @returns Type
+            inline constexpr operator Type() const noexcept { return this->value; }
+
+            /// @brief Explicit conversion operator.
+            /// @tparam Other The type to convert to.
+            /// @returns Other
+            template <typename Other>
+               requires std::is_convertible_v<Type, Other>
+            inline constexpr explicit operator Other() const noexcept {
+               return static_cast<Other>(this->value);
+            }
+
+            /// @brief Converts to a human-readable string representing the current value.
+            /// @returns std::string
+            inline std::string to_string() const { return std::to_string(this->value); }
+
+            /// @brief Converts to a human-readable wide string representing the current value.
+            /// @returns std::wstring
+            inline std::wstring to_wstring() const { return std::to_wstring(this->value); }
       };
 
       /// @brief Floating-point value-encapsulating struct for type qualifications (ex; std::formatter<>).
       /// @tparam Type The encapsulated type.
       template <typename Type>
          requires std::is_floating_point_v<Type>
-      struct float_value_t : STRICT_CPP_NAMESPACE::detail::strict_cpp_float_base_t {
+      struct strict_float_value_t : STRICT_CPP_NAMESPACE::detail::strict_cpp_float_base_t {
             inline constexpr static Type min         = std::numeric_limits<Type>::min();
             inline constexpr static Type max         = std::numeric_limits<Type>::max();
             inline constexpr static Type lowest      = std::numeric_limits<Type>::lowest();
@@ -152,10 +173,31 @@ namespace STRICT_CPP_NAMESPACE {
             using type = Type;
             Type value = {};
 
-            inline constexpr float_value_t() noexcept = default;
+            inline constexpr strict_float_value_t() noexcept = default;
 
-            inline constexpr float_value_t(const Type& value) noexcept :
+            inline constexpr strict_float_value_t(const Type& value) noexcept :
                value(value) { }
+
+            /// @brief Implicit conversion operator converts to the same encapsulated type only.
+            /// @returns Type
+            inline constexpr operator Type() const noexcept { return this->value; }
+
+            /// @brief Explicit conversion operator.
+            /// @tparam Other The type to convert to.
+            /// @returns Other
+            template <typename Other>
+               requires std::is_convertible_v<Type, Other>
+            inline constexpr explicit operator Other() const noexcept {
+               return static_cast<Other>(this->value);
+            }
+
+            /// @brief Converts to a human-readable string representing the current value.
+            /// @returns std::string
+            inline std::string to_string() const { return std::to_string(this->value); }
+
+            /// @brief Converts to a human-readable wide string representing the current value.
+            /// @returns std::wstring
+            inline std::wstring to_wstring() const { return std::to_wstring(this->value); }
       };
 
       // Returns true if [Other] is the same as one of the [QualifiedTypes] and if [QualifiedTypes] is a non-zero length.
@@ -209,9 +251,13 @@ namespace STRICT_CPP_NAMESPACE {
       concept is_qualified_float_operator_right_only = (std::is_arithmetic_v<Left> || std::is_base_of_v<STRICT_CPP_NAMESPACE::detail::strict_cpp_integral_base_t, Left>) &&
                                                        is_qualified_float_operator<Right>;
 
-      // Returns true if [Other] is the same as one of the [QualifiedTypes] and if [QualifiedTypes] is a non-zero length.
-      template <typename Other, typename... QualifiedTypes>
-      concept is_qualified_assignment_operator = is_qualified_type<Other, QualifiedTypes...>;
+      // Returns true if [Other] is convertible to [QualifiedType] or is a integral strict type.
+      template <typename Other, typename QualifiedType>
+      concept is_qualified_integral_assignment_operator = std::is_integral_v<Other> || std::is_base_of_v<Other, STRICT_CPP_NAMESPACE::detail::strict_cpp_integral_base_t>;
+
+      // Returns true if [Other] is convertible to [QualifiedType] or is a float strict type.
+      template <typename Other, typename QualifiedType>
+      concept is_qualified_float_assignment_operator = std::is_floating_point_v<Other> || std::is_base_of_v<Other, STRICT_CPP_NAMESPACE::detail::strict_cpp_float_base_t>;
    }
 
    // =============================================================================
@@ -357,8 +403,8 @@ namespace STRICT_CPP_NAMESPACE {
    STRICT_CPP_DEFINE_COMPOUND_FLOAT_OPERATOR(/=)
 
    template <typename Type, typename... QualifiedTypes>
-      requires std::is_integral_v<Type>
-   struct strict_integral_type : STRICT_CPP_NAMESPACE::detail::integral_value_t<Type> {
+      requires std::is_integral_v<Type> && std::is_trivial_v<Type>
+   struct strict_integral_type : STRICT_CPP_NAMESPACE::detail::strict_integral_value_t<Type> {
          /// @brief Default constructor.
          inline constexpr strict_integral_type() noexcept = default;
 
@@ -368,7 +414,7 @@ namespace STRICT_CPP_NAMESPACE {
          template <typename Other>
             requires STRICT_CPP_NAMESPACE::detail::is_qualified_implicit_constructor<Other, Type, QualifiedTypes...>
          inline constexpr strict_integral_type(const Other& other) noexcept :
-            STRICT_CPP_NAMESPACE::detail::integral_value_t<Type>(static_cast<Type>(other)) { }
+            STRICT_CPP_NAMESPACE::detail::strict_integral_value_t<Type>(static_cast<Type>(other)) { }
 
          /// @brief Explicit copy constructor.
          /// @tparam Other The explicitly-convertible type.
@@ -376,29 +422,17 @@ namespace STRICT_CPP_NAMESPACE {
          template <typename Other>
             requires STRICT_CPP_NAMESPACE::detail::is_qualified_explicit_constructor<Other, Type>
          inline constexpr explicit strict_integral_type(const Other& other) noexcept :
-            STRICT_CPP_NAMESPACE::detail::integral_value_t<Type>(static_cast<Type>(other)) { }
+            STRICT_CPP_NAMESPACE::detail::strict_integral_value_t<Type>(static_cast<Type>(other)) { }
 
          /// @brief Assignment operator.
          /// @tparam Other The assignment type.
-         /// @returns auto&
+         /// @returns strict_integral_type&
          template <typename Other>
-            requires STRICT_CPP_NAMESPACE::detail::is_qualified_assignment_operator<Other, Type, QualifiedTypes...>
-         inline constexpr auto& operator=(const Other& other) noexcept {
-            this->value = other.value;
+            requires STRICT_CPP_NAMESPACE::detail::is_qualified_integral_assignment_operator<Other, Type>
+         inline constexpr strict_integral_type& operator=(const Other& other) noexcept {
+            if constexpr (std::is_integral_v<Other>) this->value = other;
+            else this->value = other.value;
             return *this;
-         }
-
-         /// @brief Implicit conversion operator converts to the same encapsulated type only.
-         /// @returns Type
-         inline constexpr operator Type() const noexcept { return this->value; }
-
-         /// @brief Explicit conversion operator.
-         /// @tparam Other The type to convert to.
-         /// @returns Other
-         template <typename Other>
-            requires std::is_convertible_v<Type, Other>
-         inline constexpr explicit operator Other() const noexcept {
-            return static_cast<Other>(this->value);
          }
 
          /// @brief Conversion function.
@@ -409,19 +443,11 @@ namespace STRICT_CPP_NAMESPACE {
          inline constexpr Other as() const noexcept {
             return static_cast<Other>(this->value);
          }
-
-         /// @brief Converts to a human-readable string representing the current value.
-         /// @returns std::string
-         inline std::string to_string() const { return std::to_string(this->value); }
-
-         /// @brief Converts to a human-readable wide string representing the current value.
-         /// @returns std::wstring
-         inline std::wstring to_wstring() const { return std::to_wstring(this->value); }
    };
 
    template <typename Type, typename... QualifiedTypes>
-      requires std::is_floating_point_v<Type>
-   struct strict_float_type : STRICT_CPP_NAMESPACE::detail::float_value_t<Type> {
+      requires std::is_floating_point_v<Type> && std::is_trivial_v<Type>
+   struct strict_float_type : STRICT_CPP_NAMESPACE::detail::strict_float_value_t<Type> {
          /// @brief Default constructor.
          inline constexpr strict_float_type() noexcept = default;
 
@@ -431,7 +457,7 @@ namespace STRICT_CPP_NAMESPACE {
          template <typename Other>
             requires STRICT_CPP_NAMESPACE::detail::is_qualified_implicit_constructor<Other, Type, QualifiedTypes...>
          inline constexpr strict_float_type(const Other& other) noexcept :
-            STRICT_CPP_NAMESPACE::detail::float_value_t<Type>(static_cast<Type>(other)) { }
+            STRICT_CPP_NAMESPACE::detail::strict_float_value_t<Type>(static_cast<Type>(other)) { }
 
          /// @brief Explicit copy constructor.
          /// @tparam Other The explicitly-convertible type.
@@ -439,29 +465,17 @@ namespace STRICT_CPP_NAMESPACE {
          template <typename Other>
             requires STRICT_CPP_NAMESPACE::detail::is_qualified_explicit_constructor<Other, Type>
          inline constexpr explicit strict_float_type(const Other& other) noexcept :
-            STRICT_CPP_NAMESPACE::detail::float_value_t<Type>(static_cast<Type>(other)) { }
+            STRICT_CPP_NAMESPACE::detail::strict_float_value_t<Type>(static_cast<Type>(other)) { }
 
          /// @brief Assignment operator.
          /// @tparam Other The assignment type.
-         /// @returns auto&
+         /// @returns strict_float_type&
          template <typename Other>
-            requires STRICT_CPP_NAMESPACE::detail::is_qualified_assignment_operator<Other, Type, QualifiedTypes...>
-         inline constexpr auto& operator=(const Other& other) noexcept {
-            this->value = other.value;
+            requires STRICT_CPP_NAMESPACE::detail::is_qualified_float_assignment_operator<Other, Type>
+         inline constexpr strict_float_type& operator=(const Other& other) noexcept {
+            if constexpr (std::is_floating_point_v<Other>) this->value = other;
+            else this->value = other.value;
             return *this;
-         }
-
-         /// @brief Implicit conversion operator converts to the same encapsulated type only.
-         /// @returns Type
-         inline constexpr operator Type() const noexcept { return this->value; }
-
-         /// @brief Explicit conversion operator.
-         /// @tparam Other The type to convert to.
-         /// @returns Other
-         template <typename Other>
-            requires std::is_convertible_v<Type, Other>
-         inline constexpr explicit operator Other() const noexcept {
-            return static_cast<Other>(this->value);
          }
 
          /// @brief Conversion function.
@@ -472,17 +486,10 @@ namespace STRICT_CPP_NAMESPACE {
          inline constexpr Other as() const noexcept {
             return static_cast<Other>(this->value);
          }
-
-         /// @brief Converts to a human-readable string representing the current value.
-         /// @returns std::string
-         inline std::string to_string() const { return std::to_string(this->value); }
-
-         /// @brief Converts to a human-readable wide string representing the current value.
-         /// @returns std::wstring
-         inline std::wstring to_wstring() const { return std::to_wstring(this->value); }
    };
 
    template <typename Type, typename... QualifiedTypes>
+      requires(sizeof(Type) != 0) && (!std::is_reference_v<Type>)
    struct strict_alias_type : STRICT_CPP_NAMESPACE::detail::strict_cpp_alias_base_t {
          using type = Type;
          Type value = {};
@@ -542,7 +549,23 @@ namespace STRICT_CPP_NAMESPACE {
 
          /// @brief Indirect member access operator.
          /// @returns Type&
-         inline constexpr Type* operator->() const noexcept { return &this->value; }
+         inline constexpr const Type* operator->() const noexcept { return &this->value; }
+
+         /// @brief Subscript operator.
+         /// @returns Type&
+         template <typename _ = void>
+            requires(!std::is_void_v<decltype(std::declval<Type>().operator[](0))>)
+         inline constexpr auto& operator[](const auto& index) noexcept {
+            return this->value[index];
+         }
+
+         /// @brief Subscript operator.
+         /// @returns Type&
+         template <typename _ = void>
+            requires(!std::is_void_v<decltype(std::declval<Type>().operator[](0))>)
+         inline constexpr const auto& operator[](const auto& index) const noexcept {
+            return this->value[index];
+         }
 
          /// @brief Explicit copy conversion operator.
          /// @tparam Other The type to convert to.
@@ -571,6 +594,7 @@ namespace STRICT_CPP_NAMESPACE {
    namespace STRICT_CPP_NAMESPACE {                                                                                                                                                \
       struct NAME : STRICT_CPP_NAMESPACE::strict_integral_type<TYPE, QUALIFIED_TYPES> {                                                                                            \
             using STRICT_CPP_NAMESPACE::strict_integral_type<TYPE, QUALIFIED_TYPES>::strict_integral_type;                                                                         \
+            using STRICT_CPP_NAMESPACE::strict_integral_type<TYPE, QUALIFIED_TYPES>::operator=;                                                                                    \
       };                                                                                                                                                                           \
    }                                                                                                                                                                               \
    _STD_BEGIN                                                                                                                                                                      \
@@ -581,6 +605,7 @@ namespace STRICT_CPP_NAMESPACE {
    namespace STRICT_CPP_NAMESPACE {                                                                                                                                                \
       struct NAME : STRICT_CPP_NAMESPACE::strict_float_type<TYPE, QUALIFIED_TYPES> {                                                                                               \
             using STRICT_CPP_NAMESPACE::strict_float_type<TYPE, QUALIFIED_TYPES>::strict_float_type;                                                                               \
+            using STRICT_CPP_NAMESPACE::strict_float_type<TYPE, QUALIFIED_TYPES>::operator=;                                                                                       \
       };                                                                                                                                                                           \
    }                                                                                                                                                                               \
    _STD_BEGIN                                                                                                                                                                      \
@@ -593,6 +618,7 @@ namespace STRICT_CPP_NAMESPACE {
          requires std::is_integral_v<T>                                                                                                                                            \
       struct NAME : STRICT_CPP_NAMESPACE::strict_integral_type<T, QUALIFIED_TYPES> {                                                                                               \
             using STRICT_CPP_NAMESPACE::strict_integral_type<T, QUALIFIED_TYPES>::strict_integral_type;                                                                            \
+            using STRICT_CPP_NAMESPACE::strict_integral_type<T, QUALIFIED_TYPES>::operator=;                                                                                       \
       };                                                                                                                                                                           \
    }
 
@@ -602,6 +628,7 @@ namespace STRICT_CPP_NAMESPACE {
          requires std::is_floating_point_v<T>                                                                                                                                      \
       struct NAME : STRICT_CPP_NAMESPACE::strict_float_type<T, QUALIFIED_TYPES> {                                                                                                  \
             using STRICT_CPP_NAMESPACE::strict_float_type<T, QUALIFIED_TYPES>::strict_float_type;                                                                                  \
+            using STRICT_CPP_NAMESPACE::strict_float_type<T, QUALIFIED_TYPES>::operator=;                                                                                          \
       };                                                                                                                                                                           \
    }
 
@@ -609,30 +636,29 @@ namespace STRICT_CPP_NAMESPACE {
    namespace STRICT_CPP_NAMESPACE {                                                                                                                                                \
       struct NAME : STRICT_CPP_NAMESPACE::strict_alias_type<TYPE> {                                                                                                                \
             using STRICT_CPP_NAMESPACE::strict_alias_type<TYPE>::strict_alias_type;                                                                                                \
+            using STRICT_CPP_NAMESPACE::strict_alias_type<TYPE>::operator=;                                                                                                        \
       };                                                                                                                                                                           \
    }
-
-// #pragma warning(disable : 4146)
 
 // =============================================================================
 // Formatters
 // =============================================================================
 
 namespace std {
-   STRICT_CPP_DEFINE_FORMATTER(STRICT_CPP_NAMESPACE::detail::integral_value_t<char>)
-   STRICT_CPP_DEFINE_FORMATTER(STRICT_CPP_NAMESPACE::detail::integral_value_t<signed char>)
-   STRICT_CPP_DEFINE_FORMATTER(STRICT_CPP_NAMESPACE::detail::integral_value_t<signed short>)
-   STRICT_CPP_DEFINE_FORMATTER(STRICT_CPP_NAMESPACE::detail::integral_value_t<signed int>)
-   STRICT_CPP_DEFINE_FORMATTER(STRICT_CPP_NAMESPACE::detail::integral_value_t<signed long>)
-   STRICT_CPP_DEFINE_FORMATTER(STRICT_CPP_NAMESPACE::detail::integral_value_t<signed long long>)
-   STRICT_CPP_DEFINE_FORMATTER(STRICT_CPP_NAMESPACE::detail::integral_value_t<unsigned char>)
-   STRICT_CPP_DEFINE_FORMATTER(STRICT_CPP_NAMESPACE::detail::integral_value_t<unsigned short>)
-   STRICT_CPP_DEFINE_FORMATTER(STRICT_CPP_NAMESPACE::detail::integral_value_t<unsigned int>)
-   STRICT_CPP_DEFINE_FORMATTER(STRICT_CPP_NAMESPACE::detail::integral_value_t<unsigned long>)
-   STRICT_CPP_DEFINE_FORMATTER(STRICT_CPP_NAMESPACE::detail::integral_value_t<unsigned long long>)
-   STRICT_CPP_DEFINE_FORMATTER(STRICT_CPP_NAMESPACE::detail::float_value_t<float>)
-   STRICT_CPP_DEFINE_FORMATTER(STRICT_CPP_NAMESPACE::detail::float_value_t<double>)
-   STRICT_CPP_DEFINE_FORMATTER(STRICT_CPP_NAMESPACE::detail::float_value_t<long double>)
+   STRICT_CPP_DEFINE_FORMATTER(STRICT_CPP_NAMESPACE::detail::strict_integral_value_t<char>)
+   STRICT_CPP_DEFINE_FORMATTER(STRICT_CPP_NAMESPACE::detail::strict_integral_value_t<signed char>)
+   STRICT_CPP_DEFINE_FORMATTER(STRICT_CPP_NAMESPACE::detail::strict_integral_value_t<signed short>)
+   STRICT_CPP_DEFINE_FORMATTER(STRICT_CPP_NAMESPACE::detail::strict_integral_value_t<signed int>)
+   STRICT_CPP_DEFINE_FORMATTER(STRICT_CPP_NAMESPACE::detail::strict_integral_value_t<signed long>)
+   STRICT_CPP_DEFINE_FORMATTER(STRICT_CPP_NAMESPACE::detail::strict_integral_value_t<signed long long>)
+   STRICT_CPP_DEFINE_FORMATTER(STRICT_CPP_NAMESPACE::detail::strict_integral_value_t<unsigned char>)
+   STRICT_CPP_DEFINE_FORMATTER(STRICT_CPP_NAMESPACE::detail::strict_integral_value_t<unsigned short>)
+   STRICT_CPP_DEFINE_FORMATTER(STRICT_CPP_NAMESPACE::detail::strict_integral_value_t<unsigned int>)
+   STRICT_CPP_DEFINE_FORMATTER(STRICT_CPP_NAMESPACE::detail::strict_integral_value_t<unsigned long>)
+   STRICT_CPP_DEFINE_FORMATTER(STRICT_CPP_NAMESPACE::detail::strict_integral_value_t<unsigned long long>)
+   STRICT_CPP_DEFINE_FORMATTER(STRICT_CPP_NAMESPACE::detail::strict_float_value_t<float>)
+   STRICT_CPP_DEFINE_FORMATTER(STRICT_CPP_NAMESPACE::detail::strict_float_value_t<double>)
+   STRICT_CPP_DEFINE_FORMATTER(STRICT_CPP_NAMESPACE::detail::strict_float_value_t<long double>)
 }
 
 // =============================================================================

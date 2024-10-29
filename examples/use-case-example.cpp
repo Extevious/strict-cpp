@@ -90,6 +90,17 @@ int main() {
    multiply(2.0L, (STRICT_CPP_NAMESPACE::double_t)6.34); // Calls multiply() #3
    multiply(2.0f, STRICT_CPP_NAMESPACE::size_t(45));     // Calls multiply() #4
 
+   // Assignments can be done so long as it's being assigned a compatible type:
+   a = 11;
+   a = 400U;
+   a = -50;
+   a = 25ULL;
+
+   // But not between integral and floating-point types:
+   //
+   //    a = 100.0f;
+   //
+
    // Strict types can still be used on pointers like you normally would:
    constexpr const char* someMessage = "I'm a totally cool message..!";
 

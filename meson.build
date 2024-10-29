@@ -9,7 +9,7 @@ project(
    version: '1.0.0',
 )
 
-strict_cpp_dependency = declare_dependency(
+strict_cpp_dep = declare_dependency(
    include_directories: include_directories('include'),
    version: meson.project_version(),
 )

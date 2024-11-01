@@ -8,6 +8,19 @@
 
 void output(const auto&... out) { (std::cout << ... << out) << '\n'; }
 
+// You can define your own types:
+STRICT_CPP_DEFINE_INTEGRAL_TYPE(buffer_size_t, std::size_t);
+STRICT_CPP_DEFINE_FLOAT_TYPE(scale_t, float);
+STRICT_CPP_DEFINE_INTEGRAL_TYPE(some_totally_cool_type_t, long);
+
+// You can define your own types with multiple qualified types, (the second type being the encapsulated type):
+STRICT_CPP_DEFINE_INTEGRAL_TYPE(some_ints_t, int, unsigned int, long, std::size_t);
+STRICT_CPP_DEFINE_FLOAT_TYPE(some_floats_t, float, double, long double, STRICT_CPP_NAMESPACE::float64_t);
+
+// You can also define "dynamic" types where the encapsulated type is templated:
+STRICT_CPP_DEFINE_DYNAMIC_INTEGRAL_TYPE(many_ints_much_wow_t, int, char, long);
+STRICT_CPP_DEFINE_DYNAMIC_FLOAT_TYPE(lots_of_cool_numbers_t, float, double, long double);
+
 // === Addition ===
 
 // #1
@@ -49,6 +62,39 @@ void multiply(STRICT_CPP_NAMESPACE::long_double_t a, STRICT_CPP_NAMESPACE::doubl
 
 // #4
 void multiply(STRICT_CPP_NAMESPACE::float_t a, STRICT_CPP_NAMESPACE::size_t b) { output("multiply() #4 was called: ", a * b); }
+
+// === Custom Strict Types ===
+
+// #1
+void customStrictTypeExample(const STRICT_CPP_NAMESPACE::some_floats_t v) { output("customStrictTypeExample() #1 was called: ", v); }
+
+// #2
+void customStrictTypeExample(const STRICT_CPP_NAMESPACE::some_ints_t v) { output("customStrictTypeExample() #2 was called: ", v); }
+
+// #3
+void customStrictTypeExample(const STRICT_CPP_NAMESPACE::size_t v) { output("customStrictTypeExample() #3 was called: ", v); } // Overloaded to demonstrate ambiguity.
+
+// === Explicit Dynamic Types ===
+
+// #1
+void explicitDynamicTypeExample(const STRICT_CPP_NAMESPACE::any_size_t<std::uint16_t> v) { output("explicitDynamicTypeExample() #1 was called: ", v); }
+
+// #2
+void explicitDynamicTypeExample(const STRICT_CPP_NAMESPACE::any_int_t<long long> v) { output("explicitDynamicTypeExample() #2 was called: ", v); }
+
+// === Implicit Dynamic Types ===
+
+// #1
+template <typename T>
+void dynamicTypeExample(const STRICT_CPP_NAMESPACE::any_int_t<T> v) {
+   output("dynamicTypeExample<T>() #1 was called: ", v);
+}
+
+// #2
+template <typename T>
+void dynamicTypeExample(const STRICT_CPP_NAMESPACE::any_float_t<T> v) {
+   output("dynamicTypeExample<T>() #2 was called: ", v);
+}
 
 // === Main ===
 
@@ -118,64 +164,26 @@ int main() {
    // You can also pass strict types into a formatter:
    output(std::format("I have some numbers: {0}, {1}, {2}", a, b, 12345));
 
-   return 0;
-}
+   // Strict types can also be formatted:
+   output(std::format("I have a formatted number: {0}", STRICT_CPP_NAMESPACE::int_t(-7)));
 
-// You can define your own types:
-STRICT_CPP_DEFINE_INTEGRAL_TYPE(buffer_size_t, std::size_t);
-STRICT_CPP_DEFINE_FLOAT_TYPE(scale_t, float);
-STRICT_CPP_DEFINE_INTEGRAL_TYPE(some_totally_cool_type_t, long);
+   // Custom types work the same as you'd expect:
+   customStrictTypeExample(5.0F); // Calls customStrictTypeExample() #1
+   customStrictTypeExample(1.6L); // Calls customStrictTypeExample() #1
+   customStrictTypeExample(3.);   // Calls customStrictTypeExample() #1
 
-// You can define your own types with multiple qualified types, (the second type being the encapsulated type):
-STRICT_CPP_DEFINE_INTEGRAL_TYPE(some_ints_t, int, unsigned int, long, std::size_t);
-STRICT_CPP_DEFINE_FLOAT_TYPE(some_floats_t, float, double, long double, STRICT_CPP_NAMESPACE::float64_t);
-
-// Which means you can do stuff like this:
-// #1
-void customTypeExample(const STRICT_CPP_NAMESPACE::some_floats_t v) { output("customTypeExample() #1 was called: ", v); }
-
-// #2
-void customTypeExample(const STRICT_CPP_NAMESPACE::some_ints_t v) { output("customTypeExample() #2 was called: ", v); }
-
-// #3
-void customTypeExample(const STRICT_CPP_NAMESPACE::size_t v) { output("customTypeExample() #3 was called: ", v); } // Overloaded to demonstrate ambiguity.
-
-// Dynamic types are handy for when you have a small selection of functions
-// or operator overloads that are unique enough that even with a range of qualified types wont be ambiguous,
-// but you want to specify the encapsulated type:
-
-// #1
-void explicitDynamicTypeExample(const STRICT_CPP_NAMESPACE::any_size_t<std::uint16_t> v) { output("explicitDynamicTypeExample() #1 was called: ", v); }
-
-// #2
-void explicitDynamicTypeExample(const STRICT_CPP_NAMESPACE::any_int_t<long long> v) { output("explicitDynamicTypeExample() #2 was called: ", v); }
-
-// #1
-template <typename T>
-void dynamicTypeExample(const STRICT_CPP_NAMESPACE::any_int_t<T> v) {
-   output("dynamicTypeExample<T>() #1 was called: ", v);
-}
-
-// #2
-template <typename T>
-void dynamicTypeExample(const STRICT_CPP_NAMESPACE::any_float_t<T> v) {
-   output("dynamicTypeExample<T>() #2 was called: ", v);
-}
-
-void test() {
-   customTypeExample(5.0F); // Calls customTypeExample() #1
-   customTypeExample(1.0L); // Calls customTypeExample() #1
-   customTypeExample(3.);   // Calls customTypeExample() #1
-
-   customTypeExample(5);   // Calls customTypeExample() #2
-   customTypeExample(10U); // Calls customTypeExample() #2
-   customTypeExample(25L); // Calls customTypeExample() #2
+   customStrictTypeExample(5);   // Calls customStrictTypeExample() #2
+   customStrictTypeExample(10U); // Calls customStrictTypeExample() #2
+   customStrictTypeExample(25L); // Calls customStrictTypeExample() #2
 
    // Ambiguous as implicit conversion is possible for both some_ints_t and STRICT_CPP_NAMESPACE::size_t.
    //
-   //    customTypeExample(789ULL);
+   //    customStrictTypeExample(789ULL);
    //
 
+   // Dynamic types are handy for when you have a small selection of functions
+   // or operator overloads that are unique enough that even with a range of qualified types it wont be ambiguous,
+   // but you still want to specify the encapsulated type:
    explicitDynamicTypeExample(STRICT_CPP_NAMESPACE::size_t(20)); // Calls explicitDynamicTypeExample() #1
    explicitDynamicTypeExample(STRICT_CPP_NAMESPACE::size8_t(5)); // Calls explicitDynamicTypeExample() #1
    explicitDynamicTypeExample(5);                                // Calls explicitDynamicTypeExample() #2
@@ -193,4 +201,9 @@ void test() {
    //
    //    dynamicTypeExample<long>(123.0f);
    //
+
+   // Dynamic strict types can also be formatted:
+   output(std::format("I have a formatted number: {0}", STRICT_CPP_NAMESPACE::any_int_t<int>(45)));
+
+   return 0;
 }

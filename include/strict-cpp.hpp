@@ -251,12 +251,12 @@ namespace STRICT_CPP_NAMESPACE {
       concept is_qualified_float_operator_right_only = (std::is_arithmetic_v<Left> || std::is_base_of_v<STRICT_CPP_NAMESPACE::detail::strict_cpp_integral_base_t, Left>) &&
                                                        is_qualified_float_operator<Right>;
 
-      // Returns true if [Other] is convertible to [QualifiedType] or is a integral strict type.
-      template <typename Other, typename QualifiedType>
+      // Returns true if [Other] is integral or integral strict type.
+      template <typename Other>
       concept is_qualified_integral_assignment_operator = std::is_integral_v<Other> || std::is_base_of_v<Other, STRICT_CPP_NAMESPACE::detail::strict_cpp_integral_base_t>;
 
-      // Returns true if [Other] is convertible to [QualifiedType] or is a float strict type.
-      template <typename Other, typename QualifiedType>
+      // Returns true if [Other] is a float or float strict type.
+      template <typename Other>
       concept is_qualified_float_assignment_operator = std::is_floating_point_v<Other> || std::is_base_of_v<Other, STRICT_CPP_NAMESPACE::detail::strict_cpp_float_base_t>;
    }
 
@@ -428,7 +428,7 @@ namespace STRICT_CPP_NAMESPACE {
          /// @tparam Other The assignment type.
          /// @returns strict_integral_type&
          template <typename Other>
-            requires STRICT_CPP_NAMESPACE::detail::is_qualified_integral_assignment_operator<Other, Type>
+            requires STRICT_CPP_NAMESPACE::detail::is_qualified_integral_assignment_operator<Other>
          inline constexpr strict_integral_type& operator=(const Other& other) noexcept {
             if constexpr (std::is_integral_v<Other>) this->value = other;
             else this->value = other.value;
@@ -471,7 +471,7 @@ namespace STRICT_CPP_NAMESPACE {
          /// @tparam Other The assignment type.
          /// @returns strict_float_type&
          template <typename Other>
-            requires STRICT_CPP_NAMESPACE::detail::is_qualified_float_assignment_operator<Other, Type>
+            requires STRICT_CPP_NAMESPACE::detail::is_qualified_float_assignment_operator<Other>
          inline constexpr strict_float_type& operator=(const Other& other) noexcept {
             if constexpr (std::is_floating_point_v<Other>) this->value = other;
             else this->value = other.value;

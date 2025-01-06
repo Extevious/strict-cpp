@@ -594,9 +594,7 @@ namespace STRICT_CPP_NAMESPACE {
             using STRICT_CPP_NAMESPACE::strict_integral_type<TYPE, QUALIFIED_TYPES>::operator=;                                                                                    \
       };                                                                                                                                                                           \
    }                                                                                                                                                                               \
-   _STD_BEGIN                                                                                                                                                                      \
-   STRICT_CPP_DEFINE_FORMATTER(NAME)                                                                                                                                               \
-   _STD_END
+   STRICT_CPP_DEFINE_FORMATTER(NAME)
 
 #define STRICT_CPP_DEFINE_FLOAT_TYPE(NAME, TYPE, QUALIFIED_TYPES...)                                                                                                               \
    namespace STRICT_CPP_NAMESPACE {                                                                                                                                                \
@@ -605,9 +603,7 @@ namespace STRICT_CPP_NAMESPACE {
             using STRICT_CPP_NAMESPACE::strict_float_type<TYPE, QUALIFIED_TYPES>::operator=;                                                                                       \
       };                                                                                                                                                                           \
    }                                                                                                                                                                               \
-   _STD_BEGIN                                                                                                                                                                      \
-   STRICT_CPP_DEFINE_FORMATTER(NAME)                                                                                                                                               \
-   _STD_END
+   STRICT_CPP_DEFINE_FORMATTER(NAME)
 
 #define STRICT_CPP_DEFINE_DYNAMIC_INTEGRAL_TYPE(NAME, QUALIFIED_TYPES...)                                                                                                          \
    namespace STRICT_CPP_NAMESPACE {                                                                                                                                                \
@@ -618,7 +614,6 @@ namespace STRICT_CPP_NAMESPACE {
             using STRICT_CPP_NAMESPACE::strict_integral_type<T, QUALIFIED_TYPES>::operator=;                                                                                       \
       };                                                                                                                                                                           \
    }                                                                                                                                                                               \
-   _STD_BEGIN                                                                                                                                                                      \
    STRICT_CPP_DEFINE_FORMATTER(NAME<char>)                                                                                                                                         \
    STRICT_CPP_DEFINE_FORMATTER(NAME<unsigned char>)                                                                                                                                \
    STRICT_CPP_DEFINE_FORMATTER(NAME<unsigned short>)                                                                                                                               \
@@ -629,8 +624,7 @@ namespace STRICT_CPP_NAMESPACE {
    STRICT_CPP_DEFINE_FORMATTER(NAME<signed short>)                                                                                                                                 \
    STRICT_CPP_DEFINE_FORMATTER(NAME<signed int>)                                                                                                                                   \
    STRICT_CPP_DEFINE_FORMATTER(NAME<signed long>)                                                                                                                                  \
-   STRICT_CPP_DEFINE_FORMATTER(NAME<signed long long>)                                                                                                                             \
-   _STD_END
+   STRICT_CPP_DEFINE_FORMATTER(NAME<signed long long>)
 
 #define STRICT_CPP_DEFINE_DYNAMIC_FLOAT_TYPE(NAME, QUALIFIED_TYPES...)                                                                                                             \
    namespace STRICT_CPP_NAMESPACE {                                                                                                                                                \
@@ -641,11 +635,9 @@ namespace STRICT_CPP_NAMESPACE {
             using STRICT_CPP_NAMESPACE::strict_float_type<T, QUALIFIED_TYPES>::operator=;                                                                                          \
       };                                                                                                                                                                           \
    }                                                                                                                                                                               \
-   _STD_BEGIN                                                                                                                                                                      \
    STRICT_CPP_DEFINE_FORMATTER(NAME<float>)                                                                                                                                        \
    STRICT_CPP_DEFINE_FORMATTER(NAME<double>)                                                                                                                                       \
-   STRICT_CPP_DEFINE_FORMATTER(NAME<long double>)                                                                                                                                  \
-   _STD_END
+   STRICT_CPP_DEFINE_FORMATTER(NAME<long double>)
 
 #define STRICT_CPP_DEFINE_ALIAS_TYPE(NAME, TYPE)                                                                                                                                   \
    namespace STRICT_CPP_NAMESPACE {                                                                                                                                                \
@@ -994,6 +986,4 @@ STRICT_CPP_DEFINE_OPTIONAL_TYPE_UNSIGNED(rhs_index_offset);
 
 // capacity_t
 STRICT_CPP_DEFINE_OPTIONAL_TYPE_UNSIGNED(capacity);
-
-   #undef STRICT_CPP_DEFINE_OPTIONAL_TYPE_UNSIGNED
 #endif

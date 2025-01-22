@@ -509,7 +509,7 @@ namespace STRICT_CPP_NAMESPACE {
          template <typename Other>
             requires std::is_convertible_v<Other, Type>
          inline constexpr strict_alias_type(Other&& other) noexcept :
-            value(std::move(other)) { }
+            value(std::forward<Type>(other)) { }
 
          /// @brief Copy constructor.
          /// @tparam Other The copyable type.
@@ -517,7 +517,7 @@ namespace STRICT_CPP_NAMESPACE {
          template <typename Other>
             requires std::is_convertible_v<Other, Type>
          inline constexpr strict_alias_type(const Other& other) noexcept :
-            value(static_cast<Type>(other)) { }
+            value(other) { }
 
          /// @brief Move-assignment operator.
          /// @tparam Other The assignment type.
@@ -526,7 +526,7 @@ namespace STRICT_CPP_NAMESPACE {
          template <typename Other>
             requires std::is_convertible_v<Other, Type>
          inline constexpr auto& operator=(Other&& other) noexcept {
-            this->value = std::move(other.value);
+            this->value = std::forward<Type>(other.value);
             return *this;
          }
 

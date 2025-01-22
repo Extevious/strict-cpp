@@ -14,6 +14,9 @@
 #pragma push_macro("min")
 #pragma push_macro("max")
 
+#undef min
+#undef max
+
 #define STRICT_CPP_DEFINE_INTEGRAL_OPERATOR(OPERATOR_TYPE)                                                                                                                         \
    template <typename Left, typename Right>                                                                                                                                        \
       requires STRICT_CPP_NAMESPACE::detail::is_qualified_integral_operator<Left, Right>                                                                                           \
@@ -991,5 +994,10 @@ STRICT_CPP_DEFINE_OPTIONAL_TYPE_UNSIGNED(rhs_index_offset);
 STRICT_CPP_DEFINE_OPTIONAL_TYPE_UNSIGNED(capacity);
 #endif
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wignored-pragmas"
+
 #pragma pop_macro("min") // NOLINT
 #pragma pop_macro("max") // NOLINT
+
+#pragma GCC diagnostic pop

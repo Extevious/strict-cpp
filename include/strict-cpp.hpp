@@ -11,6 +11,9 @@
 #include <string>
 #include <type_traits>
 
+#pragma push_macro("min")
+#pragma push_macro("max")
+
 #define STRICT_CPP_DEFINE_INTEGRAL_OPERATOR(OPERATOR_TYPE)                                                                                                                         \
    template <typename Left, typename Right>                                                                                                                                        \
       requires STRICT_CPP_NAMESPACE::detail::is_qualified_integral_operator<Left, Right>                                                                                           \
@@ -987,3 +990,6 @@ STRICT_CPP_DEFINE_OPTIONAL_TYPE_UNSIGNED(rhs_index_offset);
 // capacity_t
 STRICT_CPP_DEFINE_OPTIONAL_TYPE_UNSIGNED(capacity);
 #endif
+
+#pragma pop_macro("min") // NOLINT
+#pragma pop_macro("max") // NOLINT

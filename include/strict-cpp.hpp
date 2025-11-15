@@ -999,7 +999,7 @@ STRICT_CPP_DEFINE_OPTIONAL_TYPE_UNSIGNED(capacity);
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wignored-pragmas"
 
-#pragma pop_macro("min") // NOLINT
-#pragma pop_macro("max") // NOLINT
+#pragma pop_macro("min")
+#pragma pop_macro("max")
 
 #pragma GCC diagnostic pop

@@ -663,8 +663,10 @@ STRICT_CPP_DEFINE_INTEGRAL_TYPE(schar_t, std::int8_t);
 STRICT_CPP_DEFINE_INTEGRAL_TYPE(uchar_t, std::uint8_t);
 STRICT_CPP_DEFINE_INTEGRAL_TYPE(short_t, std::int16_t);
 STRICT_CPP_DEFINE_INTEGRAL_TYPE(ushort_t, std::uint16_t);
-STRICT_CPP_DEFINE_INTEGRAL_TYPE(long_t, std::int64_t);
-STRICT_CPP_DEFINE_INTEGRAL_TYPE(ulong_t, std::uint64_t);
+STRICT_CPP_DEFINE_INTEGRAL_TYPE(long_t, long);
+STRICT_CPP_DEFINE_INTEGRAL_TYPE(ulong_t, unsigned long);
+STRICT_CPP_DEFINE_INTEGRAL_TYPE(long_long_t, long long);
+STRICT_CPP_DEFINE_INTEGRAL_TYPE(ulong_long_t, unsigned long long);
 
 STRICT_CPP_DEFINE_INTEGRAL_TYPE(size_t, std::size_t);
 STRICT_CPP_DEFINE_INTEGRAL_TYPE(size8_t, std::uint8_t);

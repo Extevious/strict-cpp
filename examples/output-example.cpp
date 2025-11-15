@@ -85,14 +85,14 @@ void integral() {
    output("Casting operators:");
 
    std::size_t                     s = a;
-   int                             i = (int)a;
-   float                           f = (float)a;
+   int                             i = a;
    STRICT_CPP_NAMESPACE::count32_t c = a.as<STRICT_CPP_NAMESPACE::count32_t>();
+   STRICT_CPP_NAMESPACE::long_t    l = a.as<long>();
 
    output("s: ", s);
    output("i: ", i);
-   output("f: ", f);
    output("c: ", c);
+   output("d: ", l);
    nl();
 
    STRICT_CPP_NAMESPACE::schar_t schar0 = {};
@@ -162,15 +162,11 @@ void floating() {
 
    output("Casting operators:");
 
-   float                           f = a;
-   std::size_t                     s = (std::size_t)a;
-   int                             i = (int)a;
-   STRICT_CPP_NAMESPACE::count32_t c = a.as<STRICT_CPP_NAMESPACE::count32_t>();
+   float                          f = a;
+   STRICT_CPP_NAMESPACE::double_t d = a.as<double>();
 
    output("f: ", f);
-   output("s: ", s);
-   output("i: ", i);
-   output("c: ", c);
+   output("c: ", d);
    nl();
 
    output("Strings:");

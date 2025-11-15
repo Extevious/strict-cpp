@@ -800,6 +800,8 @@ STRICT_CPP_DEFINE_INTEGRAL_TYPE(schar_t, std::int8_t);
 STRICT_CPP_DEFINE_INTEGRAL_TYPE(uchar_t, std::uint8_t);
 STRICT_CPP_DEFINE_INTEGRAL_TYPE(short_t, std::int16_t);
 STRICT_CPP_DEFINE_INTEGRAL_TYPE(ushort_t, std::uint16_t);
+STRICT_CPP_DEFINE_INTEGRAL_TYPE(int_t, int);
+STRICT_CPP_DEFINE_INTEGRAL_TYPE(uint_t, unsigned int);
 STRICT_CPP_DEFINE_INTEGRAL_TYPE(long_t, long);
 STRICT_CPP_DEFINE_INTEGRAL_TYPE(ulong_t, unsigned long);
 STRICT_CPP_DEFINE_INTEGRAL_TYPE(long_long_t, long long);
@@ -811,37 +813,35 @@ STRICT_CPP_DEFINE_INTEGRAL_TYPE(size16_t, std::uint16_t);
 STRICT_CPP_DEFINE_INTEGRAL_TYPE(size32_t, std::uint32_t);
 STRICT_CPP_DEFINE_INTEGRAL_TYPE(size64_t, std::uint64_t);
 
-STRICT_CPP_DEFINE_INTEGRAL_TYPE(int_t, std::int64_t);
 STRICT_CPP_DEFINE_INTEGRAL_TYPE(int8_t, std::int8_t);
 STRICT_CPP_DEFINE_INTEGRAL_TYPE(int16_t, std::int16_t);
 STRICT_CPP_DEFINE_INTEGRAL_TYPE(int32_t, std::int32_t);
 STRICT_CPP_DEFINE_INTEGRAL_TYPE(int64_t, std::int64_t);
 
-STRICT_CPP_DEFINE_INTEGRAL_TYPE(int_least_t, std::int_least64_t);
+STRICT_CPP_DEFINE_INTEGRAL_TYPE(int_least_t, std::int_least32_t);
 STRICT_CPP_DEFINE_INTEGRAL_TYPE(int_least8_t, std::int_least8_t);
 STRICT_CPP_DEFINE_INTEGRAL_TYPE(int_least16_t, std::int_least16_t);
 STRICT_CPP_DEFINE_INTEGRAL_TYPE(int_least32_t, std::int_least32_t);
 STRICT_CPP_DEFINE_INTEGRAL_TYPE(int_least64_t, std::int_least64_t);
 
-STRICT_CPP_DEFINE_INTEGRAL_TYPE(int_fast_t, std::int_fast64_t);
+STRICT_CPP_DEFINE_INTEGRAL_TYPE(int_fast_t, std::int_fast32_t);
 STRICT_CPP_DEFINE_INTEGRAL_TYPE(int_fast8_t, std::int_fast8_t);
 STRICT_CPP_DEFINE_INTEGRAL_TYPE(int_fast16_t, std::int_fast16_t);
 STRICT_CPP_DEFINE_INTEGRAL_TYPE(int_fast32_t, std::int_fast32_t);
 STRICT_CPP_DEFINE_INTEGRAL_TYPE(int_fast64_t, std::int_fast64_t);
 
-STRICT_CPP_DEFINE_INTEGRAL_TYPE(uint_t, std::uint64_t);
 STRICT_CPP_DEFINE_INTEGRAL_TYPE(uint8_t, std::uint8_t);
 STRICT_CPP_DEFINE_INTEGRAL_TYPE(uint16_t, std::uint16_t);
 STRICT_CPP_DEFINE_INTEGRAL_TYPE(uint32_t, std::uint32_t);
 STRICT_CPP_DEFINE_INTEGRAL_TYPE(uint64_t, std::uint64_t);
 
-STRICT_CPP_DEFINE_INTEGRAL_TYPE(uint_least_t, std::uint_least64_t);
+STRICT_CPP_DEFINE_INTEGRAL_TYPE(uint_least_t, std::uint_least32_t);
 STRICT_CPP_DEFINE_INTEGRAL_TYPE(uint_least8_t, std::uint_least8_t);
 STRICT_CPP_DEFINE_INTEGRAL_TYPE(uint_least16_t, std::uint_least16_t);
 STRICT_CPP_DEFINE_INTEGRAL_TYPE(uint_least32_t, std::uint_least32_t);
 STRICT_CPP_DEFINE_INTEGRAL_TYPE(uint_least64_t, std::uint_least64_t);
 
-STRICT_CPP_DEFINE_INTEGRAL_TYPE(uint_fast_t, std::uint_fast64_t);
+STRICT_CPP_DEFINE_INTEGRAL_TYPE(uint_fast_t, std::uint_fast32_t);
 STRICT_CPP_DEFINE_INTEGRAL_TYPE(uint_fast8_t, std::uint_fast8_t);
 STRICT_CPP_DEFINE_INTEGRAL_TYPE(uint_fast16_t, std::uint_fast16_t);
 STRICT_CPP_DEFINE_INTEGRAL_TYPE(uint_fast32_t, std::uint_fast32_t);

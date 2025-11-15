@@ -445,7 +445,7 @@ namespace STRICT_CPP_NAMESPACE {
          /// @tparam Other The type to convert to.
          /// @returns Other
          template <typename Other>
-            requires STRICT_CPP_NAMESPACE::detail::is_qualified_operator<Other>
+            requires STRICT_CPP_NAMESPACE::detail::is_qualified_operator<Other> || std::is_convertible_v<Type, Other>
          inline constexpr Other as() const noexcept {
             return static_cast<Other>(this->value);
          }
@@ -488,7 +488,7 @@ namespace STRICT_CPP_NAMESPACE {
          /// @tparam Other The type to convert to.
          /// @returns Other
          template <typename Other>
-            requires STRICT_CPP_NAMESPACE::detail::is_qualified_operator<Other>
+            requires STRICT_CPP_NAMESPACE::detail::is_qualified_operator<Other> || std::is_convertible_v<Type, Other>
          inline constexpr Other as() const noexcept {
             return static_cast<Other>(this->value);
          }

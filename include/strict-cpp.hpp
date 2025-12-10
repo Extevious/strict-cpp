@@ -646,19 +646,133 @@ namespace STRICT_CPP_NAMESPACE {
 
 			/// @brief Subscript operator.
 			/// @returns auto&
-			template <typename Indexer>
-				requires STRICT_CPP_NAMESPACE::detail::has_subscript_operator<Type, Indexer>
-			inline constexpr auto& operator[](Indexer&& index) const noexcept {
-				return this->value[std::move(index)];
+			/// @brief Conversion function.
+			/// @tparam Other The type to convert to.
+			/// @returns Other
+			template <typename Other>
+				requires STRICT_CPP_NAMESPACE::detail::is_qualified_conversion_fuction<Type, Other>
+			inline constexpr Other as() noexcept {
+				return static_cast<Other>(this->value);
 			}
 
-			/// @brief Subscript operator.
-			/// @returns auto&
-			template <typename Indexer>
-				requires STRICT_CPP_NAMESPACE::detail::has_subscript_operator<Type, Indexer>
-			inline constexpr auto& operator[](const Indexer& index) const noexcept {
-				return this->value[std::forward<const Indexer>(index)];
+			/// @brief Const conversion function.
+			/// @tparam Other The type to convert to.
+			/// @returns Other
+			template <typename Other>
+				requires STRICT_CPP_NAMESPACE::detail::is_qualified_conversion_fuction<Type, Other>
+			inline constexpr Other as() const noexcept {
+				return static_cast<const Other>(this->value);
 			}
+
+			// Note: some of the below functions may be unecessary, but for now they will stay.
+
+			template <typename _ = void>
+				requires STRICT_CPP_NAMESPACE::detail::has_data_function<Type>
+			inline constexpr auto data() noexcept { return this->value.data(); }
+
+			template <typename _ = void>
+				requires STRICT_CPP_NAMESPACE::detail::has_data_function<Type>
+			inline constexpr auto data() const noexcept { return this->value.data(); }
+
+			template <typename _ = void>
+				requires STRICT_CPP_NAMESPACE::detail::has_begin_function<Type>
+			inline constexpr auto begin() noexcept { return this->value.begin(); }
+
+			template <typename _ = void>
+				requires STRICT_CPP_NAMESPACE::detail::has_begin_function<Type>
+			inline constexpr auto begin() const noexcept { return this->value.begin(); }
+
+			template <typename _ = void>
+				requires STRICT_CPP_NAMESPACE::detail::has_end_function<Type>
+			inline constexpr auto end() noexcept { return this->value.end(); }
+
+			template <typename _ = void>
+				requires STRICT_CPP_NAMESPACE::detail::has_end_function<Type>
+			inline constexpr auto end() const noexcept { return this->value.end(); }
+
+			template <typename _ = void>
+				requires STRICT_CPP_NAMESPACE::detail::has_rbegin_function<Type>
+			inline constexpr auto rbegin() noexcept { return this->value.rbegin(); }
+
+			template <typename _ = void>
+				requires STRICT_CPP_NAMESPACE::detail::has_rbegin_function<Type>
+			inline constexpr auto rbegin() const noexcept { return this->value.rbegin(); }
+
+			template <typename _ = void>
+				requires STRICT_CPP_NAMESPACE::detail::has_rend_function<Type>
+			inline constexpr auto rend() noexcept { return this->value.rend(); }
+
+			template <typename _ = void>
+				requires STRICT_CPP_NAMESPACE::detail::has_rend_function<Type>
+			inline constexpr auto rend() const noexcept { return this->value.rend(); }
+
+			template <typename _ = void>
+				requires STRICT_CPP_NAMESPACE::detail::has_cbegin_function<Type>
+			inline constexpr auto cbegin() const noexcept { return this->value.cbegin(); }
+
+			template <typename _ = void>
+				requires STRICT_CPP_NAMESPACE::detail::has_cend_function<Type>
+			inline constexpr auto cend() const noexcept { return this->value.cend(); }
+
+			template <typename _ = void>
+				requires STRICT_CPP_NAMESPACE::detail::has_crbegin_function<Type>
+			inline constexpr auto crbegin() const noexcept { return this->value.crbegin(); }
+
+			template <typename _ = void>
+				requires STRICT_CPP_NAMESPACE::detail::has_crend_function<Type>
+			inline constexpr auto crend() const noexcept { return this->value.crend(); }
+
+			template <typename _ = void>
+				requires STRICT_CPP_NAMESPACE::detail::has_Unchecked_begin_function<Type>
+			inline constexpr auto _Unchecked_begin() noexcept { return this->value._Unchecked_begin(); }
+
+			template <typename _ = void>
+				requires STRICT_CPP_NAMESPACE::detail::has_Unchecked_begin_function<Type>
+			inline constexpr auto _Unchecked_begin() const noexcept { return this->value._Unchecked_begin(); }
+
+			template <typename _ = void>
+				requires STRICT_CPP_NAMESPACE::detail::has_Unchecked_end_function<Type>
+			inline constexpr auto _Unchecked_end() noexcept { return this->value._Unchecked_end(); }
+
+			template <typename _ = void>
+				requires STRICT_CPP_NAMESPACE::detail::has_Unchecked_end_function<Type>
+			inline constexpr auto _Unchecked_end() const noexcept { return this->value._Unchecked_end(); }
+
+			template <typename _ = void>
+				requires STRICT_CPP_NAMESPACE::detail::has_empty_function<Type>
+			inline constexpr auto empty() const noexcept { return this->value.empty(); }
+
+			template <typename _ = void>
+				requires STRICT_CPP_NAMESPACE::detail::has_size_function<Type>
+			inline constexpr auto size() const noexcept { return this->value.size(); }
+
+			template <typename _ = void>
+				requires STRICT_CPP_NAMESPACE::detail::has_max_size_function<Type>
+			inline constexpr auto max_size() const noexcept { return this->value.max_size(); }
+
+			template <typename _ = void>
+				requires STRICT_CPP_NAMESPACE::detail::has_capacity_function<Type>
+			inline constexpr auto capacity() const noexcept { return this->value.capacity(); }
+
+			template <typename _ = void>
+				requires STRICT_CPP_NAMESPACE::detail::has_front_function<Type>
+			inline constexpr auto front() noexcept { return this->value.front(); }
+
+			template <typename _ = void>
+				requires STRICT_CPP_NAMESPACE::detail::has_front_function<Type>
+			inline constexpr auto front() const noexcept { return this->value.front(); }
+
+			template <typename _ = void>
+				requires STRICT_CPP_NAMESPACE::detail::has_back_function<Type>
+			inline constexpr auto back() noexcept { return this->value.back(); }
+
+			template <typename _ = void>
+				requires STRICT_CPP_NAMESPACE::detail::has_back_function<Type>
+			inline constexpr auto back() const noexcept { return this->value.back(); }
+
+			template <typename _ = void>
+				requires STRICT_CPP_NAMESPACE::detail::has_get_allocator_function<Type>
+			inline constexpr auto get_allocator() const noexcept { return this->value.get_allocator(); }
 
 		protected:
 			template <typename _ = void>

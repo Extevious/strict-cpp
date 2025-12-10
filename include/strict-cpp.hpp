@@ -664,14 +664,14 @@ namespace STRICT_CPP_NAMESPACE {
 			template <typename _ = void>
 				requires STRICT_CPP_NAMESPACE::detail::can_stringify<Type>
 			inline std::string m_get_string_internal() const noexcept {
-				if constexpr (std::is_convertible_v<Type, std::string>) return this->value;
+				if constexpr (STRICT_CPP_NAMESPACE::detail::can_convert_to_string<Type>) return this->value;
 				else return std::to_string(this->value);
 			}
 
 			template <typename _ = void>
-				requires STRICT_CPP_NAMESPACE::detail::can_stringify_wide<Type>
+				requires STRICT_CPP_NAMESPACE::detail::can_wstringify<Type>
 			inline std::wstring m_get_wstring_internal() const noexcept {
-				if constexpr (std::is_convertible_v<Type, std::wstring>) return this->value;
+				if constexpr (STRICT_CPP_NAMESPACE::detail::can_convert_to_wstring<Type>) return this->value;
 				else return std::to_wstring(this->value);
 			}
 
@@ -682,7 +682,7 @@ namespace STRICT_CPP_NAMESPACE {
 			}
 
 			template <typename _ = void>
-				requires (!STRICT_CPP_NAMESPACE::detail::can_stringify_wide<Type>)
+				requires (!STRICT_CPP_NAMESPACE::detail::can_wstringify<Type>)
 			inline std::wstring m_get_wstring_internal() const noexcept {
 				return L"";
 			}

@@ -6,7 +6,7 @@ project(
    license: 'MIT',
    license_files: 'LICENSE',
    meson_version: '>=1.1.1',
-   version: '1.0.0',
+   version: '1.1.0',
 )
 
 strict_cpp_dep = declare_dependency(

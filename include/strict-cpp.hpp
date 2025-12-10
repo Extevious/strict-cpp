@@ -108,6 +108,14 @@
 		return left OPERATOR_TYPE right.value;                                                   \
 	}
 
+// Integral/float-type inheritance tree example:
+//
+//                       ,--> strict_cpp_integral_base_t --> strict_integral_type<std::size_t> ----> my_size_t
+//                      |
+//    strict_cpp_base_t ----> strict_cpp_float_base_t -----> strict_float_type<double> ------------> my_double_t
+//                      |
+//                       `--> strict_cpp_alias_base_t -----> strict_alias_type<std::vector<int>> --> my_int_vector_alias_t
+
 namespace STRICT_CPP_NAMESPACE {
 	namespace detail {
 		// Base type for integral or float type qualifications.

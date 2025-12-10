@@ -1,35 +1,8 @@
-# strict-cpp
+# strict_types
 
-Reduce ambiguity between methods and operators by using types provided by strict-cpp, a C++20 platform-agnostic project.
-
-### Features
-
-- Strict type wrappers encapsulating integral, floating-point, and alias types.
-- Singular header file.
-- Stringification and formatters.
-- [Meson Build](https://mesonbuild.com/) support.
-- MIT license.
-
-### Usages
-
-- Reduced ambiguity between methods and operators.
-- Explicit type-safety enforcement.
-- Method or operators will avoid swapped parameters, wrong parameter types, etc.
-
-### TODO
-
-- Verify compiled code has zero overhead in optimized builds.
-- Verify cross-platform support.
-- Implement support for [C++20 modules](https://en.cppreference.com/w/cpp/language/modules).
-- CMake build file(s).
-- ???
-
-## Examples
-
-### Integral and Floating-point types
+Use strictly-typed encapsulation types to reduce bugs, improve readability, and scale operator and function overloads.
 
 ```cpp
-
    // These could be ambiguous...
    add(short, short); // #1
    add(int, int);     // #2
@@ -37,99 +10,111 @@ Reduce ambiguity between methods and operators by using types provided by strict
    // ...but these are not!
    add(strict::int16_t, strict::int16_t); // #3
    add(strict::int32_t, strict::int32_t); // #4
-
-   ...
-
-   // If only method add() #1 and #2 existed:
-
-   add(5, 6);   // This would call add() #2 as expected.
-   add(5U, 6);  // This would also call add() #2 because of the 2nd argument qualifying.
-   add(5U, 6U); // However this add() is ambiguous between #1 and #2.
-
-   ...
-
-   // If only the strict-type method add() #3 and #4 existed:
-
-   add(5, 6);   // This would call add() #4 as expected.
-   add(5U, 6);  // This would fail due to no implicit conversion available for the first argument.
-   add(5U, 6U); // This would fail due to no implicit conversion available for both arguments.
 ```
 
-### Custom types
+### Features
+
+- Strict types encapsulating integral, floating-point, and alias types.
+- Explicit type-safety enforcement.
+- Header-only files.
+- Stringification and formatters.
+- [Meson Build](https://mesonbuild.com/) support.
+- MIT license.
+
+### Usages
+
+- Reduce ambiguity between methods and operators.
+- Backwards-compatible with existing types.
+- Reduce potential bugs like swapped parameters, undesired type conversions, etc.
+
+### TODO
+
+- Verify overhead impact.
+- Verify compiled code has zero overhead in optimized builds.
+- Implement debug assertion.
+- Verify cross-platform support.
+- Implement stream, hash, etc support.
+- Implement bool, enum, and proxy types.
+- Strict-ness levels.
+- Implement support for [C++20 modules](https://en.cppreference.com/w/cpp/language/modules).
+- CMake build file(s).
+- ???
+
+## Why use `strict_types`?
+
+All strict types are explicit about which type is implicitly allowed to use its constructors, functions, and operators. This is why you can have a wide range of similar, but explicitly different types. I use my
+strict types frequently to add various overloads, or reduce accidentally calling the wrong function. For example when allocating memory with the Vulkan API, I can do:
 
 ```cpp
-   // You can define your own types:
-   //    - First parameter is the name of the type.
-   //    - Second parameter is the encapsulated type.
-
-   STRICT_CPP_DEFINE_INTEGRAL_TYPE(strict::buffer_size_t, std::size_t);
-   STRICT_CPP_DEFINE_FLOAT_TYPE(strict::scale_t, float);
-
-   ...
-
-   // You can also define your own types with a range of qualified types for implicit usage:
-   //    - First parameter is the name of the type.
-   //    - Second parameter is the encapsulated type.
-   //    - All following types are the qualified types.
-
-   STRICT_CPP_DEFINE_INTEGRAL_TYPE(strict::example_t, int, long, double, std::size_t);
-   STRICT_CPP_DEFINE_INTEGRAL_TYPE(strict::some_int_t, int, long, unsigned int);
+   MemoryT allocateBufferMemory(std::size_t size);
+   MemoryT allocateImageMemory(std::size_t size);
 ```
 
-### Integral and Floating-point dynamic types
+The above functions are *fine* for the most part, but you might accidentally
+call `allocateBufferMemory` instead of `allocateImageMemory` by mistake. If the
+parameter types were instead swapped out with their respective strict size type,
+calling the wrong function would be technically impossible if using a strict type:
 
 ```cpp
-   // Functions can also use dynamic strict types.
-   // someFunction() takes any signed integer, and the encapsulated type is explicitly an int.
-   someFunction(strict::any_signed_int_t<int>); 
-
-   // Using a template to define the encapsulated type when calling the function.
-   // someFunction<T>() takes any float type, but the encapsulated type dynamically is T.
-   template<typename T>
-   someFunction(strict::any_float_t<T>);
-
-   ...
-
-   // Of course you can define your own dynamic type, but there is a slight difference:
-   //    - First parameter is the name of the type.
-   //    - All following types are the qualified types.
-
-   STRICT_CPP_DEFINE_DYNAMIC_INTEGRAL_TYPE(strict::any_example_t, char, int, std::int64_t);
+   MemoryT allocateBufferMemory(strict::buffer_memory_size_t size);
+   MemoryT allocateImageMemory(strict::image_memory_size_t size);
 ```
 
-### Alias types
+If a size value of type `strict::buffer_memory_size_t` was passed into the
+`allocateImageMemory()` function, an error will be reported by your IDE, or
+during compile time.
+
+## Defining custom types
+
+You can define your own custom types easily by using the below macros for integral, floats, and alias types. All strict integral and float types have "qualifier" types, which are defined after the second parameter in the macro.
+A qualifier type allows for implicit usage of various non-strict or strict types during construction.
 
 ```cpp
-   // Defining a strict-alias type is easy:
-   //    Note: if you need a comma (ex; for std::map<A,B>) the comma will need to be defined as a macro.
-   STRICT_CPP_DEFINE_ALIAS_TYPE(some_string_A, std::string);
-   STRICT_CPP_DEFINE_ALIAS_TYPE(some_string_B, std::string);
+   // NAME               : The name of your custom strict type.
+   // TYPE               : The encapsulated type.
+   // QUALIFIED_TYPES... : Various "qualifying" types.
+   #define STRICT_CPP_DEFINE_INTEGRAL_TYPE(NAME, TYPE, QUALIFIED_TYPES...)
 
-   ...
+   // Examples:
+   STRICT_CPP_DEFINE_INTEGRAL_TYPE(my_size_t, std::size_t)
+   STRICT_CPP_DEFINE_INTEGRAL_TYPE(my_wildcard_size_t, std::size_t, int, unsigned int, std::uint64_t)
+```
 
-   void example0(strict::some_string_A string); // #1
-   void example0(strict::some_string_B string); // #2
+```cpp
+   // NAME               : The name of your custom strict type.
+   // TYPE               : The encapsulated type.
+   // QUALIFIED_TYPES... : Various "qualifying" types.
+   #define STRICT_CPP_DEFINE_FLOAT_TYPE(NAME, TYPE, QUALIFIED_TYPES...)
 
-   const strict::some_string_A string0 = "some simple string A";
-   const strict::some_string_B string1 = "some simple string B";
-   const std::string           string2 = "I'm ambiguous!";
+   // Examples:
+   STRICT_CPP_DEFINE_INTEGRAL_TYPE(my_float_t, float)
+   STRICT_CPP_DEFINE_INTEGRAL_TYPE(my_wildcard_float_t, float, double, long double)
+```
 
-   example0(string0); // Calls #1
-   example0(string1); // Calls #2
+Dynamic strict types are slightly different. Instead of an encapsulated type defined in the macro, it is declared in a template declaration. During development, you may want to easily swap out the encapsulated type through a template, using a dynamic strict type allows for just that.
 
-   // This is ambiguous due to the implicit conversion to both some_string_A or some_string_B types:
-   example0(string2);
+```cpp
+   // NAME               : The name of your custom strict type.
+   // QUALIFIED_TYPES... : Various "qualifying" types.
+   #define STRICT_CPP_DEFINE_DYNAMIC_INTEGRAL_TYPE(NAME, QUALIFIED_TYPES...);
+```
 
-   ...
+```cpp
+   // NAME               : The name of your custom strict type.
+   // QUALIFIED_TYPES... : Various "qualifying" types.
+   #define STRICT_CPP_DEFINE_DYNAMIC_FLOAT_TYPE(NAME, QUALIFIED_TYPES...);
+```
 
-   // If you've ever had methods or constructors with similar or same parameters that differ
-   // only in parameter name, using strict-aliases can significantly reduce ambiguity.
+Strict alias types allow for encapsulating a non-reference type that isn't limited to a integral or floating-point type.
 
-   // You might accidentally swap a and b:
-   void example1(std::string a, std::string b);
+```cpp
+   // NAME : The name of your custom strict type.
+   // TYPE : The encapsulated type.
+   #define STRICT_CPP_DEFINE_ALIAS_TYPE(NAME, TYPE);
 
-   // But this is impossible to swap, unless you're passing the encapsulated type:
-   void example1(strict::some_string_A a, strict::some_string_B b);
+   // Example:
+   STRICT_CPP_DEFINE_ALIAS_TYPE(my_int_vector_t, std::vector<int>)
+   STRICT_CPP_DEFINE_ALIAS_TYPE(my_name_string_t, std::string)
 ```
 
 ## How to include in your projects
@@ -143,45 +128,45 @@ Reduce ambiguity between methods and operators by using types provided by strict
 
 1. Create a `strict-cpp.wrap` file in the `<project root>/subprojects` directory (if the directory doesn't exist, create one). An example `.wrap` file:
 
-```cmake
-   [wrap-git]
-   url = https://github.com/Extevious/strict-cpp
-   revision = head
+   ```python
+      [wrap-git]
+      url = https://github.com/Extevious/strict-cpp
+      revision = head
+      
+      [provide]
+      strict-cpp = strict_cpp_dependency
+   ```
 
-   [provide]
-   strict-cpp = strict_cpp_dependency
-```
+1. In your `meson.build` file, you should have something similar to following example:
 
-2. In your `meson.build` file, implement the following example:
+   ```python
+       # Your dependencies array.
+       dependencies = []
 
-```cmake
-    # Your dependencies array.
-    dependencies = []
+       ...
 
-    ...
+       # The name of the subproject is the same as the filename.
+       strict_cpp_subproject = subproject('strict-cpp')
 
-    # The name of the subproject is the same as the filename.
-    strict_cpp_subproject = subproject('strict-cpp')
+       # Same as the name [provide] exposes in the .wrap file.
+       dependencies += dependency('strict-cpp')
+       #
+       # Or...
+       #
+       # strict_cpp_dependency is provided by strict-cpp meson.build file.
+       dependencies += strict_cpp_subproject.get_variable('strict_cpp_dependency')
 
-    # Same as the name [provide] exposes in the .wrap file.
-    dependencies += dependency('strict-cpp')
-    #
-    # Or...
-    #
-    # strict_cpp_dependency is provided by strict-cpp meson.build file.
-    dependencies += strict_cpp_subproject.get_variable('strict_cpp_dependency')
+       ...
 
-    ...
+       # Example executable.
+       executable('MyProject', 'main.cpp', dependencies : strict_cpp_dependency)
+   ```
 
-    # Example executable.
-    executable('MyProject', 'main.cpp', dependencies : strict_cpp_dependency)
-```
-
-3. `strict-cpp.hpp` should be available once your project has been updated.
+1. `strict-cpp.hpp` should be available once your project has been recreated.
 
 ## Macros
 
-### Override-able
+### Overridable
 
 ```cpp
 // Default namespace name.
@@ -283,17 +268,17 @@ Reduce ambiguity between methods and operators by using types provided by strict
     byte_t                 std::uint8_t
     sbyte_t                std::int8_t
 
-    any_int_t<T>           ...
-    any_size_t<T>          ...
-    any_signed_int_t<T>    ...
-    any_unsigned_int_t<T>  ...
-    any_int_least_t<T>     ...
-    any_int_fast_t<T>      ...
-    any_uint_least_t<T>    ...
-    any_uint_fast_t<T>     ...
-    any_intmax_t<T>        ...
-    any_intptr_t<T>        ...
-    any_byte_t<T>          ...
+    any_int_t<T>           <user defined>
+    any_size_t<T>          <user defined>
+    any_signed_int_t<T>    <user defined>
+    any_unsigned_int_t<T>  <user defined>
+    any_int_least_t<T>     <user defined>
+    any_int_fast_t<T>      <user defined>
+    any_uint_least_t<T>    <user defined>
+    any_uint_fast_t<T>     <user defined>
+    any_intmax_t<T>        <user defined>
+    any_intptr_t<T>        <user defined>
+    any_byte_t<T>          <user defined>
 ```
 
 ```cpp
@@ -303,7 +288,7 @@ Reduce ambiguity between methods and operators by using types provided by strict
     float32_t              std::float_t
     float64_t              std::double_t
 
-    any_float_t<T>         ...
+    any_float_t<T>         <user defined>
 ```
 
 ## Available pre-defined optional types

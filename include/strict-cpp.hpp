@@ -7,6 +7,7 @@
 #include <cmath>
 #include <cstdint>
 #include <format>
+#include <initializer_list>
 #include <limits>
 #include <string>
 #include <type_traits>
@@ -447,9 +448,18 @@ namespace STRICT_CPP_NAMESPACE {
 	STRICT_CPP_DEFINE_COMPOUND_FLOAT_OPERATOR(*=)
 	STRICT_CPP_DEFINE_COMPOUND_FLOAT_OPERATOR(/=)
 
+	/// @brief Strictly-typed integral-only encapsulation struct.
+	/// @tparam Type The encapsulated type.
+	/// @tparam QualifiedTypes A range of qualified types suitable for implicit construction.
 	template <typename Type, typename... QualifiedTypes>
-		requires std::is_integral_v<Type> && std::is_trivial_v<Type>
-	struct strict_integral_type : STRICT_CPP_NAMESPACE::detail::strict_integral_value_t<Type> {
+		requires STRICT_CPP_NAMESPACE::detail::is_qualified_integral_type<Type>
+	struct strict_integral_type : STRICT_CPP_NAMESPACE::detail::strict_cpp_integral_base_t {
+			inline constexpr static Type min = std::numeric_limits<Type>::min();
+			inline constexpr static Type max = std::numeric_limits<Type>::max();
+
+			using type = Type;
+			Type value = {};
+
 			/// @brief Default constructor.
 			inline constexpr strict_integral_type() noexcept = default;
 
@@ -459,7 +469,7 @@ namespace STRICT_CPP_NAMESPACE {
 			template <typename Other>
 				requires STRICT_CPP_NAMESPACE::detail::is_qualified_implicit_constructor<Other, Type, QualifiedTypes...>
 			inline constexpr strict_integral_type(const Other other) noexcept :
-				STRICT_CPP_NAMESPACE::detail::strict_integral_value_t<Type>(static_cast<Type>(other)) { }
+				value(static_cast<Type>(other)) { }
 
 			/// @brief Explicit copy constructor.
 			/// @tparam Other The explicitly-convertible type.
@@ -467,7 +477,7 @@ namespace STRICT_CPP_NAMESPACE {
 			template <typename Other>
 				requires STRICT_CPP_NAMESPACE::detail::is_qualified_explicit_constructor<Other, Type>
 			inline constexpr explicit strict_integral_type(const Other other) noexcept :
-				STRICT_CPP_NAMESPACE::detail::strict_integral_value_t<Type>(static_cast<Type>(other)) { }
+				value(static_cast<Type>(other)) { }
 
 			/// @brief Copy assignment operator.
 			/// @tparam Other The assignment type.
@@ -475,24 +485,88 @@ namespace STRICT_CPP_NAMESPACE {
 			template <typename Other>
 				requires STRICT_CPP_NAMESPACE::detail::is_qualified_integral_assignment_operator<Other>
 			inline constexpr strict_integral_type& operator=(const Other other) noexcept {
-				if constexpr (std::is_integral_v<Other>) this->value = other;
-				else this->value = other.value;
+				if constexpr (std::is_integral_v<Other>) this->value = static_cast<Type>(other);
+				else this->value = static_cast<Type>(other.value);
 				return *this;
+			}
+
+			/// @brief Implicit conversion operator.
+			/// @returns Type&
+			inline constexpr operator Type&() noexcept { return this->value; }
+
+			/// @brief Implicit const conversion operator.
+			/// @returns const Type&
+			inline constexpr operator const Type&() const noexcept { return this->value; }
+
+			/// @brief Explicit conversion operator.
+			/// @tparam Other The type to convert to.
+			/// @returns Other
+			template <typename Other>
+				requires STRICT_CPP_NAMESPACE::detail::is_qualified_explicit_conversion_operator<Type, Other>
+			inline constexpr explicit operator Other() noexcept {
+				return static_cast<Other>(this->value);
+			}
+
+			/// @brief Explicit const conversion operator.
+			/// @tparam Other The type to convert to.
+			/// @returns Other
+			template <typename Other>
+				requires STRICT_CPP_NAMESPACE::detail::is_qualified_explicit_conversion_operator<Type, Other>
+			inline constexpr explicit operator const Other() const noexcept {
+				return static_cast<const Other>(this->value);
 			}
 
 			/// @brief Conversion function.
 			/// @tparam Other The type to convert to.
 			/// @returns Other
 			template <typename Other>
-				requires STRICT_CPP_NAMESPACE::detail::is_qualified_operator<Other> || std::is_convertible_v<Type, Other>
-			inline constexpr Other as() const noexcept {
+				requires STRICT_CPP_NAMESPACE::detail::is_qualified_conversion_fuction<Type, Other>
+			inline constexpr Other as() noexcept {
 				return static_cast<Other>(this->value);
 			}
+
+			/// @brief Const conversion function.
+			/// @tparam Other The type to convert to.
+			/// @returns const Other
+			template <typename Other>
+				requires STRICT_CPP_NAMESPACE::detail::is_qualified_conversion_fuction<Type, Other>
+			inline constexpr const Other as() const noexcept {
+				return static_cast<const Other>(this->value);
+			}
+
+			/// @brief Converts to a human-readable string representing the current value.
+			/// @returns std::string
+			template <typename _ = void>
+				requires STRICT_CPP_NAMESPACE::detail::can_convert_to_string_function<Type>
+			inline std::string to_string() const { return std::to_string(this->value); }
+
+			/// @brief Converts to a human-readable wide string representing the current value.
+			/// @returns std::wstring
+			template <typename _ = void>
+				requires STRICT_CPP_NAMESPACE::detail::can_convert_to_wstring_function<Type>
+			inline std::wstring to_wstring() const { return std::to_wstring(this->value); }
 	};
 
+	/// @brief Strictly-typed floating-point-only encapsulation struct.
+	/// @tparam Type The encapsulated type.
+	/// @tparam QualifiedTypes A range of qualified types suitable for implicit construction.
 	template <typename Type, typename... QualifiedTypes>
-		requires std::is_floating_point_v<Type> && std::is_trivial_v<Type>
-	struct strict_float_type : STRICT_CPP_NAMESPACE::detail::strict_float_value_t<Type> {
+		requires STRICT_CPP_NAMESPACE::detail::is_qualified_float_type<Type>
+	struct strict_float_type : STRICT_CPP_NAMESPACE::detail::strict_cpp_float_base_t {
+			inline static constexpr Type min					  = std::numeric_limits<Type>::min();
+			inline static constexpr Type max					  = std::numeric_limits<Type>::max();
+			inline static constexpr Type lowest				  = std::numeric_limits<Type>::lowest();
+			inline static constexpr Type quiet_NaN			  = std::numeric_limits<Type>::quiet_NaN();
+			inline static constexpr Type signaling_NaN	  = std::numeric_limits<Type>::signaling_NaN();
+			inline static constexpr Type positive_infinity = std::numeric_limits<Type>::infinity();
+			inline static constexpr Type negative_infinity = -std::numeric_limits<Type>::infinity();
+			inline static constexpr Type epsilon			  = std::numeric_limits<Type>::epsilon();
+			inline static constexpr Type round_error		  = std::numeric_limits<Type>::round_error();
+			inline static constexpr Type denorm_min		  = std::numeric_limits<Type>::denorm_min();
+
+			using type = Type;
+			Type value = {};
+
 			/// @brief Default constructor.
 			inline constexpr strict_float_type() noexcept = default;
 
@@ -502,7 +576,7 @@ namespace STRICT_CPP_NAMESPACE {
 			template <typename Other>
 				requires STRICT_CPP_NAMESPACE::detail::is_qualified_implicit_constructor<Other, Type, QualifiedTypes...>
 			inline constexpr strict_float_type(const Other other) noexcept :
-				STRICT_CPP_NAMESPACE::detail::strict_float_value_t<Type>(static_cast<Type>(other)) { }
+				value(static_cast<Type>(other)) { }
 
 			/// @brief Explicit copy constructor.
 			/// @tparam Other The explicitly-convertible type.
@@ -510,7 +584,7 @@ namespace STRICT_CPP_NAMESPACE {
 			template <typename Other>
 				requires STRICT_CPP_NAMESPACE::detail::is_qualified_explicit_constructor<Other, Type>
 			inline constexpr explicit strict_float_type(const Other other) noexcept :
-				STRICT_CPP_NAMESPACE::detail::strict_float_value_t<Type>(static_cast<Type>(other)) { }
+				value(static_cast<Type>(other)) { }
 
 			/// @brief Assignment operator.
 			/// @tparam Other The assignment type.
@@ -523,16 +597,66 @@ namespace STRICT_CPP_NAMESPACE {
 				return *this;
 			}
 
+			/// @brief Implicit conversion operator.
+			/// @returns Type&
+			inline constexpr operator Type&() noexcept { return this->value; }
+
+			/// @brief Implicit const conversion operator.
+			/// @returns const Type&
+			inline constexpr operator const Type&() const noexcept { return this->value; }
+
+			/// @brief Explicit conversion operator.
+			/// @tparam Other The type to convert to.
+			/// @returns Other
+			template <typename Other>
+				requires STRICT_CPP_NAMESPACE::detail::is_qualified_explicit_conversion_operator<Type, Other>
+			inline constexpr explicit operator Other() noexcept {
+				return static_cast<Other>(this->value);
+			}
+
+			/// @brief Explicit const conversion operator.
+			/// @tparam Other The type to convert to.
+			/// @returns Other
+			template <typename Other>
+				requires STRICT_CPP_NAMESPACE::detail::is_qualified_explicit_conversion_operator<Type, Other>
+			inline constexpr explicit operator const Other() const noexcept {
+				return static_cast<const Other>(this->value);
+			}
+
 			/// @brief Conversion function.
 			/// @tparam Other The type to convert to.
 			/// @returns Other
 			template <typename Other>
-				requires STRICT_CPP_NAMESPACE::detail::is_qualified_operator<Other> || std::is_convertible_v<Type, Other>
-			inline constexpr Other as() const noexcept {
+				requires STRICT_CPP_NAMESPACE::detail::is_qualified_conversion_fuction<Type, Other>
+			inline constexpr Other as() noexcept {
 				return static_cast<Other>(this->value);
 			}
+
+			/// @brief Const conversion function.
+			/// @tparam Other The type to convert to.
+			/// @returns const Other
+			template <typename Other>
+				requires STRICT_CPP_NAMESPACE::detail::is_qualified_conversion_fuction<Type, Other>
+			inline constexpr const Other as() const noexcept {
+				return static_cast<const Other>(this->value);
+			}
+
+			/// @brief Converts to a human-readable string representing the current value.
+			/// @returns std::string
+			template <typename _ = void>
+				requires STRICT_CPP_NAMESPACE::detail::can_convert_to_string_function<Type>
+			inline std::string to_string() const { return std::to_string(this->value); }
+
+			/// @brief Converts to a human-readable wide string representing the current value.
+			/// @returns std::wstring
+			template <typename _ = void>
+				requires STRICT_CPP_NAMESPACE::detail::can_convert_to_wstring_function<Type>
+			inline std::wstring to_wstring() const { return std::to_wstring(this->value); }
 	};
 
+	/// @brief Strictly-typed alias encapsulation struct. This type cannot encapsulate a reference.
+	/// @tparam Type The encapsulated type.
+	/// @tparam QualifiedTypes A range of qualified types suitable for implicit construction.
 	template <typename Type, typename... QualifiedTypes>
 		requires (sizeof(Type) != 0) && (!std::is_reference_v<Type>)
 	struct strict_alias_type : STRICT_CPP_NAMESPACE::detail::strict_cpp_alias_base_t {
@@ -540,41 +664,40 @@ namespace STRICT_CPP_NAMESPACE {
 			Type value = {};
 
 			/// @brief Default constructor.
-			inline constexpr strict_alias_type() noexcept = default;
+			inline constexpr strict_alias_type() noexcept(std::is_nothrow_default_constructible_v<Type>) = default;
 
-			/// @brief Move construct-in-place constructor.
+			/// @brief Move constructor.
+			inline constexpr strict_alias_type(strict_alias_type&& other) noexcept(std::is_nothrow_move_constructible_v<Type>) :
+				value(std::move(other.value)) { }
+
+			/// @brief Copy constructor.
+			inline constexpr strict_alias_type(const strict_alias_type& other) noexcept(std::is_nothrow_copy_constructible_v<Type>) :
+				value(other.value) { }
+
+			/// @brief construct-in-place constructor.
 			/// @tparam Args Constructor arguments.
 			template <typename... Args>
 				requires std::is_constructible_v<Type, Args...>
-			inline constexpr strict_alias_type(Args&&... args) noexcept :
-				value(std::move(args)...) { }
+			inline constexpr strict_alias_type(Args&&... args) noexcept(std::is_nothrow_constructible_v<Type, Args...>) :
+				value(std::forward<Args>(args)...) { }
 
-			/// @brief Copy construct-in-place constructor.
-			/// @tparam Args Constructor arguments to copy.
-			template <typename... Args>
-				requires std::is_constructible_v<Type, Args...>
-			inline constexpr strict_alias_type(const Args&... args) noexcept :
-				value(std::forward<const Args>(args)...) { }
+			/// @brief Initializer list constructor.
+			/// @tparam Other Constructor std::initializer_list<> arguments.
+			template <typename Other>
+				requires std::is_constructible_v<Type, std::initializer_list<Other>>
+			inline constexpr strict_alias_type(std::initializer_list<Other> initializer_list) noexcept(std::is_nothrow_constructible_v<Type, std::initializer_list<Other>>) :
+				value(initializer_list) { }
 
 			/// @brief Move-assignment operator.
 			/// @tparam Other The assignment type.
 			/// @param other The move-assignment value.
 			/// @returns auto&
 			template <typename Other>
-				requires std::is_base_of_v<Other, STRICT_CPP_NAMESPACE::detail::strict_cpp_alias_base_t> && std::is_convertible_v<Other, Type>
-			inline constexpr auto& operator=(Other&& other) noexcept {
-				this->value = std::move(other.value);
-				return *this;
-			}
+				requires std::is_convertible_v<Other, Type>
+			inline constexpr auto& operator=(Other&& other) noexcept(std::is_nothrow_move_assignable_v<Type>) {
+				if constexpr (std::is_base_of_v<Other, STRICT_CPP_NAMESPACE::detail::strict_cpp_alias_base_t>) this->value = std::move(other.value);
+				else this->value = std::move(other);
 
-			/// @brief Move-assignment operator.
-			/// @tparam Other The assignment type.
-			/// @param other The move-assignment value.
-			/// @returns auto&
-			template <typename Other>
-				requires std::is_convertible_v<Other, Type> && (!std::is_base_of_v<Other, STRICT_CPP_NAMESPACE::detail::strict_cpp_alias_base_t>)
-			inline constexpr auto& operator=(Other&& other) noexcept {
-				this->value = std::move(other);
 				return *this;
 			}
 
@@ -583,46 +706,49 @@ namespace STRICT_CPP_NAMESPACE {
 			/// @param other The copy-assignment value.
 			/// @returns auto&
 			template <typename Other>
-				requires std::is_base_of_v<Other, STRICT_CPP_NAMESPACE::detail::strict_cpp_alias_base_t> && std::is_convertible_v<Other, Type>
-			inline constexpr auto& operator=(const Other& other) noexcept {
-				this->value = std::forward<Other>(other.value);
+				requires std::is_convertible_v<Other, Type>
+			inline constexpr auto& operator=(const Other& other) noexcept(std::is_nothrow_copy_assignable_v<Type>) {
+				if constexpr (std::is_base_of_v<Other, STRICT_CPP_NAMESPACE::detail::strict_cpp_alias_base_t>) this->value = other.value;
+				else this->value = other;
+
 				return *this;
 			}
 
-			/// @brief Copy-assignment operator.
+			/// @brief std::initializer_list<> assignment operator.
 			/// @tparam Other The assignment type.
 			/// @param other The copy-assignment value.
 			/// @returns auto&
 			template <typename Other>
-				requires std::is_convertible_v<Other, Type> && (!std::is_base_of_v<Other, STRICT_CPP_NAMESPACE::detail::strict_cpp_alias_base_t>)
-			inline constexpr auto& operator=(const Other& other) noexcept {
-				this->value = std::forward<Other>(other);
+				requires std::is_convertible_v<std::initializer_list<Other>, Type>
+			inline constexpr auto& operator=(std::initializer_list<Other> initializer_list) noexcept(std::is_nothrow_copy_assignable_v<Type>) {
+				this->value = initializer_list;
+
 				return *this;
 			}
 
-			// @brief Implicit ref conversion operator that converts to the same encapsulated type only.
-			// @returns Type&
+			/// @brief Implicit conversion operator.
+			/// @returns Type&
 			inline constexpr operator Type&() noexcept { return this->value; }
 
-			// @brief Implicit const ref conversion operator that converts to the same encapsulated type only.
-			// @returns const Type&
+			/// @brief Implicit const conversion operator.
+			/// @returns const Type&
 			inline constexpr operator const Type&() const noexcept { return this->value; }
 
-			/// @brief Explicit copy conversion operator.
+			/// @brief Explicit conversion operator.
 			/// @tparam Other The type to convert to.
 			/// @returns Other
 			template <typename Other>
-				requires std::is_convertible_v<Type, Other>
+				requires std::is_convertible_v<Type, Other> && (!std::is_same_v<Type, Other>)
 			inline constexpr explicit operator Other() noexcept {
 				return static_cast<Other>(this->value);
 			}
 
-			/// @brief Explicit const copy conversion operator.
+			/// @brief Explicit const conversion operator.
 			/// @tparam Other The type to convert to.
 			/// @returns Other
 			template <typename Other>
-				requires std::is_convertible_v<Type, Other>
-			inline constexpr explicit operator Other() const noexcept {
+				requires std::is_convertible_v<Type, Other> && (!std::is_same_v<Type, Other>)
+			inline constexpr explicit operator const Other() const noexcept {
 				return static_cast<Other>(this->value);
 			}
 
@@ -630,52 +756,50 @@ namespace STRICT_CPP_NAMESPACE {
 			/// @returns Type
 			template <typename _ = void>
 				requires std::is_pointer_v<Type>
-			inline constexpr Type operator->() noexcept {
-				return this->value;
-			}
+			inline constexpr Type operator->() noexcept { return this->value; }
 
-			/// @brief Indirect const member access operator.
+			/// @brief Const indirect member access operator.
 			/// @returns const Type
 			template <typename _ = void>
 				requires std::is_pointer_v<Type>
-			inline constexpr Type operator->() const noexcept {
-				return this->value;
-			}
+			inline constexpr const Type operator->() const noexcept { return this->value; }
 
 			/// @brief Indirect member access operator.
 			/// @returns Type*
 			template <typename _ = void>
-				requires std::is_class_v<Type>
-			inline constexpr Type* operator->() noexcept {
-				return &this->value;
-			}
+				requires (!std::is_pointer_v<Type>)
+			inline constexpr Type* operator->() noexcept { return std::addressof(this->value); }
 
-			/// @brief Indirect const member access operator.
-			/// @returns Type*
+			/// @brief Const indirect member access operator.
+			/// @returns const Type*
 			template <typename _ = void>
-				requires std::is_class_v<Type>
-			inline constexpr Type* operator->() const noexcept {
-				return &this->value;
-			}
+				requires (!std::is_pointer_v<Type>)
+			inline constexpr const Type* operator->() const noexcept { return std::addressof(this->value); }
 
-			/// @brief Subscript operator.
-			/// @returns auto
-			template <typename Indexer>
-				requires STRICT_CPP_NAMESPACE::detail::has_subscript_operator<Type, Indexer> && (!std::is_reference_v<decltype(std::declval<Type>().operator[](Indexer{}))>)
-			inline constexpr auto operator[](Indexer && index) const noexcept {
-				return this->value[std::move(index)];
-			}
-
-			/// @brief Subscript operator.
-			/// @returns auto
-			template <typename Indexer>
-				requires STRICT_CPP_NAMESPACE::detail::has_subscript_operator<Type, Indexer> && (!std::is_reference_v<decltype(std::declval<Type>().operator[](Indexer{}))>)
-			inline constexpr auto operator[](const Indexer & index) const noexcept {
-				return this->value[std::forward<const Indexer>(index)];
-			}
-
-			/// @brief Subscript operator.
+			/// @brief rvalue subscript operator.
 			/// @returns auto&
+			template <typename IndexType>
+				requires STRICT_CPP_NAMESPACE::detail::has_subscript_operator<Type, IndexType>
+			inline constexpr auto& operator[](IndexType&& index) noexcept { return this->value[std::forward<IndexType>(index)]; }
+
+			/// @brief Const rvalue subscript operator.
+			/// @returns const auto&
+			template <typename IndexType>
+				requires STRICT_CPP_NAMESPACE::detail::has_subscript_operator<Type, IndexType>
+			inline constexpr const auto& operator[](IndexType&& index) const noexcept { return this->value[std::forward<IndexType>(index)]; }
+
+			/// @brief lvalue subscript operator.
+			/// @returns auto&
+			template <typename IndexType>
+				requires STRICT_CPP_NAMESPACE::detail::has_subscript_operator<Type, IndexType>
+			inline constexpr auto& operator[](const IndexType& index) noexcept { return this->value[index]; }
+
+			/// @brief Const lvalue subscript operator.
+			/// @returns const auto&
+			template <typename IndexType>
+				requires STRICT_CPP_NAMESPACE::detail::has_subscript_operator<Type, IndexType>
+			inline constexpr const auto& operator[](const IndexType& index) const noexcept { return this->value[index]; }
+
 			/// @brief Conversion function.
 			/// @tparam Other The type to convert to.
 			/// @returns Other
@@ -833,18 +957,18 @@ namespace STRICT_CPP_NAMESPACE {
 	};
 }
 
-#define STRICT_CPP_DEFINE_FORMATTER(TYPE)                                                                                                                                        \
-	template <>                                                                                                                                                                   \
-	struct _STD formatter<STRICT_CPP_NAMESPACE::TYPE> {                                                                                                                           \
-			inline constexpr auto parse(const _STD format_parse_context& context) const noexcept { return context.begin(); }                                                        \
-			inline constexpr auto parse(const _STD wformat_parse_context& context) const noexcept { return context.begin(); }                                                       \
-			inline auto				 format(const STRICT_CPP_NAMESPACE::TYPE value, _STD format_context& context) const { return _STD format_to(context.out(), "{}", value.value); }   \
-			inline auto				 format(const STRICT_CPP_NAMESPACE::TYPE value, _STD wformat_context& context) const { return _STD format_to(context.out(), L"{}", value.value); } \
+#define STRICT_CPP_DEFINE_FORMATTER(TYPE)                                                                                                                                               \
+	template <>                                                                                                                                                                          \
+	struct _STD formatter<STRICT_CPP_NAMESPACE::TYPE> {                                                                                                                                  \
+			inline constexpr auto parse(const _STD format_parse_context& context) const noexcept { return context.begin(); }                                                               \
+			inline constexpr auto parse(const _STD wformat_parse_context& context) const noexcept { return context.begin(); }                                                              \
+			inline auto				 format(const STRICT_CPP_NAMESPACE::TYPE value, _STD format_context& context) const { return _STD format_to(context.out(), "{}", value.to_string()); }    \
+			inline auto				 format(const STRICT_CPP_NAMESPACE::TYPE value, _STD wformat_context& context) const { return _STD format_to(context.out(), L"{}", value.to_wstring()); } \
 	};
 
 #define STRICT_CPP_DEFINE_INTEGRAL_TYPE(NAME, TYPE, QUALIFIED_TYPES...)                                    \
 	namespace STRICT_CPP_NAMESPACE {                                                                        \
-		struct NAME : STRICT_CPP_NAMESPACE::strict_integral_type<TYPE, QUALIFIED_TYPES> {                    \
+		struct NAME : public STRICT_CPP_NAMESPACE::strict_integral_type<TYPE, QUALIFIED_TYPES> {             \
 				using STRICT_CPP_NAMESPACE::strict_integral_type<TYPE, QUALIFIED_TYPES>::strict_integral_type; \
 				using STRICT_CPP_NAMESPACE::strict_integral_type<TYPE, QUALIFIED_TYPES>::operator=;            \
 		};                                                                                                   \
@@ -853,7 +977,7 @@ namespace STRICT_CPP_NAMESPACE {
 
 #define STRICT_CPP_DEFINE_FLOAT_TYPE(NAME, TYPE, QUALIFIED_TYPES...)                                 \
 	namespace STRICT_CPP_NAMESPACE {                                                                  \
-		struct NAME : STRICT_CPP_NAMESPACE::strict_float_type<TYPE, QUALIFIED_TYPES> {                 \
+		struct NAME : public STRICT_CPP_NAMESPACE::strict_float_type<TYPE, QUALIFIED_TYPES> {          \
 				using STRICT_CPP_NAMESPACE::strict_float_type<TYPE, QUALIFIED_TYPES>::strict_float_type; \
 				using STRICT_CPP_NAMESPACE::strict_float_type<TYPE, QUALIFIED_TYPES>::operator=;         \
 		};                                                                                             \
@@ -864,7 +988,7 @@ namespace STRICT_CPP_NAMESPACE {
 	namespace STRICT_CPP_NAMESPACE {                                                                     \
 		template <typename T>                                                                             \
 			requires std::is_integral_v<T>                                                                 \
-		struct NAME : STRICT_CPP_NAMESPACE::strict_integral_type<T, QUALIFIED_TYPES> {                    \
+		struct NAME : public STRICT_CPP_NAMESPACE::strict_integral_type<T, QUALIFIED_TYPES> {             \
 				using STRICT_CPP_NAMESPACE::strict_integral_type<T, QUALIFIED_TYPES>::strict_integral_type; \
 				using STRICT_CPP_NAMESPACE::strict_integral_type<T, QUALIFIED_TYPES>::operator=;            \
 		};                                                                                                \
@@ -885,7 +1009,7 @@ namespace STRICT_CPP_NAMESPACE {
 	namespace STRICT_CPP_NAMESPACE {                                                               \
 		template <typename T>                                                                       \
 			requires std::is_floating_point_v<T>                                                     \
-		struct NAME : STRICT_CPP_NAMESPACE::strict_float_type<T, QUALIFIED_TYPES> {                 \
+		struct NAME : public STRICT_CPP_NAMESPACE::strict_float_type<T, QUALIFIED_TYPES> {          \
 				using STRICT_CPP_NAMESPACE::strict_float_type<T, QUALIFIED_TYPES>::strict_float_type; \
 				using STRICT_CPP_NAMESPACE::strict_float_type<T, QUALIFIED_TYPES>::operator=;         \
 		};                                                                                          \
@@ -896,7 +1020,7 @@ namespace STRICT_CPP_NAMESPACE {
 
 #define STRICT_CPP_DEFINE_ALIAS_TYPE(NAME, TYPE)                                                                                                                                         \
 	namespace STRICT_CPP_NAMESPACE {                                                                                                                                                      \
-		struct NAME : STRICT_CPP_NAMESPACE::strict_alias_type<TYPE> {                                                                                                                      \
+		struct NAME : public STRICT_CPP_NAMESPACE::strict_alias_type<TYPE> {                                                                                                               \
 				using Type = TYPE;                                                                                                                                                           \
 				using STRICT_CPP_NAMESPACE::strict_alias_type<TYPE>::strict_alias_type;                                                                                                      \
 				using STRICT_CPP_NAMESPACE::strict_alias_type<TYPE>::operator=;                                                                                                              \
@@ -910,19 +1034,19 @@ namespace STRICT_CPP_NAMESPACE {
 				}                                                                                                                                                                            \
                                                                                                                                                                                          \
 				template <typename _ = void>                                                                                                                                                 \
-					requires STRICT_CPP_NAMESPACE::detail::can_stringify_wide<TYPE>                                                                                                           \
+					requires STRICT_CPP_NAMESPACE::detail::can_wstringify<TYPE>                                                                                                               \
 				inline std::wstring to_wstring() const noexcept {                                                                                                                            \
 					return this->m_get_wstring_internal();                                                                                                                                    \
 				}                                                                                                                                                                            \
                                                                                                                                                                                          \
 				template <typename _ = void>                                                                                                                                                 \
 				inline std::string to_string() const noexcept {                                                                                                                              \
-					return "::" #NAME "::strict_alias_type<" #TYPE ">";                                                                                                                       \
+					return "strict::" #NAME "::strict_alias_type<" #TYPE ">";                                                                                                                 \
 				}                                                                                                                                                                            \
                                                                                                                                                                                          \
 				template <typename _ = void>                                                                                                                                                 \
 				inline std::wstring to_wstring() const noexcept {                                                                                                                            \
-					return L"::" L#NAME L"::strict_alias_type<" L#TYPE L">";                                                                                                                  \
+					return L"strict::" L#NAME L"::strict_alias_type<" L#TYPE L">";                                                                                                            \
 				}                                                                                                                                                                            \
 		};                                                                                                                                                                                 \
 	}                                                                                                                                                                                     \

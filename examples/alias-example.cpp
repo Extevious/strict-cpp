@@ -38,18 +38,14 @@ void example0(const STRICT_CPP_NAMESPACE::some_string_B& string) { std::cout << 
 void example1(const STRICT_CPP_NAMESPACE::some_ints_A& ints) {
 	std::cout << "\nexample1:\n";
 
-	for (const int i : ints.value) {
-		std::cout << i << "\n";
-	}
+	for (const int i : ints) std::cout << i << "\n";
 }
 
 // some_ints_B
 void example1(const STRICT_CPP_NAMESPACE::some_ints_B& ints) {
 	std::cout << "\nexample1:\n";
 
-	for (const int i : ints.value) {
-		std::cout << i << "\n";
-	}
+	for (const int i : ints) std::cout << i << "\n";
 }
 
 // int vectors
@@ -157,12 +153,14 @@ int main() {
 	std::cout << "foo is: " << some_struct_ptr->get_foo() << "\n";
 	std::cout << "bar is: " << some_struct_ptr->get_bar() << "\n";
 
+	// the delete keyword can still be used to free memory
+	// as the encapsulated type is implicitly returned.
 	delete(int_ptr);
 	delete(some_struct_ptr);
 
 	// Alias types also support formatters/stringification:
-	STRICT_CPP_NAMESPACE::encapsulated_int encapsulated_int{678};
-	STRICT_CPP_NAMESPACE::some_ints_A		encapsulated_ints_vector{};
+	const STRICT_CPP_NAMESPACE::encapsulated_int encapsulated_int{678};
+	const STRICT_CPP_NAMESPACE::some_ints_A		encapsulated_ints_vector{5, 6, 7, 8};
 
 	// An int is easily formatted by just displaying the number:
 	std::cout << std::format("\n\nthis is a formatted message with the number {}!", encapsulated_int);
@@ -172,6 +170,13 @@ int main() {
 
 	// Simple to_string method:
 	std::cout << "\n\nThe value is: " << encapsulated_int.to_string();
+
+	// Alias types can support for-loops if the encapsulated type has the required functions:
+	std::cout << "\n\nLoops:\n";
+
+	for (const int& value : encapsulated_ints_vector) {
+		std::cout << value << '\n';
+	}
 
 	return 0;
 }

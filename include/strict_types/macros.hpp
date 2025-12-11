@@ -2,25 +2,26 @@
 
 /*
 	macros.hpp description:
-		This header file contains various macros used by strict types.
+		This header file contains various macros used by the strict_types library.
 		All non-type-defining macros will be defined in this header file.
 
 		Defined macros:
 			STRICT_CPP_NAMESPACE
 			STRICT_CPP_DEFINE_FORMATTER
-			DEFINE_STRICT_CPP_UNARY_INCR_DECR_OPERATORS
+			STRICT_CPP_DEFINE_UNARY_INCR_DECR_OPERATORS
 			STRICT_CPP_DEFINE_ARITHMETIC_OPERATORS
 			STRICT_CPP_DEFINE_COMPARISON_OPERATORS
 */
+
+// STRICT_CPP_NAMESPACE should already be defined by the build system.
+// Otherwise it will be defined here automatically with the default
+// 'strict' name.
 #if !defined(STRICT_CPP_NAMESPACE)
-	// STRICT_CPP_NAMESPACE should already be defined by the build system.
-	// Otherwise it will be defined here automatically with the default
-	// 'strict' name.
 	#define STRICT_CPP_NAMESPACE strict
 #endif
 
-//	Defines a formatter for a strict integral or floating-point type.
-//	Used primarily by other strict macros.
+//	Defines a formatter for a strict_types integral or strict_types floating-point type.
+//	Used primarily by other strict_types macros.
 #define STRICT_CPP_DEFINE_FORMATTER(TYPE)                                                                                                                                               \
 	template <>                                                                                                                                                                          \
 	struct _STD formatter<STRICT_CPP_NAMESPACE::TYPE> {                                                                                                                                  \
@@ -34,9 +35,9 @@
 // Normally only used inside the integral.hpp or float.hpp header files.
 //
 // Usage example:
-//    DEFINE_STRICT_CPP_UNARY_INCR_DECR_OPERATORS(integral)
-//    DEFINE_STRICT_CPP_UNARY_INCR_DECR_OPERATORS(float)
-#define DEFINE_STRICT_CPP_UNARY_INCR_DECR_OPERATORS(STRICT_TYPE_CONCEPT)                                 \
+//    STRICT_CPP_DEFINE_UNARY_INCR_DECR_OPERATORS(integral)
+//    STRICT_CPP_DEFINE_UNARY_INCR_DECR_OPERATORS(float)
+#define STRICT_CPP_DEFINE_UNARY_INCR_DECR_OPERATORS(STRICT_TYPE_CONCEPT)                                 \
 	template <typename Type>                                                                              \
 		requires STRICT_CPP_NAMESPACE::detail::is_qualified_                                               \
 	##STRICT_TYPE_CONCEPT##_operator<Type> inline constexpr Type operator++(Type& value) noexcept {       \

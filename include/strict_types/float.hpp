@@ -17,7 +17,7 @@
 
 /*
 	float.hpp description:
-		This header file contains a float-only strict encapsulation type, operators,
+		This header file contains a float-only strict_types encapsulation type, operators,
 		and various pre-defined common float types such as: float_t, double_t, etc.
 		The encapsulated type must be a floating-point type.
 */
@@ -27,7 +27,7 @@ namespace STRICT_CPP_NAMESPACE {
 	/// @tparam Type The encapsulated type.
 	/// @tparam QualifiedTypes A range of qualified types suitable for implicit construction.
 	template <typename Type, typename... QualifiedTypes>
-		requires STRICT_CPP_NAMESPACE::detail::is_qualified_float_type<Type>
+		requires STRICT_CPP_NAMESPACE::detail::is_qualified_float_type<Type, QualifiedTypes...>
 	struct strict_float_type : STRICT_CPP_NAMESPACE::detail::strict_cpp_float_base_t {
 			inline static constexpr Type min					  = std::numeric_limits<Type>::min();
 			inline static constexpr Type max					  = std::numeric_limits<Type>::max();
@@ -134,55 +134,103 @@ namespace STRICT_CPP_NAMESPACE {
 	// Operators
 	// ==========================================================================
 
+	/// @brief Float modulus operator returns the remainder between two strict_types floating-point types.
+	/// @tparam Left Left-most strict_types floating-point type.
+	/// @tparam Right Right-most strict_types floating-point type.
+	/// @returns Left
 	template <typename Left, typename Right>
 		requires STRICT_CPP_NAMESPACE::detail::is_qualified_float_operator<Left, Right>
-	inline constexpr Left operator%(const Left left, const Right right) noexcept {
-		if constexpr (__cplusplus >= 202207L) return static_cast<Left>(std::fmod(left.value, right.value));
+	inline static constexpr Left operator%(const Left left, const Right right) noexcept {
+#if __cplusplus >= 202203L
+		return static_cast<Left>(std::fmod(left.value, right.value));
+#else
+		if constexpr (std::is_same_v<typename Left::type, float> && std::is_same_v<typename Right::type, float>) return static_cast<Left>(std::fmodf(left.value, right.value));
 		else return static_cast<Left>(std::fmodl(left.value, right.value));
+#endif
 	}
 
+	/// @brief Float modulus operator returns the remainder between a strict_types floating-point type and a non-strict_types floating-point type.
+	/// @tparam Left Left-most strict_types floating-point type.
+	/// @tparam Right Right-most non-strict_types floating-point type.
+	/// @returns Left
 	template <typename Left, typename Right>
 		requires STRICT_CPP_NAMESPACE::detail::is_qualified_float_operator_left_only<Left, Right>
-	inline constexpr Left operator%(const Left left, const Right right) noexcept {
-		if constexpr (__cplusplus >= 202207L) return static_cast<Left>(std::fmod(left.value, right));
+	inline static constexpr Left operator%(const Left left, const Right right) noexcept {
+#if __cplusplus >= 202203L
+		return static_cast<Left>(std::fmod(left.value, right));
+#else
+		if constexpr (std::is_same_v<typename Left::type, float> && std::is_same_v<Right, float>) return static_cast<Left>(std::fmodf(left.value, right));
 		else return static_cast<Left>(std::fmodl(left.value, right));
+#endif
 	}
 
+	/// @brief Float modulus operator returns the remainder between a non-strict_types floating-point type and a strict_types floating-point type.
+	/// @tparam Left Left-most non-strict_types floating-point type.
+	/// @tparam Right Right-most strict_types floating-point type.
+	/// @returns Left
 	template <typename Left, typename Right>
 		requires STRICT_CPP_NAMESPACE::detail::is_qualified_float_operator_right_only<Left, Right>
-	inline constexpr Left operator%(const Left left, const Right right) noexcept {
-		if constexpr (__cplusplus >= 202207L) return static_cast<Left>(std::fmod(left, right.value));
+	inline static constexpr Left operator%(const Left left, const Right right) noexcept {
+#if __cplusplus >= 202203L
+		return static_cast<Left>(std::fmod(left, right.value));
+#else
+		if constexpr (std::is_same_v<Left, float> && std::is_same_v<typename Right::type, float>) return static_cast<Left>(std::fmodf(left, right.value));
 		else return static_cast<Left>(std::fmodl(left, right.value));
+#endif
 	}
 
+	/// @brief Float compound-assignment modulus operator assigns the remainder between two strict_types floating-point types.
+	/// @tparam Left Left-most strict_types floating-point type.
+	/// @tparam Right Right-most strict_types floating-point type.
+	/// @returns Left&
 	template <typename Left, typename Right>
 		requires STRICT_CPP_NAMESPACE::detail::is_qualified_float_operator<Left, Right>
-	inline constexpr Left& operator%=(Left& left, const Right right) noexcept {
-		if constexpr (__cplusplus >= 202207L) left.value = static_cast<typename Left::type>(std::fmod(left.value, right.value));
+	inline static constexpr Left& operator%=(Left& left, const Right right) noexcept {
+#if __cplusplus >= 202203L
+		left.value = static_cast<typename Left::type>(std::fmod(left.value, right.value));
+#else
+		if constexpr (std::is_same_v<typename Left::type, float> && std::is_same_v<typename Right::type, float>) left.value = static_cast<typename Left::type>(std::fmodf(left.value, right.value));
 		else left.value = static_cast<typename Left::type>(std::fmodl(left.value, right.value));
+#endif
 
 		return left;
 	}
 
+	/// @brief Float compound-assignment modulus operator assigns the remainder between a strict_types floating-point type and a non-strict_types floating-point type.
+	/// @tparam Left Left-most strict_types floating-point type.
+	/// @tparam Right Right-most non-strict_types floating-point type.
+	/// @returns Left&
 	template <typename Left, typename Right>
 		requires STRICT_CPP_NAMESPACE::detail::is_qualified_float_operator_left_only<Left, Right>
-	inline constexpr Left& operator%=(Left& left, const Right right) noexcept {
-		if constexpr (__cplusplus >= 202207L) left.value = static_cast<typename Left::type>(std::fmod(left.value, right));
+	inline static constexpr Left& operator%=(Left& left, const Right right) noexcept {
+#if __cplusplus >= 202203L
+		left.value = static_cast<typename Left::type>(std::fmod(left.value, right));
+#else
+		if constexpr (std::is_same_v<typename Left::type, float> && std::is_same_v<Right, float>) left.value = static_cast<typename Left::type>(std::fmodf(left.value, right));
 		else left.value = static_cast<typename Left::type>(std::fmodl(left.value, right));
+#endif
 
 		return left;
 	}
 
+	/// @brief Float compound-assignment modulus operator assigns the remainder between a non-strict_types floating-point type and a strict_types floating-point type.
+	/// @tparam Left Left-most non-strict_types floating-point type.
+	/// @tparam Right Right-most strict_types floating-point type.
+	/// @returns Left&
 	template <typename Left, typename Right>
 		requires STRICT_CPP_NAMESPACE::detail::is_qualified_float_operator_right_only<Left, Right>
-	inline constexpr Left& operator%=(Left& left, const Right right) noexcept {
-		if constexpr (__cplusplus >= 202207L) left = static_cast<typename Left::type>(std::fmod(left, right.value));
+	inline static constexpr Left& operator%=(Left& left, const Right right) noexcept {
+#if __cplusplus >= 202203L
+		left = static_cast<typename Left::type>(std::fmod(left, right.value));
+#else
+		if constexpr (std::is_same_v<typename Left::type, float> && std::is_same_v<typename Right::type, float>) left = static_cast<typename Left::type>(std::fmodf(left, right.value));
 		else left = static_cast<typename Left::type>(std::fmodl(left, right.value));
+#endif
 
 		return left;
 	}
 
-	DEFINE_STRICT_CPP_UNARY_INCR_DECR_OPERATORS(float)
+	STRICT_CPP_DEFINE_UNARY_INCR_DECR_OPERATORS(float)
 
 	STRICT_CPP_DEFINE_ARITHMETIC_OPERATORS(+, float)
 	STRICT_CPP_DEFINE_ARITHMETIC_OPERATORS(-, float)
@@ -194,10 +242,7 @@ namespace STRICT_CPP_NAMESPACE {
 // Macros
 // =============================================================================
 
-//	Defines a strict float-only type.
-//
-//	Usage example:
-//	   STRICT_CPP_DEFINE_INTEGRAL_TYPE(float32_t, float)
+//	Defines a strict_types float-only type.
 #define STRICT_CPP_DEFINE_FLOAT_TYPE(NAME, TYPE, QUALIFIED_TYPES...)                                 \
 	namespace STRICT_CPP_NAMESPACE {                                                                  \
 		struct NAME : STRICT_CPP_NAMESPACE::strict_float_type<TYPE, QUALIFIED_TYPES> {                 \
@@ -207,18 +252,11 @@ namespace STRICT_CPP_NAMESPACE {
 	}                                                                                                 \
 	STRICT_CPP_DEFINE_FORMATTER(NAME)
 
-//	Defines a strict float-only dynamic type.
-//
-//	Usage example:
-//		STRICT_CPP_DEFINE_DYNAMIC_FLOAT_TYPE(
-//			any_float32_t,
-//			float,
-//			STRICT_CPP_NAMESPACE::float32_t
-//		)
+//	Defines a strict_types dynamic float-only type.
 #define STRICT_CPP_DEFINE_DYNAMIC_FLOAT_TYPE(NAME, QUALIFIED_TYPES...)                            \
 	namespace STRICT_CPP_NAMESPACE {                                                               \
 		template <typename T>                                                                       \
-			requires std::is_floating_point_v<T>                                                     \
+			requires STRICT_CPP_NAMESPACE::detail::is_qualified_float_type<QUALIFIED_TYPES>          \
 		struct NAME : STRICT_CPP_NAMESPACE::strict_float_type<T, QUALIFIED_TYPES> {                 \
 				using STRICT_CPP_NAMESPACE::strict_float_type<T, QUALIFIED_TYPES>::strict_float_type; \
 				using STRICT_CPP_NAMESPACE::strict_float_type<T, QUALIFIED_TYPES>::operator=;         \

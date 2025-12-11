@@ -2,7 +2,8 @@
 	#define STRICT_CPP_OPTIONAL_TYPES
 #endif
 
-#include "strict-cpp.hpp"
+#include "strict_types/float.hpp"
+#include "strict_types/integral.hpp"
 
 #include <iostream>
 
@@ -80,13 +81,13 @@ void customStrictTypeExample(const STRICT_CPP_NAMESPACE::size_t v) { output("cus
 void explicitDynamicTypeExample(const STRICT_CPP_NAMESPACE::any_size_t<std::uint16_t> v) { output("explicitDynamicTypeExample() #1 was called: ", v); }
 
 // #2
-void explicitDynamicTypeExample(const STRICT_CPP_NAMESPACE::any_int_t<long long> v) { output("explicitDynamicTypeExample() #2 was called: ", v); }
+void explicitDynamicTypeExample(const STRICT_CPP_NAMESPACE::any_integer_t<long long> v) { output("explicitDynamicTypeExample() #2 was called: ", v); }
 
 // === Implicit Dynamic Types ===
 
 // #1
 template <typename T>
-void dynamicTypeExample(const STRICT_CPP_NAMESPACE::any_int_t<T> v) {
+void dynamicTypeExample(const STRICT_CPP_NAMESPACE::any_integer_t<T> v) {
 	output("dynamicTypeExample<T>() #1 was called: ", v);
 }
 
@@ -203,7 +204,7 @@ int main() {
 	//
 
 	// Dynamic strict types can also be formatted:
-	output(std::format("I have a formatted number: {0}", STRICT_CPP_NAMESPACE::any_int_t<int>(45)));
+	output(std::format("I have a formatted number: {0}", STRICT_CPP_NAMESPACE::any_integer_t<int>(45)));
 
 	return 0;
 }

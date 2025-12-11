@@ -4,19 +4,20 @@ Use strictly-typed encapsulation types to reduce bugs, improve readability, and 
 
 ```cpp
    // These could be ambiguous...
-   add(short, short); // #1
-   add(int, int);     // #2
+   add(short, short);
+   add(int,   int);
 
    // ...but these are not!
-   add(strict::int16_t, strict::int16_t); // #3
-   add(strict::int32_t, strict::int32_t); // #4
+   add(strict::int16_t, strict::int16_t);
+   add(strict::int32_t, strict::int32_t);
 ```
 
-### Features
+## Features
 
-- Strict types encapsulating integral, floating-point, and alias types.
 - Explicit type-safety enforcement.
+- Strict types encapsulating integral, floating-point, and custom types.
 - Header-only files.
+- Backwards-compatibility with existing types.
 - Stringification and formatters.
 - [Meson Build](https://mesonbuild.com/) support.
 - MIT license.
@@ -24,12 +25,10 @@ Use strictly-typed encapsulation types to reduce bugs, improve readability, and 
 ### Usages
 
 - Reduce ambiguity between methods and operators.
-- Backwards-compatible with existing types.
 - Reduce potential bugs like swapped parameters, undesired type conversions, etc.
 
 ### TODO
 
-- Verify overhead impact.
 - Verify compiled code has zero overhead in optimized builds.
 - Implement debug assertion.
 - Verify cross-platform support.
@@ -38,103 +37,53 @@ Use strictly-typed encapsulation types to reduce bugs, improve readability, and 
 - Strict-ness levels.
 - Implement support for [C++20 modules](https://en.cppreference.com/w/cpp/language/modules).
 - CMake build file(s).
-- ???
+- ???\
+&nbsp;
 
 ## Why use `strict_types`?
 
-All strict types are explicit about which type is implicitly allowed to use its constructors, functions, and operators. This is why you can have a wide range of similar, but explicitly different types. I use my
-strict types frequently to add various overloads, or reduce accidentally calling the wrong function. For example when allocating memory with the Vulkan API, I can do:
+All strict types are explicit about which type is implicitly allowed to be used in its constructors, functions, and operators. This is why you can have a wide range of similar, but explicitly different types. I use my strict types frequently to add various overloads, or reduce accidentally calling the wrong function. For example, when allocating memory I can do:
 
 ```cpp
-   MemoryT allocateBufferMemory(std::size_t size);
-   MemoryT allocateImageMemory(std::size_t size);
+   MemoryT allocate_buffer_memory(std::size_t size);
+   MemoryT allocate_image_memory(std::size_t size);
+   MemoryT allocate_text_memory(std::size_t size);
 ```
 
-The above functions are *fine* for the most part, but you might accidentally
-call `allocateBufferMemory` instead of `allocateImageMemory` by mistake. If the
-parameter types were instead swapped out with their respective strict size type,
-calling the wrong function would be technically impossible if using a strict type:
+The above functions are *fine* for the most part, but you might accidentally call `allocate_buffer_memory()` instead of `allocate_image_memory()` by mistake. If the parameter types were instead swapped out with their respective strict size type, calling the wrong function would be impossible when passing in the respective strict type.
 
 ```cpp
-   MemoryT allocateBufferMemory(strict::buffer_memory_size_t size);
-   MemoryT allocateImageMemory(strict::image_memory_size_t size);
+   MemoryT allocate_buffer_memory(strict::buffer_memory_size_t size);
+   MemoryT allocate_image_memory(strict::image_memory_size_t size);
+   MemoryT allocate_text_memory(strict::text_memory_size_t size);
 ```
 
-If a size value of type `strict::buffer_memory_size_t` was passed into the
-`allocateImageMemory()` function, an error will be reported by your IDE, or
-during compile time.
+If a size value of type `strict::buffer_memory_size_t` was passed into the `allocate_image_memory()` function, an error will be reported by your IDE, or during compile time. You can still, however, pass in a non-strict type with no errors reported so long as it's the same type as the encapsulated type. For more examples, check out [these examples](/examples).\
+&nbsp;
 
-## Defining custom types
+## Installation/Setup
 
-You can define your own custom types easily by using the below macros for integral, floats, and alias types. All strict integral and float types have "qualifier" types, which are defined after the second parameter in the macro.
-A qualifier type allows for implicit usage of various non-strict or strict types during construction.
+Since `strict_types` is made up of header-only C++ source files, you can download/clone and reference the files directly, or use the provided build system files.
 
-```cpp
-   // NAME               : The name of your custom strict type.
-   // TYPE               : The encapsulated type.
-   // QUALIFIED_TYPES... : Various "qualifying" types.
-   #define STRICT_CPP_DEFINE_INTEGRAL_TYPE(NAME, TYPE, QUALIFIED_TYPES...)
+### Meson Build System
 
-   // Examples:
-   STRICT_CPP_DEFINE_INTEGRAL_TYPE(my_size_t, std::size_t)
-   STRICT_CPP_DEFINE_INTEGRAL_TYPE(my_wildcard_size_t, std::size_t, int, unsigned int, std::uint64_t)
-```
+| Options            | Type      | Default value | Description                                   |
+|--------------------|-----------|---------------|-----------------------------------------------|
+| namespace          | `string`  | `strict`      | The namespace for strict types.               |
+| enable_extra_types | `boolean` | `false`       | If pre-defined extra types should be exposed. |
+| build_examples     | `boolean` | `false`       | If examples should be built.                  |
 
-```cpp
-   // NAME               : The name of your custom strict type.
-   // TYPE               : The encapsulated type.
-   // QUALIFIED_TYPES... : Various "qualifying" types.
-   #define STRICT_CPP_DEFINE_FLOAT_TYPE(NAME, TYPE, QUALIFIED_TYPES...)
+### Including `strict_types` using a meson .wrap file
 
-   // Examples:
-   STRICT_CPP_DEFINE_INTEGRAL_TYPE(my_float_t, float)
-   STRICT_CPP_DEFINE_INTEGRAL_TYPE(my_wildcard_float_t, float, double, long double)
-```
-
-Dynamic strict types are slightly different. Instead of an encapsulated type defined in the macro, it is declared in a template declaration. During development, you may want to easily swap out the encapsulated type through a template, using a dynamic strict type allows for just that.
-
-```cpp
-   // NAME               : The name of your custom strict type.
-   // QUALIFIED_TYPES... : Various "qualifying" types.
-   #define STRICT_CPP_DEFINE_DYNAMIC_INTEGRAL_TYPE(NAME, QUALIFIED_TYPES...);
-```
-
-```cpp
-   // NAME               : The name of your custom strict type.
-   // QUALIFIED_TYPES... : Various "qualifying" types.
-   #define STRICT_CPP_DEFINE_DYNAMIC_FLOAT_TYPE(NAME, QUALIFIED_TYPES...);
-```
-
-Strict alias types allow for encapsulating a non-reference type that isn't limited to a integral or floating-point type.
-
-```cpp
-   // NAME : The name of your custom strict type.
-   // TYPE : The encapsulated type.
-   #define STRICT_CPP_DEFINE_ALIAS_TYPE(NAME, TYPE);
-
-   // Example:
-   STRICT_CPP_DEFINE_ALIAS_TYPE(my_int_vector_t, std::vector<int>)
-   STRICT_CPP_DEFINE_ALIAS_TYPE(my_name_string_t, std::string)
-```
-
-## How to include in your projects
-
-### Cmake, Meson, or directly from GitHub
-
-1. Clone or download this repo into your project.
-2. Include the `strict-cpp.hpp` file that is inside the `include` directory.
-
-### Meson (as a .wrap dependency)
-
-1. Create a `strict-cpp.wrap` file in the `<project root>/subprojects` directory (if the directory doesn't exist, create one). An example `.wrap` file:
+1. Create a `strict_types.wrap` file in the `<project root>/subprojects` directory (if the directory doesn't exist, create one). An example `.wrap` file:
 
    ```python
       [wrap-git]
-      url = https://github.com/Extevious/strict-cpp
+      url = https://github.com/Extevious/strict_types
       revision = head
       
       [provide]
-      strict-cpp = strict_cpp_dependency
+      strict_types = strict_types_dep
    ```
 
 1. In your `meson.build` file, you should have something similar to following example:
@@ -145,67 +94,186 @@ Strict alias types allow for encapsulating a non-reference type that isn't limit
 
        ...
 
-       # The name of the subproject is the same as the filename.
-       strict_cpp_subproject = subproject('strict-cpp')
+       # The name of the subproject is the same as the strict_types.wrap filename.
+       strict_types_subproject = subproject('strict_types')
 
-       # Same as the name [provide] exposes in the .wrap file.
-       dependencies += dependency('strict-cpp')
+       # You can use the dependency [provide] exposes in the strict_types.wrap file:
+       dependencies += dependency('strict_types')
        #
        # Or...
        #
-       # strict_cpp_dependency is provided by strict-cpp meson.build file.
-       dependencies += strict_cpp_subproject.get_variable('strict_cpp_dependency')
+       # use the strict_types_dep that is provided by the strict_types meson.build file:
+       dependencies += strict_types_subproject.get_variable('strict_types_dep')
 
        ...
 
        # Example executable.
-       executable('MyProject', 'main.cpp', dependencies : strict_cpp_dependency)
+       executable('MyProject', 'main.cpp', dependencies : strict_types_dep)
    ```
 
-1. `strict-cpp.hpp` should be available once your project has been recreated.
+1. Recreate your build files. `strict_types` should be available once your project has been recreated.\
+&nbsp;
 
-## Macros
+## Defining custom types
 
-### Overridable
+You can define your own custom types easily by using the `STRICT_TYPES_DEFINE_*` macros for integral, floating-point, and alias types.
 
-```cpp
-// Default namespace name.
-#define STRICT_CPP_NAMESPACE strict
+**Strict dynamic types:** Dynamic strict types are slightly different than their non-dynamic equivalent. Instead of an encapsulated type defined in the macro, it is declared using templates. During development, you may want to easily swap out the encapsulated type through a template. Using a dynamic strict type allows for just that.
 
-// When defined, exposes pre-defined optional types.
-#define STRICT_CPP_OPTIONAL_TYPES
-```
+**Strict alias types:** Strict alias types allow for encapsulating a non-reference type that isn't limited to a integral or floating-point type. Strict alias types also has a dynamic variant, which behaves the same way as a dynamic integral or float type. The difference is you still need to specify the encapsulated type in the macro, but without the template brackets.
 
-### User-exposed
+## Defining custom types: Macros
 
-```cpp
-// Macro to define your own integral types.
-//    NAME            : the name of your strict type.
-//    TYPE            : the encapsulated primitive type (int, long, etc).
-//    QUALIFIED_TYPES : the optional range of types that are qualified for implicit usage.
-#define STRICT_CPP_DEFINE_INTEGRAL_TYPE(NAME, TYPE, QUALIFIED_TYPES...)
+**Currently defined are the following macros:**
 
-// Macro to define your own floating-point types.
-//    NAME            : the name of your strict type.
-//    TYPE            : the encapsulated primitive type (float, double, etc).
-//    QUALIFIED_TYPES : the optional range of types that are qualified for implicit usage.
-#define STRICT_CPP_DEFINE_FLOAT_TYPE(NAME, TYPE, QUALIFIED_TYPES...)
+- `STRICT_TYPES_DEFINE_INTEGRAL_TYPE`
+- `STRICT_TYPES_DEFINE_FLOAT_TYPE`
+- `STRICT_TYPES_DEFINE_ALIAS_TYPE`
+- `STRICT_TYPES_DEFINE_DYNAMIC_INTEGRAL_TYPE`
+- `STRICT_TYPES_DEFINE_DYNAMIC_FLOAT_TYPE`
+- `STRICT_TYPES_DEFINE_DYNAMIC_ALIAS_TYPE`
 
-// Macro to define your own dynamic integral types.
-//    NAME            : the name of your strict type.
-//    QUALIFIED_TYPES : the required range of types that are qualified for implicit usage.
-#define STRICT_CPP_DEFINE_DYNAMIC_INTEGRAL_TYPE(NAME, QUALIFIED_TYPES...)
+&nbsp;\
+&nbsp;
 
-// Macro to define your own dynamic floating-point types.
-//    NAME            : the name of your strict type.
-//    QUALIFIED_TYPES : the required range of types that are qualified for implicit usage.
-#define STRICT_CPP_DEFINE_DYNAMIC_FLOAT_TYPE(NAME, QUALIFIED_TYPES...)
+>### `STRICT_TYPES_DEFINE_INTEGRAL_TYPE(NAME, TYPE, QUALIFIED_TYPES...)`
+>
+>| Parameter Name  | Type       | Description                                                                                         |
+>|-----------------|------------|-----------------------------------------------------------------------------------------------------|
+>| NAME            | `raw text` | The name of your custom strict type. Conventionally ends with `_t` to denote it's a primitive type. |
+>| TYPE            | `type`     | The encapsulated type. Must be an integral type.                                                    |
+>| QUALIFIED_TYPES | `types...` | A range of integral types. These types enable implicit usage of their respective type.              |
+>
+>```cpp
+>   // Macro example:
+>   STRICT_TYPES_DEFINE_INTEGRAL_TYPE(my_size_t, std::size_t, int, unsigned int, std::uint64_t)
+>
+>   // Usage example:
+>   strict::my_size_t my_size = 5;
+>```
 
-// Macro to define your own alias types.
-//    NAME            : the name of your strict type.
-//    TYPE            : the encapsulated type (std::string, std::vector<>, etc).
-#define STRICT_CPP_DEFINE_ALIAS_TYPE(NAME, TYPE)
-```
+&nbsp;\
+&nbsp;
+
+>### `STRICT_TYPES_DEFINE_FLOAT_TYPE(NAME, TYPE, QUALIFIED_TYPES...)`
+>
+>| Parameter Name  | Type       | Description                                                                                         |
+>|-----------------|------------|-----------------------------------------------------------------------------------------------------|
+>| NAME            | `raw text` | The name of your custom strict type. Conventionally ends with `_t` to denote it's a primitive type. |
+>| TYPE            | `type`     | The encapsulated type. Must be a floating-point type.                                               |
+>| QUALIFIED_TYPES | `types...` | A range of floating-point types. These types enable implicit usage of their respective type.        |
+>
+>```cpp
+>   // Macro example:
+>   STRICT_TYPES_DEFINE_FLOAT_TYPE(my_float_t, float, double, long double)
+>
+>   // Usage example:
+>   strict::my_float_t my_float = 5.0d;
+>```
+
+&nbsp;\
+&nbsp;
+
+>### `STRICT_TYPES_DEFINE_ALIAS_TYPE(NAME, TYPE)`
+>
+>| Parameter Name  | Type       | Description                                                                                         |
+>|-----------------|------------|-----------------------------------------------------------------------------------------------------|
+>| NAME            | `raw text` | The name of your custom strict type.                                                                |
+>| TYPE            | `type`     | The encapsulated type. Must be a non-zero sized type.                                               |
+>
+>```cpp
+>   // Macro examples:
+>   STRICT_TYPES_DEFINE_ALIAS_TYPE(my_int_vector,  std::vector<int>)
+>   STRICT_TYPES_DEFINE_ALIAS_TYPE(my_name_string, std::string     )
+>
+>   // Usage examples:
+>   strict::my_int_vector  my_vector = {1, 2, 3};
+>   strict::my_name_string my_name   = "Joe Swanson";
+>```
+
+&nbsp;\
+&nbsp;
+
+>### `STRICT_TYPES_DEFINE_DYNAMIC_INTEGRAL_TYPE(NAME, TYPE)`
+>
+>| Parameter Name  | Type       | Description                                                                                         |
+>|-----------------|------------|-----------------------------------------------------------------------------------------------------|
+>| NAME            | `raw text` | The name of your custom strict type. Conventionally ends with `_t` to denote it's a primitive type. |
+>| TYPE            | `type`     | The encapsulated type. Must be a floating-point type.                                               |
+>
+>```cpp
+>   // Macro example:
+>   STRICT_TYPES_DEFINE_DYNAMIC_INTEGRAL_TYPE(my_dynamic_int_t, int, std::uint64_t)
+>
+>   // Usage examples:
+>   strict::my_dynamic_int_t<unsigned long int> my_int       = 5ULL;
+>   strict::my_dynamic_int_t<int>               my_other_int = 32;
+>```
+
+&nbsp;\
+&nbsp;
+
+>### `STRICT_TYPES_DEFINE_DYNAMIC_FLOAT_TYPE(NAME, TYPE)`
+>
+>| Parameter Name  | Type       | Description                                                                                         |
+>|-----------------|------------|-----------------------------------------------------------------------------------------------------|
+>| NAME            | `raw text` | The name of your custom strict type. Conventionally ends with `_t` to denote it's a primitive type. |
+>| TYPE            | `type`     | The encapsulated type. Must be a floating-point type.                                               |
+>
+>```cpp
+>   // Macro examples:
+>   STRICT_TYPES_DEFINE_DYNAMIC_FLOAT_TYPE(my_dynamic_float_t, float, double, long double)
+>
+>   // Usage examples:
+>   strict::my_dynamic_float_t<float>  my_float       = 5.0f;
+>   strict::my_dynamic_float_t<double> my_other_float = 3.14d;
+>```
+
+&nbsp;\
+&nbsp;
+
+>### `STRICT_TYPES_DEFINE_DYNAMIC_ALIAS_TYPE(NAME, TYPE)`
+>
+>| Parameter Name  | Type       | Description                                                                                         |
+>|-----------------|------------|-----------------------------------------------------------------------------------------------------|
+>| NAME            | `raw text` | The name of your custom strict type.                                                                |
+>| TYPE            | `type`     | The encapsulated type. Must be a non-zero sized type.                                               |
+>
+>```cpp
+>   // Macro examples:
+>   STRICT_TYPES_DEFINE_ALIAS_TYPE(my_vector, std::vector)
+>   STRICT_TYPES_DEFINE_ALIAS_TYPE(my_array, std::array)
+>
+>   // Usage examples:
+>   strict::my_vector<int>    my_vector = {1, 2, 3};
+>   strict::my_array<bool, 2> my_array  = {true, false};
+>```
+
+&nbsp;
+
+## User-Definable Macros
+
+>### `STRICT_TYPES_NAMESPACE`
+>
+>**Description**\
+>The name of the `strict_types` namespace. If the macro is left undefined, it will be automatically defined with the default value `strict`.
+>
+>| Requirements     |          |
+>|------------------|----------|
+>| Default value    | `strict` |
+>| Can be undefined | `true`   |
+>| Value type       | `text`   |
+
+### `STRICT_TYPES_ENABLE_EXTRA_TYPES`
+
+**Description**\
+When defined it enables pre-defined extra types. Some extra types included are: `offset_t` `count_t` `capacity_t` `index_t`
+
+| Requirements     |           |
+|------------------|-----------|
+| Default value    | undefined |
+| Can be undefined | `true`    |
+| Value type       | `any`     |
 
 ## Available pre-defined types
 
@@ -293,7 +361,7 @@ Strict alias types allow for encapsulating a non-reference type that isn't limit
 
 ## Available pre-defined optional types
 
-***Note:*** *optional types available by defining the* `STRICT_CPP_OPTIONAL_TYPES` *macro.*
+***Note:*** *optional types available by defining the* `STRICT_TYPES_OPTIONAL_TYPES` *macro.*
 
 ```cpp
    Name:                  Encapsulated type:
@@ -346,6 +414,5 @@ Strict alias types allow for encapsulating a non-reference type that isn't limit
     rhs_index_t            std::size_t
     rhs_index_offset_t     std::size_t
     capacity_t             std::size_t
+    ...
 ```
-
-### *... and more*

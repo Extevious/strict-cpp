@@ -1,4 +1,9 @@
-#include "strict-cpp.hpp"
+#if !defined(STRICT_CPP_OPTIONAL_TYPES)
+	#define STRICT_CPP_OPTIONAL_TYPES
+#endif
+
+#include "strict_types/alias.hpp"
+#include "strict_types/integral.hpp"
 
 #include <iostream>
 #include <string>
@@ -52,7 +57,7 @@ void example1(const STRICT_CPP_NAMESPACE::some_ints_B& ints) {
 void example2(const std::vector<int>& ints0, const std::vector<int>& ints1) {
 	std::cout << "\nexample2:\n";
 
-	for (STRICT_CPP_NAMESPACE::size_t i = 0ULL; i < 5; i++) {
+	for (STRICT_CPP_NAMESPACE::index_t i = 0ULL; i < 5; i++) {
 		std::cout << (ints0[i] + ints1[i]) << "\n";
 	}
 }
@@ -61,7 +66,7 @@ void example2(const std::vector<int>& ints0, const std::vector<int>& ints1) {
 void example2(const STRICT_CPP_NAMESPACE::some_ints_A& ints0, const std::vector<int>& ints1) {
 	std::cout << "\nexample2:\n";
 
-	for (STRICT_CPP_NAMESPACE::size_t i = 0ULL; i < 5; i++) {
+	for (STRICT_CPP_NAMESPACE::index_t i = 0ULL; i < 5; i++) {
 		std::cout << (ints0[i] + ints1[i]) << "\n";
 	}
 }

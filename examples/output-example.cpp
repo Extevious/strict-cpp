@@ -2,7 +2,8 @@
 	#define STRICT_CPP_OPTIONAL_TYPES
 #endif
 
-#include "strict-cpp.hpp"
+#include "strict_types/float.hpp"
+#include "strict_types/integral.hpp"
 
 #include <iostream>
 

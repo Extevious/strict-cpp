@@ -6,10 +6,10 @@ option(
 )
 
 option(
-   'enable_optional_types',
+   'enable_extra_types',
    type: 'boolean',
    value: false,
-   description: 'If pre-defined optional types should be exposed.',
+   description: 'If pre-defined extra types should be exposed.',
 )
 
 option(

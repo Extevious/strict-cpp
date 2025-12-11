@@ -1,8 +1,8 @@
 #pragma once
 
 #include "strict_types/concepts.hpp"
-#include "strict_types/macros.hpp"
 
+#include <format>
 #include <initializer_list>
 #include <string>
 #include <type_traits>

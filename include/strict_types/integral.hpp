@@ -18,7 +18,7 @@
 
 /*
 	integral.hpp description:
-		This header file contains a strict_types integral-only encapsulation type, operators,
+		This header file contains a strict integral-only encapsulation types, operators,
 		and various pre-defined common integral types such as: int_t, size_t, long_t, etc.
 		The encapsulated type must be an integral type.
 */
@@ -153,7 +153,7 @@ namespace STRICT_CPP_NAMESPACE {
 // Macros
 // =============================================================================
 
-//	Defines an strict_types integral-only type.
+//	Defines a strict integral-only type.
 #define STRICT_CPP_DEFINE_INTEGRAL_TYPE(NAME, TYPE, QUALIFIED_TYPES...)                                    \
 	namespace STRICT_CPP_NAMESPACE {                                                                        \
 		struct NAME : STRICT_CPP_NAMESPACE::strict_integral_type<TYPE, QUALIFIED_TYPES> {                    \
@@ -164,7 +164,7 @@ namespace STRICT_CPP_NAMESPACE {
 	STRICT_CPP_DEFINE_FORMATTER(NAME)
 
 #if defined(__cpp_char8_t)
-	//	Defines a strict_types dynamic integral-only type.
+	//	Defines a strict dynamic integral-only type.
 	#define STRICT_CPP_DEFINE_DYNAMIC_INTEGRAL_TYPE(NAME, QUALIFIED_TYPES...)                               \
 		namespace STRICT_CPP_NAMESPACE {                                                                     \
 			template <typename T>                                                                             \
@@ -189,7 +189,7 @@ namespace STRICT_CPP_NAMESPACE {
 		STRICT_CPP_DEFINE_FORMATTER(NAME<long long>)                                                         \
 		STRICT_CPP_DEFINE_FORMATTER(NAME<unsigned long long>)
 #else
-	//	Defines a strict_types dynamic integral-only type.
+	//	Defines a strict dynamic integral-only type.
 	#define STRICT_CPP_DEFINE_DYNAMIC_INTEGRAL_TYPE(NAME, QUALIFIED_TYPES...)                               \
 		namespace STRICT_CPP_NAMESPACE {                                                                     \
 			template <typename T>                                                                             \

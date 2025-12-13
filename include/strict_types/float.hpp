@@ -17,7 +17,7 @@
 
 /*
 	float.hpp description:
-		This header file contains a float-only strict_types encapsulation type, operators,
+		This header file contains a float-only strict encapsulation type, operators,
 		and various pre-defined common float types such as: float_t, double_t, etc.
 		The encapsulated type must be a floating-point type.
 */
@@ -134,9 +134,9 @@ namespace STRICT_CPP_NAMESPACE {
 	// Operators
 	// ==========================================================================
 
-	/// @brief Float modulus operator returns the remainder between two strict_types floating-point types.
-	/// @tparam Left Left-most strict_types floating-point type.
-	/// @tparam Right Right-most strict_types floating-point type.
+	/// @brief Float modulus operator returns the remainder between two strict floating-point types.
+	/// @tparam Left Left-most strict floating-point type.
+	/// @tparam Right Right-most strict floating-point type.
 	/// @returns Left
 	template <typename Left, typename Right>
 		requires STRICT_CPP_NAMESPACE::detail::is_qualified_float_operator<Left, Right>
@@ -149,9 +149,9 @@ namespace STRICT_CPP_NAMESPACE {
 #endif
 	}
 
-	/// @brief Float modulus operator returns the remainder between a strict_types floating-point type and a non-strict_types floating-point type.
-	/// @tparam Left Left-most strict_types floating-point type.
-	/// @tparam Right Right-most non-strict_types floating-point type.
+	/// @brief Float modulus operator returns the remainder between a strict floating-point type and a non-strict floating-point type.
+	/// @tparam Left Left-most strict floating-point type.
+	/// @tparam Right Right-most non-strict floating-point type.
 	/// @returns Left
 	template <typename Left, typename Right>
 		requires STRICT_CPP_NAMESPACE::detail::is_qualified_float_operator_left_only<Left, Right>
@@ -164,9 +164,9 @@ namespace STRICT_CPP_NAMESPACE {
 #endif
 	}
 
-	/// @brief Float modulus operator returns the remainder between a non-strict_types floating-point type and a strict_types floating-point type.
-	/// @tparam Left Left-most non-strict_types floating-point type.
-	/// @tparam Right Right-most strict_types floating-point type.
+	/// @brief Float modulus operator returns the remainder between a non-strict floating-point type and a strict floating-point type.
+	/// @tparam Left Left-most non-strict floating-point type.
+	/// @tparam Right Right-most strict floating-point type.
 	/// @returns Left
 	template <typename Left, typename Right>
 		requires STRICT_CPP_NAMESPACE::detail::is_qualified_float_operator_right_only<Left, Right>
@@ -179,9 +179,9 @@ namespace STRICT_CPP_NAMESPACE {
 #endif
 	}
 
-	/// @brief Float compound-assignment modulus operator assigns the remainder between two strict_types floating-point types.
-	/// @tparam Left Left-most strict_types floating-point type.
-	/// @tparam Right Right-most strict_types floating-point type.
+	/// @brief Float compound-assignment modulus operator assigns the remainder between two strict floating-point types.
+	/// @tparam Left Left-most strict floating-point type.
+	/// @tparam Right Right-most strict floating-point type.
 	/// @returns Left&
 	template <typename Left, typename Right>
 		requires STRICT_CPP_NAMESPACE::detail::is_qualified_float_operator<Left, Right>
@@ -196,9 +196,9 @@ namespace STRICT_CPP_NAMESPACE {
 		return left;
 	}
 
-	/// @brief Float compound-assignment modulus operator assigns the remainder between a strict_types floating-point type and a non-strict_types floating-point type.
-	/// @tparam Left Left-most strict_types floating-point type.
-	/// @tparam Right Right-most non-strict_types floating-point type.
+	/// @brief Float compound-assignment modulus operator assigns the remainder between a strict floating-point type and a non-strict floating-point type.
+	/// @tparam Left Left-most strict floating-point type.
+	/// @tparam Right Right-most non-strict floating-point type.
 	/// @returns Left&
 	template <typename Left, typename Right>
 		requires STRICT_CPP_NAMESPACE::detail::is_qualified_float_operator_left_only<Left, Right>
@@ -213,9 +213,9 @@ namespace STRICT_CPP_NAMESPACE {
 		return left;
 	}
 
-	/// @brief Float compound-assignment modulus operator assigns the remainder between a non-strict_types floating-point type and a strict_types floating-point type.
-	/// @tparam Left Left-most non-strict_types floating-point type.
-	/// @tparam Right Right-most strict_types floating-point type.
+	/// @brief Float compound-assignment modulus operator assigns the remainder between a non-strict floating-point type and a strict floating-point type.
+	/// @tparam Left Left-most non-strict floating-point type.
+	/// @tparam Right Right-most strict floating-point type.
 	/// @returns Left&
 	template <typename Left, typename Right>
 		requires STRICT_CPP_NAMESPACE::detail::is_qualified_float_operator_right_only<Left, Right>
@@ -242,28 +242,10 @@ namespace STRICT_CPP_NAMESPACE {
 // Macros
 // =============================================================================
 
-//	Defines a strict_types float-only type.
-#define STRICT_CPP_DEFINE_FLOAT_TYPE(NAME, TYPE, QUALIFIED_TYPES...)                                 \
-	namespace STRICT_CPP_NAMESPACE {                                                                  \
-		struct NAME : STRICT_CPP_NAMESPACE::strict_float_type<TYPE, QUALIFIED_TYPES> {                 \
-				using STRICT_CPP_NAMESPACE::strict_float_type<TYPE, QUALIFIED_TYPES>::strict_float_type; \
-				using STRICT_CPP_NAMESPACE::strict_float_type<TYPE, QUALIFIED_TYPES>::operator=;         \
-		};                                                                                             \
-	}                                                                                                 \
+//	Defines a strict float-only type.
 	STRICT_CPP_DEFINE_FORMATTER(NAME)
 
-//	Defines a strict_types dynamic float-only type.
-#define STRICT_CPP_DEFINE_DYNAMIC_FLOAT_TYPE(NAME, QUALIFIED_TYPES...)                            \
-	namespace STRICT_CPP_NAMESPACE {                                                               \
-		template <typename T>                                                                       \
-			requires STRICT_CPP_NAMESPACE::detail::is_qualified_float_type<QUALIFIED_TYPES>          \
-		struct NAME : STRICT_CPP_NAMESPACE::strict_float_type<T, QUALIFIED_TYPES> {                 \
-				using STRICT_CPP_NAMESPACE::strict_float_type<T, QUALIFIED_TYPES>::strict_float_type; \
-				using STRICT_CPP_NAMESPACE::strict_float_type<T, QUALIFIED_TYPES>::operator=;         \
-		};                                                                                          \
-	}                                                                                              \
-	STRICT_CPP_DEFINE_FORMATTER(NAME<float>)                                                       \
-	STRICT_CPP_DEFINE_FORMATTER(NAME<double>)                                                      \
+//	Defines a strict dynamic float-only type.
 	STRICT_CPP_DEFINE_FORMATTER(NAME<long double>)
 
 // =============================================================================

@@ -9,7 +9,7 @@
 	concepts.hpp description:
 		This header file contains a wide range of c++20 concepts,
 		hidden inside the "detail" namespace. These concepts are to be used
-		for all types of strict_types types.
+		for all types of strict types.
 */
 
 namespace STRICT_CPP_NAMESPACE {
@@ -90,11 +90,11 @@ namespace STRICT_CPP_NAMESPACE {
 		template <typename Left, typename Right>
 		concept is_qualified_float_operator_right_only = (std::is_arithmetic_v<Left> || is_strict_integral_type<Left>) && is_qualified_float_operator<Right>;
 
-		// Returns true if [Other] is integral or integral strict_types type.
+		// Returns true if [Other] is integral or integral strict type.
 		template <typename Other>
 		concept is_qualified_integral_assignment_operator = std::is_integral_v<Other> || is_strict_integral_type<Other>;
 
-		// Returns true if [Other] is a float or float strict_types type.
+		// Returns true if [Other] is a float or float strict type.
 		template <typename Other>
 		concept is_qualified_float_assignment_operator = std::is_floating_point_v<Other> || is_strict_float_type<Other>;
 

@@ -1,5 +1,5 @@
-#if !defined(STRICT_TYPES_OPTIONAL_TYPES)
-	#define STRICT_TYPES_OPTIONAL_TYPES
+#if !defined(STRICT_TYPES_EXTRA_TYPES)
+	#define STRICT_TYPES_EXTRA_TYPES
 #endif
 
 #include "strict_types/alias.hpp"

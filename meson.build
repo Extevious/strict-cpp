@@ -19,7 +19,7 @@ strict_types_enable_extra_types = get_option('enable_extra_types')
 strict_types_build_examples = get_option('build_examples')
 
 if strict_types_enable_extra_types
-   add_project_arguments('-DSTRICT_TYPES_OPTIONAL_TYPES', language: 'cpp')
+   add_project_arguments('-DSTRICT_TYPES_EXTRA_TYPES', language: 'cpp')
 endif
 
 if strict_types_namespace == ''

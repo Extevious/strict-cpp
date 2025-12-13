@@ -536,7 +536,7 @@ STRICT_TYPES_DEFINE_DYNAMIC_INTEGRAL_TYPE(
 // Optional types
 // =============================================================================
 
-#if defined(STRICT_TYPES_OPTIONAL_TYPES)
+#if defined(STRICT_TYPES_EXTRA_TYPES)
 	#define STRICT_TYPES_DEFINE_OPTIONAL_TYPE_UNSIGNED(NAME)         \
 		STRICT_TYPES_DEFINE_INTEGRAL_TYPE(NAME##_t, std::size_t);     \
 		STRICT_TYPES_DEFINE_INTEGRAL_TYPE(NAME##8_t, std::uint8_t);   \

@@ -22,13 +22,13 @@
 
 //	Defines a formatter for a strict_types integral or strict_types floating-point type.
 //	Used primarily by other strict_types macros.
-#define STRICT_CPP_DEFINE_FORMATTER(TYPE)                                                                                                                                               \
-	template <>                                                                                                                                                                          \
-	struct _STD formatter<STRICT_CPP_NAMESPACE::TYPE> {                                                                                                                                  \
-			inline constexpr auto parse(const _STD format_parse_context& context) const noexcept { return context.begin(); }                                                               \
-			inline constexpr auto parse(const _STD wformat_parse_context& context) const noexcept { return context.begin(); }                                                              \
-			inline auto				 format(const STRICT_CPP_NAMESPACE::TYPE value, _STD format_context& context) const { return _STD format_to(context.out(), "{}", value.to_string()); }    \
-			inline auto				 format(const STRICT_CPP_NAMESPACE::TYPE value, _STD wformat_context& context) const { return _STD format_to(context.out(), L"{}", value.to_wstring()); } \
+#define STRICT_CPP_DEFINE_FORMATTER(TYPE)                                                                                                                                                             \
+	template <>                                                                                                                                                                                        \
+	struct _STD formatter<STRICT_CPP_NAMESPACE::TYPE> {                                                                                                                                                \
+			[[nodiscard]] inline constexpr auto parse(const _STD format_parse_context& context) const noexcept { return context.begin(); }                                                               \
+			[[nodiscard]] inline constexpr auto parse(const _STD wformat_parse_context& context) const noexcept { return context.begin(); }                                                              \
+			[[nodiscard]] inline auto				format(const STRICT_CPP_NAMESPACE::TYPE value, _STD format_context& context) const { return _STD format_to(context.out(), "{}", value.to_string()); }    \
+			[[nodiscard]] inline auto				format(const STRICT_CPP_NAMESPACE::TYPE value, _STD wformat_context& context) const { return _STD format_to(context.out(), L"{}", value.to_wstring()); } \
 	};
 
 // Defines unary and incremental/decremental operators.
@@ -37,41 +37,41 @@
 // Usage example:
 //    STRICT_CPP_DEFINE_UNARY_INCR_DECR_OPERATORS(integral)
 //    STRICT_CPP_DEFINE_UNARY_INCR_DECR_OPERATORS(float)
-#define STRICT_CPP_DEFINE_UNARY_INCR_DECR_OPERATORS(STRICT_TYPE_CONCEPT)                                 \
-	template <typename Type>                                                                              \
-		requires STRICT_CPP_NAMESPACE::detail::is_qualified_                                               \
-	##STRICT_TYPE_CONCEPT##_operator<Type> inline constexpr Type operator++(Type& value) noexcept {       \
-		return static_cast<Type>(++value.value);                                                           \
-	}                                                                                                     \
-                                                                                                         \
-	template <typename Type>                                                                              \
-		requires STRICT_CPP_NAMESPACE::detail::is_qualified_                                               \
-	##STRICT_TYPE_CONCEPT##_operator<Type> inline constexpr Type operator++(Type& value, auto) noexcept { \
-		return static_cast<Type>(value.value++);                                                           \
-	}                                                                                                     \
-                                                                                                         \
-	template <typename Type>                                                                              \
-		requires STRICT_CPP_NAMESPACE::detail::is_qualified_                                               \
-	##STRICT_TYPE_CONCEPT##_operator<Type> inline constexpr Type operator--(Type& value) noexcept {       \
-		return static_cast<Type>(--value.value);                                                           \
-	}                                                                                                     \
-                                                                                                         \
-	template <typename Type>                                                                              \
-		requires STRICT_CPP_NAMESPACE::detail::is_qualified_                                               \
-	##STRICT_TYPE_CONCEPT##_operator<Type> inline constexpr Type operator--(Type& value, auto) noexcept { \
-		return static_cast<Type>(value.value--);                                                           \
-	}                                                                                                     \
-                                                                                                         \
-	template <typename Type>                                                                              \
-		requires STRICT_CPP_NAMESPACE::detail::is_qualified_                                               \
-	##STRICT_TYPE_CONCEPT##_operator<Type> inline constexpr Type operator+(const Type value) noexcept {   \
-		return static_cast<Type>(+value.value);                                                            \
-	}                                                                                                     \
-                                                                                                         \
-	template <typename Type>                                                                              \
-		requires STRICT_CPP_NAMESPACE::detail::is_qualified_                                               \
-	##STRICT_TYPE_CONCEPT##_operator<Type> inline constexpr Type operator-(const Type value) noexcept {   \
-		return static_cast<Type>(-value.value);                                                            \
+#define STRICT_CPP_DEFINE_UNARY_INCR_DECR_OPERATORS(STRICT_TYPE_CONCEPT)                                               \
+	template <typename Type>                                                                                            \
+		requires STRICT_CPP_NAMESPACE::detail::is_qualified_                                                             \
+	##STRICT_TYPE_CONCEPT##_operator<Type> [[nodiscard]] inline constexpr Type operator++(Type& value) noexcept {       \
+		return static_cast<Type>(++value.value);                                                                         \
+	}                                                                                                                   \
+                                                                                                                       \
+	template <typename Type>                                                                                            \
+		requires STRICT_CPP_NAMESPACE::detail::is_qualified_                                                             \
+	##STRICT_TYPE_CONCEPT##_operator<Type> [[nodiscard]] inline constexpr Type operator++(Type& value, auto) noexcept { \
+		return static_cast<Type>(value.value++);                                                                         \
+	}                                                                                                                   \
+                                                                                                                       \
+	template <typename Type>                                                                                            \
+		requires STRICT_CPP_NAMESPACE::detail::is_qualified_                                                             \
+	##STRICT_TYPE_CONCEPT##_operator<Type> [[nodiscard]] inline constexpr Type operator--(Type& value) noexcept {       \
+		return static_cast<Type>(--value.value);                                                                         \
+	}                                                                                                                   \
+                                                                                                                       \
+	template <typename Type>                                                                                            \
+		requires STRICT_CPP_NAMESPACE::detail::is_qualified_                                                             \
+	##STRICT_TYPE_CONCEPT##_operator<Type> [[nodiscard]] inline constexpr Type operator--(Type& value, auto) noexcept { \
+		return static_cast<Type>(value.value--);                                                                         \
+	}                                                                                                                   \
+                                                                                                                       \
+	template <typename Type>                                                                                            \
+		requires STRICT_CPP_NAMESPACE::detail::is_qualified_                                                             \
+	##STRICT_TYPE_CONCEPT##_operator<Type> [[nodiscard]] inline constexpr Type operator+(const Type value) noexcept {   \
+		return static_cast<Type>(+value.value);                                                                          \
+	}                                                                                                                   \
+                                                                                                                       \
+	template <typename Type>                                                                                            \
+		requires STRICT_CPP_NAMESPACE::detail::is_qualified_                                                             \
+	##STRICT_TYPE_CONCEPT##_operator<Type> [[nodiscard]] inline constexpr Type operator-(const Type value) noexcept {   \
+		return static_cast<Type>(-value.value);                                                                          \
 	}
 
 // This macro defines a tri-collection of arithmetic operators specified by [OP].
@@ -81,39 +81,39 @@
 //    STRICT_CPP_DEFINE_ARITHMETIC_OPERATORS(+, float)
 //    STRICT_CPP_DEFINE_ARITHMETIC_OPERATORS(/, float)
 //    STRICT_CPP_DEFINE_ARITHMETIC_OPERATORS(*, integral)
-#define STRICT_CPP_DEFINE_ARITHMETIC_OPERATORS(OP, STRICT_TYPE_CONCEPT)                                                                               \
-	template <typename Left, typename Right>                                                                                                           \
-		requires STRICT_CPP_NAMESPACE::detail::is_qualified_                                                                                            \
-	##STRICT_TYPE_CONCEPT##_operator<Left, Right> inline static constexpr Left operator OP(const Left left, const Right right) noexcept {              \
-		return static_cast<Left>(left.value OP right.value);                                                                                            \
-	}                                                                                                                                                  \
-	template <typename Left, typename Right>                                                                                                           \
-		requires STRICT_CPP_NAMESPACE::detail::is_qualified_                                                                                            \
-	##STRICT_TYPE_CONCEPT##_operator_left_only<Left, Right> inline static constexpr Left operator OP(const Left left, const Right right) noexcept {    \
-		return static_cast<Left>(left.value OP right);                                                                                                  \
-	}                                                                                                                                                  \
-	template <typename Left, typename Right>                                                                                                           \
-		requires STRICT_CPP_NAMESPACE::detail::is_qualified_                                                                                            \
-	##STRICT_TYPE_CONCEPT##_operator_right_only<Left, Right> inline static constexpr Left operator OP(const Left left, const Right right) noexcept {   \
-		return static_cast<Left>(left OP right.value);                                                                                                  \
-	}                                                                                                                                                  \
-	template <typename Left, typename Right>                                                                                                           \
-		requires STRICT_CPP_NAMESPACE::detail::is_qualified_                                                                                            \
-	##STRICT_TYPE_CONCEPT##_operator<Left, Right> inline static constexpr Left& operator OP## = (Left & left, const Right right) noexcept {            \
-		left.value OP## = right.value;                                                                                                                  \
-		return left;                                                                                                                                    \
-	}                                                                                                                                                  \
-	template <typename Left, typename Right>                                                                                                           \
-		requires STRICT_CPP_NAMESPACE::detail::is_qualified_                                                                                            \
-	##STRICT_TYPE_CONCEPT##_operator_left_only<Left, Right> inline static constexpr Left& operator OP## = (Left & left, const Right right) noexcept {  \
-		left.value OP## = right;                                                                                                                        \
-		return left;                                                                                                                                    \
-	}                                                                                                                                                  \
-	template <typename Left, typename Right>                                                                                                           \
-		requires STRICT_CPP_NAMESPACE::detail::is_qualified_                                                                                            \
-	##STRICT_TYPE_CONCEPT##_operator_right_only<Left, Right> inline static constexpr Left& operator OP## = (Left & left, const Right right) noexcept { \
-		left OP## = right.value;                                                                                                                        \
-		return left;                                                                                                                                    \
+#define STRICT_CPP_DEFINE_ARITHMETIC_OPERATORS(OP, STRICT_TYPE_CONCEPT)                                                                                      \
+	template <typename Left, typename Right>                                                                                                                  \
+		requires STRICT_CPP_NAMESPACE::detail::is_qualified_                                                                                                   \
+	##STRICT_TYPE_CONCEPT##_operator<Left, Right> [[nodiscard]] inline constexpr Left operator OP(const Left left, const Right right) noexcept {              \
+		return static_cast<Left>(left.value OP right.value);                                                                                                   \
+	}                                                                                                                                                         \
+	template <typename Left, typename Right>                                                                                                                  \
+		requires STRICT_CPP_NAMESPACE::detail::is_qualified_                                                                                                   \
+	##STRICT_TYPE_CONCEPT##_operator_left_only<Left, Right> [[nodiscard]] inline constexpr Left operator OP(const Left left, const Right right) noexcept {    \
+		return static_cast<Left>(left.value OP right);                                                                                                         \
+	}                                                                                                                                                         \
+	template <typename Left, typename Right>                                                                                                                  \
+		requires STRICT_CPP_NAMESPACE::detail::is_qualified_                                                                                                   \
+	##STRICT_TYPE_CONCEPT##_operator_right_only<Left, Right> [[nodiscard]] inline constexpr Left operator OP(const Left left, const Right right) noexcept {   \
+		return static_cast<Left>(left OP right.value);                                                                                                         \
+	}                                                                                                                                                         \
+	template <typename Left, typename Right>                                                                                                                  \
+		requires STRICT_CPP_NAMESPACE::detail::is_qualified_                                                                                                   \
+	##STRICT_TYPE_CONCEPT##_operator<Left, Right> [[nodiscard]] inline constexpr Left& operator OP## = (Left & left, const Right right) noexcept {            \
+		left.value OP## = right.value;                                                                                                                         \
+		return left;                                                                                                                                           \
+	}                                                                                                                                                         \
+	template <typename Left, typename Right>                                                                                                                  \
+		requires STRICT_CPP_NAMESPACE::detail::is_qualified_                                                                                                   \
+	##STRICT_TYPE_CONCEPT##_operator_left_only<Left, Right> [[nodiscard]] inline constexpr Left& operator OP## = (Left & left, const Right right) noexcept {  \
+		left.value OP## = right;                                                                                                                               \
+		return left;                                                                                                                                           \
+	}                                                                                                                                                         \
+	template <typename Left, typename Right>                                                                                                                  \
+		requires STRICT_CPP_NAMESPACE::detail::is_qualified_                                                                                                   \
+	##STRICT_TYPE_CONCEPT##_operator_right_only<Left, Right> [[nodiscard]] inline constexpr Left& operator OP## = (Left & left, const Right right) noexcept { \
+		left OP## = right.value;                                                                                                                               \
+		return left;                                                                                                                                           \
 	}
 
 // Similar to STRICT_CPP_DEFINE_ARITHMETIC_OPERATORS, this macro defines
@@ -124,19 +124,19 @@
 //    STRICT_CPP_DEFINE_COMPARISON_OPERATORS(>, integral)
 //    STRICT_CPP_DEFINE_COMPARISON_OPERATORS(==, float)
 //    STRICT_CPP_DEFINE_COMPARISON_OPERATORS(!=, float)
-#define STRICT_CPP_DEFINE_COMPARISON_OPERATORS(OP, STRICT_TYPE_CONCEPT)                                                                      \
-	template <typename Left, typename Right>                                                                                                  \
-		requires STRICT_CPP_NAMESPACE::detail::is_qualified_                                                                                   \
-	##STRICT_TYPE_CONCEPT##_operator<Left, Right> inline constexpr bool operator OP(const Left left, const Right right) noexcept {            \
-		return left.value OP right.value;                                                                                                      \
-	}                                                                                                                                         \
-	template <typename Left, typename Right>                                                                                                  \
-		requires STRICT_CPP_NAMESPACE::detail::is_qualified_                                                                                   \
-	##STRICT_TYPE_CONCEPT##_operator_left_only<Left, Right> inline constexpr bool operator OP(const Left left, const Right right) noexcept {  \
-		return left.value OP right;                                                                                                            \
-	}                                                                                                                                         \
-	template <typename Left, typename Right>                                                                                                  \
-		requires STRICT_CPP_NAMESPACE::detail::is_qualified_                                                                                   \
-	##STRICT_TYPE_CONCEPT##_operator_right_only<Left, Right> inline constexpr bool operator OP(const Left left, const Right right) noexcept { \
-		return left OP right.value;                                                                                                            \
+#define STRICT_CPP_DEFINE_COMPARISON_OPERATORS(OP, STRICT_TYPE_CONCEPT)                                                                                    \
+	template <typename Left, typename Right>                                                                                                                \
+		requires STRICT_CPP_NAMESPACE::detail::is_qualified_                                                                                                 \
+	##STRICT_TYPE_CONCEPT##_operator<Left, Right> [[nodiscard]] inline constexpr bool operator OP(const Left left, const Right right) noexcept {            \
+		return left.value OP right.value;                                                                                                                    \
+	}                                                                                                                                                       \
+	template <typename Left, typename Right>                                                                                                                \
+		requires STRICT_CPP_NAMESPACE::detail::is_qualified_                                                                                                 \
+	##STRICT_TYPE_CONCEPT##_operator_left_only<Left, Right> [[nodiscard]] inline constexpr bool operator OP(const Left left, const Right right) noexcept {  \
+		return left.value OP right;                                                                                                                          \
+	}                                                                                                                                                       \
+	template <typename Left, typename Right>                                                                                                                \
+		requires STRICT_CPP_NAMESPACE::detail::is_qualified_                                                                                                 \
+	##STRICT_TYPE_CONCEPT##_operator_right_only<Left, Right> [[nodiscard]] inline constexpr bool operator OP(const Left left, const Right right) noexcept { \
+		return left OP right.value;                                                                                                                          \
 	}

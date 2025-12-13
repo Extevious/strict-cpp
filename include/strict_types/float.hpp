@@ -64,18 +64,18 @@ namespace STRICT_CPP_NAMESPACE {
 
 			/// @brief Implicit conversion operator.
 			/// @returns Type&
-			inline constexpr operator Type&() noexcept { return this->value; }
+			[[nodiscard]] inline constexpr operator Type&() noexcept { return this->value; }
 
 			/// @brief Implicit const conversion operator.
 			/// @returns const Type&
-			inline constexpr operator const Type&() const noexcept { return this->value; }
+			[[nodiscard]] inline constexpr operator const Type&() const noexcept { return this->value; }
 
 			/// @brief Explicit conversion operator.
 			/// @tparam Other The type to convert to.
 			/// @returns Other
 			template <typename Other>
 				requires STRICT_CPP_NAMESPACE::detail::is_qualified_explicit_conversion_operator<Type, Other>
-			inline constexpr explicit operator Other() noexcept {
+			[[nodiscard]] inline constexpr explicit operator Other() noexcept {
 				return static_cast<Other>(this->value);
 			}
 
@@ -84,7 +84,7 @@ namespace STRICT_CPP_NAMESPACE {
 			/// @returns Other
 			template <typename Other>
 				requires STRICT_CPP_NAMESPACE::detail::is_qualified_explicit_conversion_operator<Type, Other>
-			inline constexpr explicit operator const Other() const noexcept {
+			[[nodiscard]] inline constexpr explicit operator const Other() const noexcept {
 				return static_cast<const Other>(this->value);
 			}
 
@@ -93,7 +93,7 @@ namespace STRICT_CPP_NAMESPACE {
 			/// @returns Other
 			template <typename Other>
 				requires STRICT_CPP_NAMESPACE::detail::is_qualified_conversion_fuction<Type, Other>
-			inline constexpr Other as() noexcept {
+			[[nodiscard]] inline constexpr Other as() noexcept {
 				return static_cast<Other>(this->value);
 			}
 
@@ -102,7 +102,7 @@ namespace STRICT_CPP_NAMESPACE {
 			/// @returns const Other
 			template <typename Other>
 				requires STRICT_CPP_NAMESPACE::detail::is_qualified_conversion_fuction<Type, Other>
-			inline constexpr const Other as() const noexcept {
+			[[nodiscard]] inline constexpr const Other as() const noexcept {
 				return static_cast<const Other>(this->value);
 			}
 
@@ -110,13 +110,13 @@ namespace STRICT_CPP_NAMESPACE {
 			/// @returns std::string
 			template <typename _ = void>
 				requires STRICT_CPP_NAMESPACE::detail::can_convert_to_string_function<Type>
-			inline std::string to_string() const { return std::to_string(this->value); }
+			[[nodiscard]] inline std::string to_string() const { return std::to_string(this->value); }
 
 			/// @brief Converts to a human-readable wide string representing the current value.
 			/// @returns std::wstring
 			template <typename _ = void>
 				requires STRICT_CPP_NAMESPACE::detail::can_convert_to_wstring_function<Type>
-			inline std::wstring to_wstring() const { return std::to_wstring(this->value); }
+			[[nodiscard]] inline std::wstring to_wstring() const { return std::to_wstring(this->value); }
 	};
 
 	// ==========================================================================
@@ -129,7 +129,7 @@ namespace STRICT_CPP_NAMESPACE {
 	/// @returns Left
 	template <typename Left, typename Right>
 		requires STRICT_CPP_NAMESPACE::detail::is_qualified_float_operator<Left, Right>
-	inline static constexpr Left operator%(const Left left, const Right right) noexcept {
+	[[nodiscard]] inline static constexpr Left operator%(const Left left, const Right right) noexcept {
 #if __cplusplus >= 202203L
 		return static_cast<Left>(std::fmod(left.value, right.value));
 #else
@@ -144,7 +144,7 @@ namespace STRICT_CPP_NAMESPACE {
 	/// @returns Left
 	template <typename Left, typename Right>
 		requires STRICT_CPP_NAMESPACE::detail::is_qualified_float_operator_left_only<Left, Right>
-	inline static constexpr Left operator%(const Left left, const Right right) noexcept {
+	[[nodiscard]] inline static constexpr Left operator%(const Left left, const Right right) noexcept {
 #if __cplusplus >= 202203L
 		return static_cast<Left>(std::fmod(left.value, right));
 #else
@@ -159,7 +159,7 @@ namespace STRICT_CPP_NAMESPACE {
 	/// @returns Left
 	template <typename Left, typename Right>
 		requires STRICT_CPP_NAMESPACE::detail::is_qualified_float_operator_right_only<Left, Right>
-	inline static constexpr Left operator%(const Left left, const Right right) noexcept {
+	[[nodiscard]] inline static constexpr Left operator%(const Left left, const Right right) noexcept {
 #if __cplusplus >= 202203L
 		return static_cast<Left>(std::fmod(left, right.value));
 #else

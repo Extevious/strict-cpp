@@ -106,7 +106,7 @@ namespace STRICT_CPP_NAMESPACE {
 
 		// Returns true if [Other] inherits from the [strict_cpp_base_t], or is convertible to [Type].
 		template <typename Type, typename Other>
-		concept is_qualified_conversion_fuction = is_strict_type<Other> || std::is_convertible_v<Type, Other> || std::is_same_v<Type, std::remove_cvref_t<Other>>;
+		concept is_qualified_conversion_function = is_strict_type<Other> || std::is_convertible_v<Type, Other> || std::is_same_v<Type, std::remove_cvref_t<Other>>;
 
 		// Returns true if [Type] can be converted to a std::string.
 		template <typename Type>

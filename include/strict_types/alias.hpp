@@ -180,7 +180,7 @@ namespace STRICT_CPP_NAMESPACE {
 			/// @tparam Other The type to convert to.
 			/// @returns Other
 			template <typename Other>
-				requires STRICT_CPP_NAMESPACE::detail::is_qualified_conversion_fuction<Type, Other>
+				requires STRICT_CPP_NAMESPACE::detail::is_qualified_conversion_function<Type, Other>
 			inline constexpr Other as() noexcept {
 				return static_cast<Other>(this->value);
 			}
@@ -189,7 +189,7 @@ namespace STRICT_CPP_NAMESPACE {
 			/// @tparam Other The type to convert to.
 			/// @returns Other
 			template <typename Other>
-				requires STRICT_CPP_NAMESPACE::detail::is_qualified_conversion_fuction<Type, Other>
+				requires STRICT_CPP_NAMESPACE::detail::is_qualified_conversion_function<Type, Other>
 			inline constexpr Other as() const noexcept {
 				return static_cast<const Other>(this->value);
 			}

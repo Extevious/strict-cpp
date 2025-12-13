@@ -35,7 +35,7 @@ namespace STRICT_TYPES_NAMESPACE {
 	/// @tparam Type The encapsulated type.
 	template <typename Type>
 		requires (sizeof(Type) != 0) && (!std::is_reference_v<Type>)
-	struct strict_alias_type : STRICT_TYPES_NAMESPACE::detail::strict_cpp_alias_base_t {
+	struct strict_alias_type : STRICT_TYPES_NAMESPACE::detail::strict_types_alias_base_t {
 			using type = Type;
 			Type value = {};
 
@@ -71,7 +71,7 @@ namespace STRICT_TYPES_NAMESPACE {
 			template <typename Other>
 				requires std::is_convertible_v<Other, Type>
 			inline constexpr auto& operator=(Other&& other) noexcept(std::is_nothrow_move_assignable_v<Type>) {
-				if constexpr (std::is_base_of_v<Other, STRICT_TYPES_NAMESPACE::detail::strict_cpp_alias_base_t>) this->value = std::move(other.value);
+				if constexpr (std::is_base_of_v<Other, STRICT_TYPES_NAMESPACE::detail::strict_types_alias_base_t>) this->value = std::move(other.value);
 				else this->value = std::move(other);
 
 				return *this;
@@ -84,7 +84,7 @@ namespace STRICT_TYPES_NAMESPACE {
 			template <typename Other>
 				requires std::is_convertible_v<Other, Type>
 			inline constexpr auto& operator=(const Other& other) noexcept(std::is_nothrow_copy_assignable_v<Type>) {
-				if constexpr (std::is_base_of_v<Other, STRICT_TYPES_NAMESPACE::detail::strict_cpp_alias_base_t>) this->value = other.value;
+				if constexpr (std::is_base_of_v<Other, STRICT_TYPES_NAMESPACE::detail::strict_types_alias_base_t>) this->value = other.value;
 				else this->value = other;
 
 				return *this;

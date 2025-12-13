@@ -28,7 +28,7 @@ namespace STRICT_TYPES_NAMESPACE {
 	/// @tparam QualifiedTypes A range of qualified types suitable for implicit construction.
 	template <typename Type, typename... QualifiedTypes>
 		requires STRICT_TYPES_NAMESPACE::detail::is_qualified_float_type<Type, QualifiedTypes...>
-	struct strict_float_type : STRICT_TYPES_NAMESPACE::detail::strict_cpp_float_base_t {
+	struct strict_float_type : STRICT_TYPES_NAMESPACE::detail::strict_types_float_base_t {
 			inline static constexpr Type min					  = std::numeric_limits<Type>::min();
 			inline static constexpr Type max					  = std::numeric_limits<Type>::max();
 			inline static constexpr Type lowest				  = std::numeric_limits<Type>::lowest();

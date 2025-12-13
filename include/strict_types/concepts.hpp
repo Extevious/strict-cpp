@@ -14,21 +14,21 @@
 
 namespace STRICT_TYPES_NAMESPACE {
 	namespace detail {
-		// Returns true if [Type] inherits from the base class strict_cpp_base_t.
+		// Returns true if [Type] inherits from the base class strict_types_base_t.
 		template <typename Type>
-		concept is_strict_type = std::is_base_of_v<STRICT_TYPES_NAMESPACE::detail::strict_cpp_base_t, Type>;
+		concept is_strict_type = std::is_base_of_v<STRICT_TYPES_NAMESPACE::detail::strict_types_base_t, Type>;
 
-		// Returns true if [Type] inherits from the base class strict_cpp_integral_base_t.
+		// Returns true if [Type] inherits from the base class strict_types_integral_base_t.
 		template <typename Type>
-		concept is_strict_integral_type = std::is_base_of_v<STRICT_TYPES_NAMESPACE::detail::strict_cpp_integral_base_t, Type>;
+		concept is_strict_integral_type = std::is_base_of_v<STRICT_TYPES_NAMESPACE::detail::strict_types_integral_base_t, Type>;
 
-		// Returns true if [Type] inherits from the base class strict_cpp_float_base_t.
+		// Returns true if [Type] inherits from the base class strict_types_float_base_t.
 		template <typename Type>
-		concept is_strict_float_type = std::is_base_of_v<STRICT_TYPES_NAMESPACE::detail::strict_cpp_float_base_t, Type>;
+		concept is_strict_float_type = std::is_base_of_v<STRICT_TYPES_NAMESPACE::detail::strict_types_float_base_t, Type>;
 
-		// Returns true if [Type] inherits from the base class strict_cpp_alias_base_t.
+		// Returns true if [Type] inherits from the base class strict_types_alias_base_t.
 		template <typename Type>
-		concept is_strict_alias_type = std::is_base_of_v<STRICT_TYPES_NAMESPACE::detail::strict_cpp_alias_base_t, Type>;
+		concept is_strict_alias_type = std::is_base_of_v<STRICT_TYPES_NAMESPACE::detail::strict_types_alias_base_t, Type>;
 
 		// Returns true if [Other] is the same as one of the [QualifiedTypes], and if [QualifiedTypes] is a non-zero length.
 		template <typename Other, typename... QualifiedTypes>
@@ -54,39 +54,39 @@ namespace STRICT_TYPES_NAMESPACE {
 		template <typename Type, typename Other>
 		concept is_qualified_explicit_conversion_operator = std::is_convertible_v<Type, Other> && !std::is_same_v<Type, Other>;
 
-		// Returns true if all [Types] inherits from the [strict_cpp_base_t] type.
+		// Returns true if all [Types] inherits from the [strict_types_base_t] type.
 		template <typename... Types>
 		concept is_qualified_operator = (is_strict_type<Types> && ...);
 
-		// Returns true if [Left] inherits from the [strict_cpp_base_t] type and Right is a scalar type.
+		// Returns true if [Left] inherits from the [strict_types_base_t] type and Right is a scalar type.
 		template <typename Left, typename Right>
 		concept is_qualified_operator_left_only = is_qualified_operator<Left> && std::is_arithmetic_v<Right>;
 
-		// Returns true if [Left] is a scalar type and Right inherits from the [strict_cpp_base_t] type.
+		// Returns true if [Left] is a scalar type and Right inherits from the [strict_types_base_t] type.
 		template <typename Left, typename Right>
 		concept is_qualified_operator_right_only = std::is_scalar_v<Left> && is_qualified_operator<Right>;
 
-		// Returns true if all [Types] inherits from the [strict_cpp_integral_base_t] type.
+		// Returns true if all [Types] inherits from the [strict_types_integral_base_t] type.
 		template <typename... Types>
 		concept is_qualified_integral_operator = (is_strict_integral_type<Types> && ...);
 
-		// Returns true if [Left] inherits from the [strict_cpp_integral_base_t] type and [Right] is a scalar type.
+		// Returns true if [Left] inherits from the [strict_types_integral_base_t] type and [Right] is a scalar type.
 		template <typename Left, typename Right>
 		concept is_qualified_integral_operator_left_only = is_qualified_integral_operator<Left> && std::is_arithmetic_v<Right>;
 
-		// Returns true if [Left] is a scalar type and [Right] inherits from the [strict_cpp_integral_base_t] type.
+		// Returns true if [Left] is a scalar type and [Right] inherits from the [strict_types_integral_base_t] type.
 		template <typename Left, typename Right>
 		concept is_qualified_integral_operator_right_only = std::is_scalar_v<Left> && is_qualified_integral_operator<Right>;
 
-		// Returns true if any of [Types] inherits from the [strict_cpp_float_base_t] type.
+		// Returns true if any of [Types] inherits from the [strict_types_float_base_t] type.
 		template <typename... Types>
 		concept is_qualified_float_operator = (is_strict_float_type<Types> && ...);
 
-		// Returns true if [Left] inherits from the [strict_cpp_float_base_t] type and [Right] is a arithmetic type.
+		// Returns true if [Left] inherits from the [strict_types_float_base_t] type and [Right] is a arithmetic type.
 		template <typename Left, typename Right>
 		concept is_qualified_float_operator_left_only = is_qualified_float_operator<Left> && (std::is_arithmetic_v<Right> || is_strict_integral_type<Right>);
 
-		// Returns true if [Left] is a arithmetic type and [Right] inherits from the [strict_cpp_float_base_t] type.
+		// Returns true if [Left] is a arithmetic type and [Right] inherits from the [strict_types_float_base_t] type.
 		template <typename Left, typename Right>
 		concept is_qualified_float_operator_right_only = (std::is_arithmetic_v<Left> || is_strict_integral_type<Left>) && is_qualified_float_operator<Right>;
 
@@ -104,7 +104,7 @@ namespace STRICT_TYPES_NAMESPACE {
 			= requires (Type t, IndexType&& i) { t.operator[](i); }
 		  || requires (Type t, const IndexType& i) { t.operator[](i); };
 
-		// Returns true if [Other] inherits from the [strict_cpp_base_t], or is convertible to [Type].
+		// Returns true if [Other] inherits from the [strict_types_base_t], or is convertible to [Type].
 		template <typename Type, typename Other>
 		concept is_qualified_conversion_function = is_strict_type<Other> || std::is_convertible_v<Type, Other> || std::is_same_v<Type, std::remove_cvref_t<Other>>;
 

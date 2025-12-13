@@ -29,7 +29,7 @@ namespace STRICT_TYPES_NAMESPACE {
 	/// @tparam QualifiedTypes A range of qualified types suitable for implicit construction.
 	template <typename Type, typename... QualifiedTypes>
 		requires STRICT_TYPES_NAMESPACE::detail::is_qualified_integral_type<Type, QualifiedTypes...>
-	struct strict_integral_type : STRICT_TYPES_NAMESPACE::detail::strict_cpp_integral_base_t {
+	struct strict_integral_type : STRICT_TYPES_NAMESPACE::detail::strict_types_integral_base_t {
 			inline constexpr static Type min = std::numeric_limits<Type>::min();
 			inline constexpr static Type max = std::numeric_limits<Type>::max();
 

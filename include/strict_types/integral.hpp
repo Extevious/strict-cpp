@@ -55,17 +55,6 @@ namespace STRICT_CPP_NAMESPACE {
 			inline constexpr explicit strict_integral_type(const Other other) noexcept :
 				value(static_cast<Type>(other)) { }
 
-			/// @brief Copy assignment operator.
-			/// @tparam Other The assignment type.
-			/// @returns strict_integral_type&
-			template <typename Other>
-				requires STRICT_CPP_NAMESPACE::detail::is_qualified_integral_assignment_operator<Other>
-			inline constexpr strict_integral_type& operator=(const Other other) noexcept {
-				if constexpr (std::is_integral_v<Other>) this->value = static_cast<Type>(other);
-				else this->value = static_cast<Type>(other.value);
-				return *this;
-			}
-
 			/// @brief Implicit conversion operator.
 			/// @returns Type&
 			inline constexpr operator Type&() noexcept { return this->value; }
@@ -158,7 +147,14 @@ namespace STRICT_CPP_NAMESPACE {
 	namespace STRICT_CPP_NAMESPACE {                                                                        \
 		struct NAME : STRICT_CPP_NAMESPACE::strict_integral_type<TYPE, QUALIFIED_TYPES> {                    \
 				using STRICT_CPP_NAMESPACE::strict_integral_type<TYPE, QUALIFIED_TYPES>::strict_integral_type; \
-				using STRICT_CPP_NAMESPACE::strict_integral_type<TYPE, QUALIFIED_TYPES>::operator=;            \
+				template <typename Other>                                                                      \
+					requires STRICT_CPP_NAMESPACE::detail::is_qualified_integral_assignment_operator<Other>     \
+				inline constexpr NAME& operator=(const Other other) noexcept {                                 \
+					if constexpr (std::is_integral_v<Other>) this->value = static_cast<TYPE>(other);            \
+					else this->value = static_cast<TYPE>(other.value);                                          \
+                                                                                                           \
+					return *this;                                                                               \
+				}                                                                                              \
 		};                                                                                                   \
 	}                                                                                                       \
 	STRICT_CPP_DEFINE_FORMATTER(NAME)
@@ -171,7 +167,14 @@ namespace STRICT_CPP_NAMESPACE {
 				requires STRICT_CPP_NAMESPACE::detail::is_qualified_integral_type<QUALIFIED_TYPES>             \
 			struct NAME : STRICT_CPP_NAMESPACE::strict_integral_type<T, QUALIFIED_TYPES> {                    \
 					using STRICT_CPP_NAMESPACE::strict_integral_type<T, QUALIFIED_TYPES>::strict_integral_type; \
-					using STRICT_CPP_NAMESPACE::strict_integral_type<T, QUALIFIED_TYPES>::operator=;            \
+					template <typename Other>                                                                   \
+						requires STRICT_CPP_NAMESPACE::detail::is_qualified_integral_assignment_operator<Other>  \
+					inline constexpr NAME& operator=(const Other other) noexcept {                              \
+						if constexpr (std::is_integral_v<Other>) this->value = static_cast<T>(other);            \
+						else this->value = static_cast<T>(other.value);                                          \
+                                                                                                           \
+						return *this;                                                                            \
+					}                                                                                           \
 			};                                                                                                \
 		}                                                                                                    \
 		STRICT_CPP_DEFINE_FORMATTER(NAME<char>)                                                              \
@@ -196,7 +199,14 @@ namespace STRICT_CPP_NAMESPACE {
 				requires STRICT_CPP_NAMESPACE::detail::is_qualified_integral_type<QUALIFIED_TYPES>             \
 			struct NAME : STRICT_CPP_NAMESPACE::strict_integral_type<T, QUALIFIED_TYPES> {                    \
 					using STRICT_CPP_NAMESPACE::strict_integral_type<T, QUALIFIED_TYPES>::strict_integral_type; \
-					using STRICT_CPP_NAMESPACE::strict_integral_type<T, QUALIFIED_TYPES>::operator=;            \
+					template <typename Other>                                                                   \
+						requires STRICT_CPP_NAMESPACE::detail::is_qualified_integral_assignment_operator<Other>  \
+					inline constexpr auto& operator=(const Other other) noexcept {                              \
+						if constexpr (std::is_integral_v<Other>) this->value = static_cast<T>(other);            \
+						else this->value = static_cast<T>(other.value);                                          \
+                                                                                                           \
+						return *this;                                                                            \
+					}                                                                                           \
 			};                                                                                                \
 		}                                                                                                    \
 		STRICT_CPP_DEFINE_FORMATTER(NAME<char>)                                                              \

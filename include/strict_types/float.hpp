@@ -62,17 +62,6 @@ namespace STRICT_CPP_NAMESPACE {
 			inline constexpr explicit strict_float_type(const Other other) noexcept :
 				value(static_cast<Type>(other)) { }
 
-			/// @brief Assignment operator.
-			/// @tparam Other The assignment type.
-			/// @returns strict_float_type&
-			template <typename Other>
-				requires STRICT_CPP_NAMESPACE::detail::is_qualified_float_assignment_operator<Other>
-			inline constexpr strict_float_type& operator=(const Other other) noexcept {
-				if constexpr (std::is_floating_point_v<Other>) this->value = other;
-				else this->value = other.value;
-				return *this;
-			}
-
 			/// @brief Implicit conversion operator.
 			/// @returns Type&
 			inline constexpr operator Type&() noexcept { return this->value; }
@@ -243,9 +232,41 @@ namespace STRICT_CPP_NAMESPACE {
 // =============================================================================
 
 //	Defines a strict float-only type.
+#define STRICT_CPP_DEFINE_FLOAT_TYPE(NAME, TYPE, QUALIFIED_TYPES...)                                  \
+	namespace STRICT_CPP_NAMESPACE {                                                                   \
+		struct NAME : STRICT_CPP_NAMESPACE::strict_float_type<TYPE, QUALIFIED_TYPES> {                  \
+				using STRICT_CPP_NAMESPACE::strict_float_type<TYPE, QUALIFIED_TYPES>::strict_float_type;  \
+                                                                                                      \
+				template <typename Other>                                                                 \
+					requires STRICT_CPP_NAMESPACE::detail::is_qualified_float_assignment_operator<Other>   \
+				inline constexpr NAME& operator=(const Other other) noexcept {                            \
+					if constexpr (std::is_floating_point_v<Other>) this->value = static_cast<TYPE>(other); \
+					else this->value = static_cast<TYPE>(other.value);                                     \
+					return *this;                                                                          \
+				}                                                                                         \
+		};                                                                                              \
+	}                                                                                                  \
 	STRICT_CPP_DEFINE_FORMATTER(NAME)
 
 //	Defines a strict dynamic float-only type.
+#define STRICT_CPP_DEFINE_DYNAMIC_FLOAT_TYPE(NAME, QUALIFIED_TYPES...)                              \
+	namespace STRICT_CPP_NAMESPACE {                                                                 \
+		template <typename T>                                                                         \
+			requires STRICT_CPP_NAMESPACE::detail::is_qualified_float_type<QUALIFIED_TYPES>            \
+		struct NAME : STRICT_CPP_NAMESPACE::strict_float_type<T, QUALIFIED_TYPES> {                   \
+				using STRICT_CPP_NAMESPACE::strict_float_type<T, QUALIFIED_TYPES>::strict_float_type;   \
+                                                                                                    \
+				template <typename Other>                                                               \
+					requires STRICT_CPP_NAMESPACE::detail::is_qualified_float_assignment_operator<Other> \
+				inline constexpr NAME& operator=(const Other other) noexcept {                          \
+					if constexpr (std::is_floating_point_v<Other>) this->value = static_cast<T>(other);  \
+					else this->value = static_cast<T>(other.value);                                      \
+					return *this;                                                                        \
+				}                                                                                       \
+		};                                                                                            \
+	}                                                                                                \
+	STRICT_CPP_DEFINE_FORMATTER(NAME<float>)                                                         \
+	STRICT_CPP_DEFINE_FORMATTER(NAME<double>)                                                        \
 	STRICT_CPP_DEFINE_FORMATTER(NAME<long double>)
 
 // =============================================================================

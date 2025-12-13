@@ -223,6 +223,7 @@ namespace STRICT_CPP_NAMESPACE {
 		STRICT_CPP_DEFINE_FORMATTER(NAME<long long>)                                                         \
 		STRICT_CPP_DEFINE_FORMATTER(NAME<unsigned long long>)
 #endif
+
 // =============================================================================
 // Pre-defined common types
 // =============================================================================
@@ -305,7 +306,7 @@ STRICT_CPP_DEFINE_INTEGRAL_TYPE(byte_t, std::uint8_t);
 STRICT_CPP_DEFINE_INTEGRAL_TYPE(sbyte_t, std::int8_t);
 
 // =============================================================================
-// Dynamic "any" integral types
+// Pre-defined common dynamic types
 // =============================================================================
 
 // integers
@@ -531,7 +532,10 @@ STRICT_CPP_DEFINE_DYNAMIC_INTEGRAL_TYPE(
 	STRICT_CPP_NAMESPACE::sbyte_t
 );
 
-// Optional integral types:
+// =============================================================================
+// Optional types
+// =============================================================================
+
 #if defined(STRICT_CPP_OPTIONAL_TYPES)
 	#define STRICT_CPP_DEFINE_OPTIONAL_TYPE_UNSIGNED(NAME)         \
 		STRICT_CPP_DEFINE_INTEGRAL_TYPE(NAME##_t, std::size_t);     \

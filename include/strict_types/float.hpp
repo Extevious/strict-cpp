@@ -270,17 +270,19 @@ namespace STRICT_CPP_NAMESPACE {
 	STRICT_CPP_DEFINE_FORMATTER(NAME<long double>)
 
 // =============================================================================
-// Pre-defined types
+// Pre-defined common types
 // =============================================================================
 
-// Common floating-point types:
 STRICT_CPP_DEFINE_FLOAT_TYPE(float_t, float);
 STRICT_CPP_DEFINE_FLOAT_TYPE(double_t, double);
 STRICT_CPP_DEFINE_FLOAT_TYPE(long_double_t, long double);
 STRICT_CPP_DEFINE_FLOAT_TYPE(float32_t, std::float_t);
 STRICT_CPP_DEFINE_FLOAT_TYPE(float64_t, std::double_t);
 
-// Dynamic "any" float types:
+// =============================================================================
+// Pre-defined common dynamic types
+// =============================================================================
+
 STRICT_CPP_DEFINE_DYNAMIC_FLOAT_TYPE(
 	any_float_t,
 	float,

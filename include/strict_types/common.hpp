@@ -18,7 +18,7 @@
 			|------------------------------------------------------------------------------------------------------------------------------|
 */
 
-namespace STRICT_CPP_NAMESPACE {
+namespace STRICT_TYPES_NAMESPACE {
 	namespace detail {
 		/// @brief Base type for integral or float type qualifications.
 		struct strict_cpp_base_t { };
@@ -27,9 +27,9 @@ namespace STRICT_CPP_NAMESPACE {
 		struct strict_cpp_alias_base_t { };
 
 		/// @brief Base type for integral-only type qualifications.
-		struct strict_cpp_integral_base_t : STRICT_CPP_NAMESPACE::detail::strict_cpp_base_t { };
+		struct strict_cpp_integral_base_t : STRICT_TYPES_NAMESPACE::detail::strict_cpp_base_t { };
 
 		/// @brief Base type for float-only type qualifications.
-		struct strict_cpp_float_base_t : STRICT_CPP_NAMESPACE::detail::strict_cpp_base_t { };
+		struct strict_cpp_float_base_t : STRICT_TYPES_NAMESPACE::detail::strict_cpp_base_t { };
 	}
 }

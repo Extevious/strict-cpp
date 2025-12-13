@@ -1,5 +1,5 @@
-#if !defined(STRICT_CPP_OPTIONAL_TYPES)
-	#define STRICT_CPP_OPTIONAL_TYPES
+#if !defined(STRICT_TYPES_OPTIONAL_TYPES)
+	#define STRICT_TYPES_OPTIONAL_TYPES
 #endif
 
 #include "strict_types/float.hpp"
@@ -115,8 +115,8 @@ void integral() {
 	output("=== Integral ===");
 	nl();
 
-	STRICT_CPP_NAMESPACE::size_t lhs = 10ULL;
-	STRICT_CPP_NAMESPACE::size_t rhs = 5ULL;
+	STRICT_TYPES_NAMESPACE::size_t lhs = 10ULL;
+	STRICT_TYPES_NAMESPACE::size_t rhs = 5ULL;
 
 	output("Initial value of lhs (strict::size_t): ", lhs);
 	output("Initial value of rhs (strict::size_t): ", rhs);
@@ -138,27 +138,27 @@ void integral() {
 
 	output("strict::size_t as long: ", static_cast<long>(lhs));
 	output("strict::size_t as int: ", static_cast<int>(lhs));
-	output("strict::size_t as strict::count_t: ", static_cast<STRICT_CPP_NAMESPACE::count32_t>(lhs));
+	output("strict::size_t as strict::count_t: ", static_cast<STRICT_TYPES_NAMESPACE::count32_t>(lhs));
 	output("strict::size_t as double: ", static_cast<double>(lhs));
-	output("strict::size_t as strict::float_t ", static_cast<STRICT_CPP_NAMESPACE::float_t>(lhs));
+	output("strict::size_t as strict::float_t ", static_cast<STRICT_TYPES_NAMESPACE::float_t>(lhs));
 	output("strict::size_t as std::size_t&: ", static_cast<std::size_t&>(lhs));
 	nl();
 
 	output("Conversion operators (c-style cast):");
 	output("strict::size_t as long: ", (long)(lhs));
 	output("strict::size_t as int: ", (int)(lhs));
-	output("strict::size_t as strict::count_t: ", (STRICT_CPP_NAMESPACE::count32_t)(lhs));
+	output("strict::size_t as strict::count_t: ", (STRICT_TYPES_NAMESPACE::count32_t)(lhs));
 	output("strict::size_t as double: ", (double)(lhs));
-	output("strict::size_t as strict::float_t ", (STRICT_CPP_NAMESPACE::float_t)(lhs));
+	output("strict::size_t as strict::float_t ", (STRICT_TYPES_NAMESPACE::float_t)(lhs));
 	output("strict::size_t as std::size_t&: ", (std::size_t&)lhs);
 	nl();
 
 	output("Conversion functions (.as<T>()):");
 	output("strict::size_t as long: ", lhs.as<long>());
 	output("strict::size_t as int: ", lhs.as<int>());
-	output("strict::size_t as strict::count_t: ", lhs.as<STRICT_CPP_NAMESPACE::count32_t>());
+	output("strict::size_t as strict::count_t: ", lhs.as<STRICT_TYPES_NAMESPACE::count32_t>());
 	output("strict::size_t as double: ", lhs.as<double>());
-	output("strict::size_t as strict::float_t: ", lhs.as<STRICT_CPP_NAMESPACE::float_t>());
+	output("strict::size_t as strict::float_t: ", lhs.as<STRICT_TYPES_NAMESPACE::float_t>());
 	output("strict::size_t as std::size_t&: ", lhs.as<std::size_t&>());
 	nl();
 
@@ -169,8 +169,8 @@ void floating_point() {
 	output("=== Floats ===");
 	nl();
 
-	STRICT_CPP_NAMESPACE::float_t lhs = 10.0f;
-	STRICT_CPP_NAMESPACE::float_t rhs = 5.0f;
+	STRICT_TYPES_NAMESPACE::float_t lhs = 10.0f;
+	STRICT_TYPES_NAMESPACE::float_t rhs = 5.0f;
 
 	output("Initial value of lhs (strict::float_t): ", lhs);
 	output("Initial value of rhs (strict::float_t): ", rhs);
@@ -190,7 +190,7 @@ void floating_point() {
 
 	output("strict::float_t as long: ", static_cast<long>(lhs));
 	output("strict::float_t as int: ", static_cast<int>(lhs));
-	output("strict::float_t as strict::count_t: ", static_cast<STRICT_CPP_NAMESPACE::count32_t>(lhs));
+	output("strict::float_t as strict::count_t: ", static_cast<STRICT_TYPES_NAMESPACE::count32_t>(lhs));
 	output("strict::float_t as double: ", static_cast<double>(lhs));
 	output("strict::float_t as float&: ", static_cast<float&>(lhs));
 	nl();
@@ -199,7 +199,7 @@ void floating_point() {
 
 	output("strict::float_t as long: ", (long)(lhs));
 	output("strict::float_t as int: ", (int)(lhs));
-	output("strict::float_t as strict::count_t: ", (STRICT_CPP_NAMESPACE::count32_t)(lhs));
+	output("strict::float_t as strict::count_t: ", (STRICT_TYPES_NAMESPACE::count32_t)(lhs));
 	output("strict::float_t as double: ", (double)(lhs));
 	output("strict::float_t as float&: ", (float&)(lhs));
 	nl();
@@ -208,7 +208,7 @@ void floating_point() {
 
 	output("strict::float_t as long: ", lhs.as<long>());
 	output("strict::float_t as int: ", lhs.as<int>());
-	output("strict::float_t as strict::count_t: ", lhs.as<STRICT_CPP_NAMESPACE::count32_t>());
+	output("strict::float_t as strict::count_t: ", lhs.as<STRICT_TYPES_NAMESPACE::count32_t>());
 	output("strict::float_t as double: ", lhs.as<double>());
 	output("strict::float_t as float&: ", lhs.as<float&>());
 	nl();

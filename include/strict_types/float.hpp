@@ -22,13 +22,13 @@
 		The encapsulated type must be a floating-point type.
 */
 
-namespace STRICT_CPP_NAMESPACE {
+namespace STRICT_TYPES_NAMESPACE {
 	/// @brief Strictly-typed float-only encapsulation struct.
 	/// @tparam Type The encapsulated type.
 	/// @tparam QualifiedTypes A range of qualified types suitable for implicit construction.
 	template <typename Type, typename... QualifiedTypes>
-		requires STRICT_CPP_NAMESPACE::detail::is_qualified_float_type<Type, QualifiedTypes...>
-	struct strict_float_type : STRICT_CPP_NAMESPACE::detail::strict_cpp_float_base_t {
+		requires STRICT_TYPES_NAMESPACE::detail::is_qualified_float_type<Type, QualifiedTypes...>
+	struct strict_float_type : STRICT_TYPES_NAMESPACE::detail::strict_cpp_float_base_t {
 			inline static constexpr Type min					  = std::numeric_limits<Type>::min();
 			inline static constexpr Type max					  = std::numeric_limits<Type>::max();
 			inline static constexpr Type lowest				  = std::numeric_limits<Type>::lowest();
@@ -50,7 +50,7 @@ namespace STRICT_CPP_NAMESPACE {
 			/// @tparam Other The implicitly-convertible type.
 			/// @param other The implicitly-convertible value.
 			template <typename Other>
-				requires STRICT_CPP_NAMESPACE::detail::is_qualified_implicit_constructor<Other, Type, QualifiedTypes...>
+				requires STRICT_TYPES_NAMESPACE::detail::is_qualified_implicit_constructor<Other, Type, QualifiedTypes...>
 			inline constexpr strict_float_type(const Other other) noexcept :
 				value(static_cast<Type>(other)) { }
 
@@ -58,7 +58,7 @@ namespace STRICT_CPP_NAMESPACE {
 			/// @tparam Other The explicitly-convertible type.
 			/// @param other The explicitly-convertible value.
 			template <typename Other>
-				requires STRICT_CPP_NAMESPACE::detail::is_qualified_explicit_constructor<Other, Type>
+				requires STRICT_TYPES_NAMESPACE::detail::is_qualified_explicit_constructor<Other, Type>
 			inline constexpr explicit strict_float_type(const Other other) noexcept :
 				value(static_cast<Type>(other)) { }
 
@@ -74,7 +74,7 @@ namespace STRICT_CPP_NAMESPACE {
 			/// @tparam Other The type to convert to.
 			/// @returns Other
 			template <typename Other>
-				requires STRICT_CPP_NAMESPACE::detail::is_qualified_explicit_conversion_operator<Type, Other>
+				requires STRICT_TYPES_NAMESPACE::detail::is_qualified_explicit_conversion_operator<Type, Other>
 			[[nodiscard]] inline constexpr explicit operator Other() noexcept {
 				return static_cast<Other>(this->value);
 			}
@@ -83,7 +83,7 @@ namespace STRICT_CPP_NAMESPACE {
 			/// @tparam Other The type to convert to.
 			/// @returns Other
 			template <typename Other>
-				requires STRICT_CPP_NAMESPACE::detail::is_qualified_explicit_conversion_operator<Type, Other>
+				requires STRICT_TYPES_NAMESPACE::detail::is_qualified_explicit_conversion_operator<Type, Other>
 			[[nodiscard]] inline constexpr explicit operator const Other() const noexcept {
 				return static_cast<const Other>(this->value);
 			}
@@ -92,7 +92,7 @@ namespace STRICT_CPP_NAMESPACE {
 			/// @tparam Other The type to convert to.
 			/// @returns Other
 			template <typename Other>
-				requires STRICT_CPP_NAMESPACE::detail::is_qualified_conversion_function<Type, Other>
+				requires STRICT_TYPES_NAMESPACE::detail::is_qualified_conversion_function<Type, Other>
 			[[nodiscard]] inline constexpr Other as() noexcept {
 				return static_cast<Other>(this->value);
 			}
@@ -101,7 +101,7 @@ namespace STRICT_CPP_NAMESPACE {
 			/// @tparam Other The type to convert to.
 			/// @returns const Other
 			template <typename Other>
-				requires STRICT_CPP_NAMESPACE::detail::is_qualified_conversion_function<Type, Other>
+				requires STRICT_TYPES_NAMESPACE::detail::is_qualified_conversion_function<Type, Other>
 			[[nodiscard]] inline constexpr const Other as() const noexcept {
 				return static_cast<const Other>(this->value);
 			}
@@ -109,13 +109,13 @@ namespace STRICT_CPP_NAMESPACE {
 			/// @brief Converts to a human-readable string representing the current value.
 			/// @returns std::string
 			template <typename _ = void>
-				requires STRICT_CPP_NAMESPACE::detail::can_convert_to_string_function<Type>
+				requires STRICT_TYPES_NAMESPACE::detail::can_convert_to_string_function<Type>
 			[[nodiscard]] inline std::string to_string() const { return std::to_string(this->value); }
 
 			/// @brief Converts to a human-readable wide string representing the current value.
 			/// @returns std::wstring
 			template <typename _ = void>
-				requires STRICT_CPP_NAMESPACE::detail::can_convert_to_wstring_function<Type>
+				requires STRICT_TYPES_NAMESPACE::detail::can_convert_to_wstring_function<Type>
 			[[nodiscard]] inline std::wstring to_wstring() const { return std::to_wstring(this->value); }
 	};
 
@@ -128,7 +128,7 @@ namespace STRICT_CPP_NAMESPACE {
 	/// @tparam Right Right-most strict floating-point type.
 	/// @returns Left
 	template <typename Left, typename Right>
-		requires STRICT_CPP_NAMESPACE::detail::is_qualified_float_operator<Left, Right>
+		requires STRICT_TYPES_NAMESPACE::detail::is_qualified_float_operator<Left, Right>
 	[[nodiscard]] inline static constexpr Left operator%(const Left left, const Right right) noexcept {
 #if __cplusplus >= 202203L
 		return static_cast<Left>(std::fmod(left.value, right.value));
@@ -143,7 +143,7 @@ namespace STRICT_CPP_NAMESPACE {
 	/// @tparam Right Right-most non-strict floating-point type.
 	/// @returns Left
 	template <typename Left, typename Right>
-		requires STRICT_CPP_NAMESPACE::detail::is_qualified_float_operator_left_only<Left, Right>
+		requires STRICT_TYPES_NAMESPACE::detail::is_qualified_float_operator_left_only<Left, Right>
 	[[nodiscard]] inline static constexpr Left operator%(const Left left, const Right right) noexcept {
 #if __cplusplus >= 202203L
 		return static_cast<Left>(std::fmod(left.value, right));
@@ -158,7 +158,7 @@ namespace STRICT_CPP_NAMESPACE {
 	/// @tparam Right Right-most strict floating-point type.
 	/// @returns Left
 	template <typename Left, typename Right>
-		requires STRICT_CPP_NAMESPACE::detail::is_qualified_float_operator_right_only<Left, Right>
+		requires STRICT_TYPES_NAMESPACE::detail::is_qualified_float_operator_right_only<Left, Right>
 	[[nodiscard]] inline static constexpr Left operator%(const Left left, const Right right) noexcept {
 #if __cplusplus >= 202203L
 		return static_cast<Left>(std::fmod(left, right.value));
@@ -173,7 +173,7 @@ namespace STRICT_CPP_NAMESPACE {
 	/// @tparam Right Right-most strict floating-point type.
 	/// @returns Left&
 	template <typename Left, typename Right>
-		requires STRICT_CPP_NAMESPACE::detail::is_qualified_float_operator<Left, Right>
+		requires STRICT_TYPES_NAMESPACE::detail::is_qualified_float_operator<Left, Right>
 	inline static constexpr Left& operator%=(Left& left, const Right right) noexcept {
 #if __cplusplus >= 202203L
 		left.value = static_cast<typename Left::type>(std::fmod(left.value, right.value));
@@ -190,7 +190,7 @@ namespace STRICT_CPP_NAMESPACE {
 	/// @tparam Right Right-most non-strict floating-point type.
 	/// @returns Left&
 	template <typename Left, typename Right>
-		requires STRICT_CPP_NAMESPACE::detail::is_qualified_float_operator_left_only<Left, Right>
+		requires STRICT_TYPES_NAMESPACE::detail::is_qualified_float_operator_left_only<Left, Right>
 	inline static constexpr Left& operator%=(Left& left, const Right right) noexcept {
 #if __cplusplus >= 202203L
 		left.value = static_cast<typename Left::type>(std::fmod(left.value, right));
@@ -207,7 +207,7 @@ namespace STRICT_CPP_NAMESPACE {
 	/// @tparam Right Right-most strict floating-point type.
 	/// @returns Left&
 	template <typename Left, typename Right>
-		requires STRICT_CPP_NAMESPACE::detail::is_qualified_float_operator_right_only<Left, Right>
+		requires STRICT_TYPES_NAMESPACE::detail::is_qualified_float_operator_right_only<Left, Right>
 	inline static constexpr Left& operator%=(Left& left, const Right right) noexcept {
 #if __cplusplus >= 202203L
 		left = static_cast<typename Left::type>(std::fmod(left, right.value));
@@ -219,12 +219,12 @@ namespace STRICT_CPP_NAMESPACE {
 		return left;
 	}
 
-	STRICT_CPP_DEFINE_UNARY_INCR_DECR_OPERATORS(float)
+	STRICT_TYPES_DEFINE_UNARY_INCR_DECR_OPERATORS(float)
 
-	STRICT_CPP_DEFINE_ARITHMETIC_OPERATORS(+, float)
-	STRICT_CPP_DEFINE_ARITHMETIC_OPERATORS(-, float)
-	STRICT_CPP_DEFINE_ARITHMETIC_OPERATORS(*, float)
-	STRICT_CPP_DEFINE_ARITHMETIC_OPERATORS(/, float)
+	STRICT_TYPES_DEFINE_ARITHMETIC_OPERATORS(+, float)
+	STRICT_TYPES_DEFINE_ARITHMETIC_OPERATORS(-, float)
+	STRICT_TYPES_DEFINE_ARITHMETIC_OPERATORS(*, float)
+	STRICT_TYPES_DEFINE_ARITHMETIC_OPERATORS(/, float)
 }
 
 // =============================================================================
@@ -232,81 +232,81 @@ namespace STRICT_CPP_NAMESPACE {
 // =============================================================================
 
 //	Defines a strict float-only type.
-#define STRICT_CPP_DEFINE_FLOAT_TYPE(NAME, TYPE, QUALIFIED_TYPES...)                                  \
-	namespace STRICT_CPP_NAMESPACE {                                                                   \
-		struct NAME : STRICT_CPP_NAMESPACE::strict_float_type<TYPE, QUALIFIED_TYPES> {                  \
-				using STRICT_CPP_NAMESPACE::strict_float_type<TYPE, QUALIFIED_TYPES>::strict_float_type;  \
+#define STRICT_TYPES_DEFINE_FLOAT_TYPE(NAME, TYPE, QUALIFIED_TYPES...)                                 \
+	namespace STRICT_TYPES_NAMESPACE {                                                                  \
+		struct NAME : STRICT_TYPES_NAMESPACE::strict_float_type<TYPE, QUALIFIED_TYPES> {                 \
+				using STRICT_TYPES_NAMESPACE::strict_float_type<TYPE, QUALIFIED_TYPES>::strict_float_type; \
+                                                                                                       \
+				template <typename Other>                                                                  \
+					requires STRICT_TYPES_NAMESPACE::detail::is_qualified_float_assignment_operator<Other>  \
+				inline constexpr NAME& operator=(const Other other) noexcept {                             \
+					if constexpr (std::is_floating_point_v<Other>) this->value = static_cast<TYPE>(other);  \
+					else this->value = static_cast<TYPE>(other.value);                                      \
+					return *this;                                                                           \
+				}                                                                                          \
+		};                                                                                               \
+	}                                                                                                   \
+	STRICT_TYPES_DEFINE_FORMATTER(NAME)
+
+//	Defines a strict dynamic float-only type.
+#define STRICT_TYPES_DEFINE_DYNAMIC_FLOAT_TYPE(NAME, QUALIFIED_TYPES...)                              \
+	namespace STRICT_TYPES_NAMESPACE {                                                                 \
+		template <typename T>                                                                           \
+			requires STRICT_TYPES_NAMESPACE::detail::is_qualified_float_type<QUALIFIED_TYPES>            \
+		struct NAME : STRICT_TYPES_NAMESPACE::strict_float_type<T, QUALIFIED_TYPES> {                   \
+				using STRICT_TYPES_NAMESPACE::strict_float_type<T, QUALIFIED_TYPES>::strict_float_type;   \
                                                                                                       \
 				template <typename Other>                                                                 \
-					requires STRICT_CPP_NAMESPACE::detail::is_qualified_float_assignment_operator<Other>   \
+					requires STRICT_TYPES_NAMESPACE::detail::is_qualified_float_assignment_operator<Other> \
 				inline constexpr NAME& operator=(const Other other) noexcept {                            \
-					if constexpr (std::is_floating_point_v<Other>) this->value = static_cast<TYPE>(other); \
-					else this->value = static_cast<TYPE>(other.value);                                     \
+					if constexpr (std::is_floating_point_v<Other>) this->value = static_cast<T>(other);    \
+					else this->value = static_cast<T>(other.value);                                        \
 					return *this;                                                                          \
 				}                                                                                         \
 		};                                                                                              \
 	}                                                                                                  \
-	STRICT_CPP_DEFINE_FORMATTER(NAME)
-
-//	Defines a strict dynamic float-only type.
-#define STRICT_CPP_DEFINE_DYNAMIC_FLOAT_TYPE(NAME, QUALIFIED_TYPES...)                              \
-	namespace STRICT_CPP_NAMESPACE {                                                                 \
-		template <typename T>                                                                         \
-			requires STRICT_CPP_NAMESPACE::detail::is_qualified_float_type<QUALIFIED_TYPES>            \
-		struct NAME : STRICT_CPP_NAMESPACE::strict_float_type<T, QUALIFIED_TYPES> {                   \
-				using STRICT_CPP_NAMESPACE::strict_float_type<T, QUALIFIED_TYPES>::strict_float_type;   \
-                                                                                                    \
-				template <typename Other>                                                               \
-					requires STRICT_CPP_NAMESPACE::detail::is_qualified_float_assignment_operator<Other> \
-				inline constexpr NAME& operator=(const Other other) noexcept {                          \
-					if constexpr (std::is_floating_point_v<Other>) this->value = static_cast<T>(other);  \
-					else this->value = static_cast<T>(other.value);                                      \
-					return *this;                                                                        \
-				}                                                                                       \
-		};                                                                                            \
-	}                                                                                                \
-	STRICT_CPP_DEFINE_FORMATTER(NAME<float>)                                                         \
-	STRICT_CPP_DEFINE_FORMATTER(NAME<double>)                                                        \
-	STRICT_CPP_DEFINE_FORMATTER(NAME<long double>)
+	STRICT_TYPES_DEFINE_FORMATTER(NAME<float>)                                                         \
+	STRICT_TYPES_DEFINE_FORMATTER(NAME<double>)                                                        \
+	STRICT_TYPES_DEFINE_FORMATTER(NAME<long double>)
 
 // =============================================================================
 // Pre-defined common types
 // =============================================================================
 
-STRICT_CPP_DEFINE_FLOAT_TYPE(float_t, float);
-STRICT_CPP_DEFINE_FLOAT_TYPE(double_t, double);
-STRICT_CPP_DEFINE_FLOAT_TYPE(long_double_t, long double);
-STRICT_CPP_DEFINE_FLOAT_TYPE(float32_t, std::float_t);
-STRICT_CPP_DEFINE_FLOAT_TYPE(float64_t, std::double_t);
+STRICT_TYPES_DEFINE_FLOAT_TYPE(float_t, float);
+STRICT_TYPES_DEFINE_FLOAT_TYPE(double_t, double);
+STRICT_TYPES_DEFINE_FLOAT_TYPE(long_double_t, long double);
+STRICT_TYPES_DEFINE_FLOAT_TYPE(float32_t, std::float_t);
+STRICT_TYPES_DEFINE_FLOAT_TYPE(float64_t, std::double_t);
 
 // =============================================================================
 // Pre-defined common dynamic types
 // =============================================================================
 
-STRICT_CPP_DEFINE_DYNAMIC_FLOAT_TYPE(
+STRICT_TYPES_DEFINE_DYNAMIC_FLOAT_TYPE(
 	any_float_t,
 	float,
 	double,
 	long double,
-	STRICT_CPP_NAMESPACE::float_t,
-	STRICT_CPP_NAMESPACE::double_t,
-	STRICT_CPP_NAMESPACE::long_double_t,
-	STRICT_CPP_NAMESPACE::float32_t,
-	STRICT_CPP_NAMESPACE::float64_t
+	STRICT_TYPES_NAMESPACE::float_t,
+	STRICT_TYPES_NAMESPACE::double_t,
+	STRICT_TYPES_NAMESPACE::long_double_t,
+	STRICT_TYPES_NAMESPACE::float32_t,
+	STRICT_TYPES_NAMESPACE::float64_t
 );
 
-STRICT_CPP_DEFINE_DYNAMIC_FLOAT_TYPE(
+STRICT_TYPES_DEFINE_DYNAMIC_FLOAT_TYPE(
 	any_float32_t,
 	float,
-	STRICT_CPP_NAMESPACE::float_t,
-	STRICT_CPP_NAMESPACE::float32_t
+	STRICT_TYPES_NAMESPACE::float_t,
+	STRICT_TYPES_NAMESPACE::float32_t
 );
 
-STRICT_CPP_DEFINE_DYNAMIC_FLOAT_TYPE(
+STRICT_TYPES_DEFINE_DYNAMIC_FLOAT_TYPE(
 	any_float64_t,
 	double,
-	STRICT_CPP_NAMESPACE::double_t,
-	STRICT_CPP_NAMESPACE::float64_t
+	STRICT_TYPES_NAMESPACE::double_t,
+	STRICT_TYPES_NAMESPACE::float64_t
 );
 
 #pragma GCC diagnostic push

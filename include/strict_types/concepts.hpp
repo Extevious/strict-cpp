@@ -12,23 +12,23 @@
 		for all types of strict types.
 */
 
-namespace STRICT_CPP_NAMESPACE {
+namespace STRICT_TYPES_NAMESPACE {
 	namespace detail {
 		// Returns true if [Type] inherits from the base class strict_cpp_base_t.
 		template <typename Type>
-		concept is_strict_type = std::is_base_of_v<STRICT_CPP_NAMESPACE::detail::strict_cpp_base_t, Type>;
+		concept is_strict_type = std::is_base_of_v<STRICT_TYPES_NAMESPACE::detail::strict_cpp_base_t, Type>;
 
 		// Returns true if [Type] inherits from the base class strict_cpp_integral_base_t.
 		template <typename Type>
-		concept is_strict_integral_type = std::is_base_of_v<STRICT_CPP_NAMESPACE::detail::strict_cpp_integral_base_t, Type>;
+		concept is_strict_integral_type = std::is_base_of_v<STRICT_TYPES_NAMESPACE::detail::strict_cpp_integral_base_t, Type>;
 
 		// Returns true if [Type] inherits from the base class strict_cpp_float_base_t.
 		template <typename Type>
-		concept is_strict_float_type = std::is_base_of_v<STRICT_CPP_NAMESPACE::detail::strict_cpp_float_base_t, Type>;
+		concept is_strict_float_type = std::is_base_of_v<STRICT_TYPES_NAMESPACE::detail::strict_cpp_float_base_t, Type>;
 
 		// Returns true if [Type] inherits from the base class strict_cpp_alias_base_t.
 		template <typename Type>
-		concept is_strict_alias_type = std::is_base_of_v<STRICT_CPP_NAMESPACE::detail::strict_cpp_alias_base_t, Type>;
+		concept is_strict_alias_type = std::is_base_of_v<STRICT_TYPES_NAMESPACE::detail::strict_cpp_alias_base_t, Type>;
 
 		// Returns true if [Other] is the same as one of the [QualifiedTypes], and if [QualifiedTypes] is a non-zero length.
 		template <typename Other, typename... QualifiedTypes>

@@ -8,27 +8,27 @@
 /*
 	concepts.hpp description:
 		This header file contains a wide range of c++20 concepts,
-		hidden inside the "detail" namespace. These concepts are to be used
+		hidden inside the "details" namespace. These concepts are to be used
 		for all types of strict types.
 */
 
 namespace STRICT_TYPES_NAMESPACE {
-	namespace detail {
+	namespace details {
 		// Returns true if [Type] inherits from the base class strict_types_base_t.
 		template <typename Type>
-		concept is_strict_type = std::is_base_of_v<STRICT_TYPES_NAMESPACE::detail::strict_types_base_t, Type>;
+		concept is_strict_type = std::is_base_of_v<STRICT_TYPES_NAMESPACE::details::strict_types_base_t, Type>;
 
 		// Returns true if [Type] inherits from the base class strict_types_integral_base_t.
 		template <typename Type>
-		concept is_strict_integral_type = std::is_base_of_v<STRICT_TYPES_NAMESPACE::detail::strict_types_integral_base_t, Type>;
+		concept is_strict_integral_type = std::is_base_of_v<STRICT_TYPES_NAMESPACE::details::strict_types_integral_base_t, Type>;
 
 		// Returns true if [Type] inherits from the base class strict_types_float_base_t.
 		template <typename Type>
-		concept is_strict_float_type = std::is_base_of_v<STRICT_TYPES_NAMESPACE::detail::strict_types_float_base_t, Type>;
+		concept is_strict_float_type = std::is_base_of_v<STRICT_TYPES_NAMESPACE::details::strict_types_float_base_t, Type>;
 
 		// Returns true if [Type] inherits from the base class strict_types_alias_base_t.
 		template <typename Type>
-		concept is_strict_alias_type = std::is_base_of_v<STRICT_TYPES_NAMESPACE::detail::strict_types_alias_base_t, Type>;
+		concept is_strict_alias_type = std::is_base_of_v<STRICT_TYPES_NAMESPACE::details::strict_types_alias_base_t, Type>;
 
 		// Returns true if [Other] is the same as one of the [QualifiedTypes], and if [QualifiedTypes] is a non-zero length.
 		template <typename Other, typename... QualifiedTypes>

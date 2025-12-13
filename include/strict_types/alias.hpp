@@ -35,7 +35,7 @@ namespace STRICT_TYPES_NAMESPACE {
 	/// @tparam Type The encapsulated type.
 	template <typename Type>
 		requires (sizeof(Type) != 0) && (!std::is_reference_v<Type>)
-	struct strict_alias_type : STRICT_TYPES_NAMESPACE::detail::strict_types_alias_base_t {
+	struct strict_alias_type : STRICT_TYPES_NAMESPACE::details::strict_types_alias_base_t {
 			using type = Type;
 			Type value = {};
 
@@ -71,7 +71,7 @@ namespace STRICT_TYPES_NAMESPACE {
 			template <typename Other>
 				requires std::is_convertible_v<Other, Type>
 			inline constexpr auto& operator=(Other&& other) noexcept(std::is_nothrow_move_assignable_v<Type>) {
-				if constexpr (std::is_base_of_v<Other, STRICT_TYPES_NAMESPACE::detail::strict_types_alias_base_t>) this->value = std::move(other.value);
+				if constexpr (std::is_base_of_v<Other, STRICT_TYPES_NAMESPACE::details::strict_types_alias_base_t>) this->value = std::move(other.value);
 				else this->value = std::move(other);
 
 				return *this;
@@ -84,7 +84,7 @@ namespace STRICT_TYPES_NAMESPACE {
 			template <typename Other>
 				requires std::is_convertible_v<Other, Type>
 			inline constexpr auto& operator=(const Other& other) noexcept(std::is_nothrow_copy_assignable_v<Type>) {
-				if constexpr (std::is_base_of_v<Other, STRICT_TYPES_NAMESPACE::detail::strict_types_alias_base_t>) this->value = other.value;
+				if constexpr (std::is_base_of_v<Other, STRICT_TYPES_NAMESPACE::details::strict_types_alias_base_t>) this->value = other.value;
 				else this->value = other;
 
 				return *this;
@@ -155,32 +155,32 @@ namespace STRICT_TYPES_NAMESPACE {
 			/// @brief rvalue subscript operator.
 			/// @returns auto&
 			template <typename IndexType>
-				requires STRICT_TYPES_NAMESPACE::detail::has_subscript_operator<Type, IndexType>
+				requires STRICT_TYPES_NAMESPACE::details::has_subscript_operator<Type, IndexType>
 			inline constexpr auto& operator[](IndexType&& index) noexcept { return this->value[std::forward<IndexType>(index)]; }
 
 			/// @brief Const rvalue subscript operator.
 			/// @returns const auto&
 			template <typename IndexType>
-				requires STRICT_TYPES_NAMESPACE::detail::has_subscript_operator<Type, IndexType>
+				requires STRICT_TYPES_NAMESPACE::details::has_subscript_operator<Type, IndexType>
 			inline constexpr const auto& operator[](IndexType&& index) const noexcept { return this->value[std::forward<IndexType>(index)]; }
 
 			/// @brief lvalue subscript operator.
 			/// @returns auto&
 			template <typename IndexType>
-				requires STRICT_TYPES_NAMESPACE::detail::has_subscript_operator<Type, IndexType>
+				requires STRICT_TYPES_NAMESPACE::details::has_subscript_operator<Type, IndexType>
 			inline constexpr auto& operator[](const IndexType& index) noexcept { return this->value[index]; }
 
 			/// @brief Const lvalue subscript operator.
 			/// @returns const auto&
 			template <typename IndexType>
-				requires STRICT_TYPES_NAMESPACE::detail::has_subscript_operator<Type, IndexType>
+				requires STRICT_TYPES_NAMESPACE::details::has_subscript_operator<Type, IndexType>
 			inline constexpr const auto& operator[](const IndexType& index) const noexcept { return this->value[index]; }
 
 			/// @brief Conversion function.
 			/// @tparam Other The type to convert to.
 			/// @returns Other
 			template <typename Other>
-				requires STRICT_TYPES_NAMESPACE::detail::is_qualified_conversion_function<Type, Other>
+				requires STRICT_TYPES_NAMESPACE::details::is_qualified_conversion_function<Type, Other>
 			inline constexpr Other as() noexcept {
 				return static_cast<Other>(this->value);
 			}
@@ -189,7 +189,7 @@ namespace STRICT_TYPES_NAMESPACE {
 			/// @tparam Other The type to convert to.
 			/// @returns Other
 			template <typename Other>
-				requires STRICT_TYPES_NAMESPACE::detail::is_qualified_conversion_function<Type, Other>
+				requires STRICT_TYPES_NAMESPACE::details::is_qualified_conversion_function<Type, Other>
 			inline constexpr Other as() const noexcept {
 				return static_cast<const Other>(this->value);
 			}
@@ -197,136 +197,136 @@ namespace STRICT_TYPES_NAMESPACE {
 			// Note: some of the below functions may be unecessary, but for now they will stay.
 
 			template <typename _ = void>
-				requires STRICT_TYPES_NAMESPACE::detail::has_data_function<Type>
+				requires STRICT_TYPES_NAMESPACE::details::has_data_function<Type>
 			inline constexpr auto data() noexcept { return this->value.data(); }
 
 			template <typename _ = void>
-				requires STRICT_TYPES_NAMESPACE::detail::has_data_function<Type>
+				requires STRICT_TYPES_NAMESPACE::details::has_data_function<Type>
 			inline constexpr auto data() const noexcept { return this->value.data(); }
 
 			template <typename _ = void>
-				requires STRICT_TYPES_NAMESPACE::detail::has_begin_function<Type>
+				requires STRICT_TYPES_NAMESPACE::details::has_begin_function<Type>
 			inline constexpr auto begin() noexcept { return this->value.begin(); }
 
 			template <typename _ = void>
-				requires STRICT_TYPES_NAMESPACE::detail::has_begin_function<Type>
+				requires STRICT_TYPES_NAMESPACE::details::has_begin_function<Type>
 			inline constexpr auto begin() const noexcept { return this->value.begin(); }
 
 			template <typename _ = void>
-				requires STRICT_TYPES_NAMESPACE::detail::has_end_function<Type>
+				requires STRICT_TYPES_NAMESPACE::details::has_end_function<Type>
 			inline constexpr auto end() noexcept { return this->value.end(); }
 
 			template <typename _ = void>
-				requires STRICT_TYPES_NAMESPACE::detail::has_end_function<Type>
+				requires STRICT_TYPES_NAMESPACE::details::has_end_function<Type>
 			inline constexpr auto end() const noexcept { return this->value.end(); }
 
 			template <typename _ = void>
-				requires STRICT_TYPES_NAMESPACE::detail::has_rbegin_function<Type>
+				requires STRICT_TYPES_NAMESPACE::details::has_rbegin_function<Type>
 			inline constexpr auto rbegin() noexcept { return this->value.rbegin(); }
 
 			template <typename _ = void>
-				requires STRICT_TYPES_NAMESPACE::detail::has_rbegin_function<Type>
+				requires STRICT_TYPES_NAMESPACE::details::has_rbegin_function<Type>
 			inline constexpr auto rbegin() const noexcept { return this->value.rbegin(); }
 
 			template <typename _ = void>
-				requires STRICT_TYPES_NAMESPACE::detail::has_rend_function<Type>
+				requires STRICT_TYPES_NAMESPACE::details::has_rend_function<Type>
 			inline constexpr auto rend() noexcept { return this->value.rend(); }
 
 			template <typename _ = void>
-				requires STRICT_TYPES_NAMESPACE::detail::has_rend_function<Type>
+				requires STRICT_TYPES_NAMESPACE::details::has_rend_function<Type>
 			inline constexpr auto rend() const noexcept { return this->value.rend(); }
 
 			template <typename _ = void>
-				requires STRICT_TYPES_NAMESPACE::detail::has_cbegin_function<Type>
+				requires STRICT_TYPES_NAMESPACE::details::has_cbegin_function<Type>
 			inline constexpr auto cbegin() const noexcept { return this->value.cbegin(); }
 
 			template <typename _ = void>
-				requires STRICT_TYPES_NAMESPACE::detail::has_cend_function<Type>
+				requires STRICT_TYPES_NAMESPACE::details::has_cend_function<Type>
 			inline constexpr auto cend() const noexcept { return this->value.cend(); }
 
 			template <typename _ = void>
-				requires STRICT_TYPES_NAMESPACE::detail::has_crbegin_function<Type>
+				requires STRICT_TYPES_NAMESPACE::details::has_crbegin_function<Type>
 			inline constexpr auto crbegin() const noexcept { return this->value.crbegin(); }
 
 			template <typename _ = void>
-				requires STRICT_TYPES_NAMESPACE::detail::has_crend_function<Type>
+				requires STRICT_TYPES_NAMESPACE::details::has_crend_function<Type>
 			inline constexpr auto crend() const noexcept { return this->value.crend(); }
 
 			template <typename _ = void>
-				requires STRICT_TYPES_NAMESPACE::detail::has_Unchecked_begin_function<Type>
+				requires STRICT_TYPES_NAMESPACE::details::has_Unchecked_begin_function<Type>
 			inline constexpr auto _Unchecked_begin() noexcept { return this->value._Unchecked_begin(); }
 
 			template <typename _ = void>
-				requires STRICT_TYPES_NAMESPACE::detail::has_Unchecked_begin_function<Type>
+				requires STRICT_TYPES_NAMESPACE::details::has_Unchecked_begin_function<Type>
 			inline constexpr auto _Unchecked_begin() const noexcept { return this->value._Unchecked_begin(); }
 
 			template <typename _ = void>
-				requires STRICT_TYPES_NAMESPACE::detail::has_Unchecked_end_function<Type>
+				requires STRICT_TYPES_NAMESPACE::details::has_Unchecked_end_function<Type>
 			inline constexpr auto _Unchecked_end() noexcept { return this->value._Unchecked_end(); }
 
 			template <typename _ = void>
-				requires STRICT_TYPES_NAMESPACE::detail::has_Unchecked_end_function<Type>
+				requires STRICT_TYPES_NAMESPACE::details::has_Unchecked_end_function<Type>
 			inline constexpr auto _Unchecked_end() const noexcept { return this->value._Unchecked_end(); }
 
 			template <typename _ = void>
-				requires STRICT_TYPES_NAMESPACE::detail::has_empty_function<Type>
+				requires STRICT_TYPES_NAMESPACE::details::has_empty_function<Type>
 			inline constexpr auto empty() const noexcept { return this->value.empty(); }
 
 			template <typename _ = void>
-				requires STRICT_TYPES_NAMESPACE::detail::has_size_function<Type>
+				requires STRICT_TYPES_NAMESPACE::details::has_size_function<Type>
 			inline constexpr auto size() const noexcept { return this->value.size(); }
 
 			template <typename _ = void>
-				requires STRICT_TYPES_NAMESPACE::detail::has_max_size_function<Type>
+				requires STRICT_TYPES_NAMESPACE::details::has_max_size_function<Type>
 			inline constexpr auto max_size() const noexcept { return this->value.max_size(); }
 
 			template <typename _ = void>
-				requires STRICT_TYPES_NAMESPACE::detail::has_capacity_function<Type>
+				requires STRICT_TYPES_NAMESPACE::details::has_capacity_function<Type>
 			inline constexpr auto capacity() const noexcept { return this->value.capacity(); }
 
 			template <typename _ = void>
-				requires STRICT_TYPES_NAMESPACE::detail::has_front_function<Type>
+				requires STRICT_TYPES_NAMESPACE::details::has_front_function<Type>
 			inline constexpr auto front() noexcept { return this->value.front(); }
 
 			template <typename _ = void>
-				requires STRICT_TYPES_NAMESPACE::detail::has_front_function<Type>
+				requires STRICT_TYPES_NAMESPACE::details::has_front_function<Type>
 			inline constexpr auto front() const noexcept { return this->value.front(); }
 
 			template <typename _ = void>
-				requires STRICT_TYPES_NAMESPACE::detail::has_back_function<Type>
+				requires STRICT_TYPES_NAMESPACE::details::has_back_function<Type>
 			inline constexpr auto back() noexcept { return this->value.back(); }
 
 			template <typename _ = void>
-				requires STRICT_TYPES_NAMESPACE::detail::has_back_function<Type>
+				requires STRICT_TYPES_NAMESPACE::details::has_back_function<Type>
 			inline constexpr auto back() const noexcept { return this->value.back(); }
 
 			template <typename _ = void>
-				requires STRICT_TYPES_NAMESPACE::detail::has_get_allocator_function<Type>
+				requires STRICT_TYPES_NAMESPACE::details::has_get_allocator_function<Type>
 			inline constexpr auto get_allocator() const noexcept { return this->value.get_allocator(); }
 
 		protected:
 			template <typename _ = void>
-				requires STRICT_TYPES_NAMESPACE::detail::can_stringify<Type>
+				requires STRICT_TYPES_NAMESPACE::details::can_stringify<Type>
 			inline std::string m_get_string_internal() const noexcept {
-				if constexpr (STRICT_TYPES_NAMESPACE::detail::can_convert_to_string<Type>) return static_cast<std::string>(this->value);
+				if constexpr (STRICT_TYPES_NAMESPACE::details::can_convert_to_string<Type>) return static_cast<std::string>(this->value);
 				else return std::to_string(this->value);
 			}
 
 			template <typename _ = void>
-				requires STRICT_TYPES_NAMESPACE::detail::can_wstringify<Type>
+				requires STRICT_TYPES_NAMESPACE::details::can_wstringify<Type>
 			inline std::wstring m_get_wstring_internal() const noexcept {
-				if constexpr (STRICT_TYPES_NAMESPACE::detail::can_convert_to_wstring<Type>) return static_cast<std::wstring>(this->value);
+				if constexpr (STRICT_TYPES_NAMESPACE::details::can_convert_to_wstring<Type>) return static_cast<std::wstring>(this->value);
 				else return std::to_wstring(this->value);
 			}
 
 			template <typename _ = void>
-				requires (!STRICT_TYPES_NAMESPACE::detail::can_stringify<Type>)
+				requires (!STRICT_TYPES_NAMESPACE::details::can_stringify<Type>)
 			inline std::string m_get_string_internal() const noexcept {
 				return "";
 			}
 
 			template <typename _ = void>
-				requires (!STRICT_TYPES_NAMESPACE::detail::can_wstringify<Type>)
+				requires (!STRICT_TYPES_NAMESPACE::details::can_wstringify<Type>)
 			inline std::wstring m_get_wstring_internal() const noexcept {
 				return L"";
 			}
@@ -347,25 +347,25 @@ namespace STRICT_TYPES_NAMESPACE {
 				using STRICT_TYPES_NAMESPACE::strict_alias_type<TYPE>::operator[];                                                                                                             \
                                                                                                                                                                                            \
 				template <typename _ = void>                                                                                                                                                   \
-					requires STRICT_TYPES_NAMESPACE::detail::can_stringify<TYPE>                                                                                                                \
+					requires STRICT_TYPES_NAMESPACE::details::can_stringify<TYPE>                                                                                                               \
 				inline std::string to_string() const noexcept {                                                                                                                                \
 					return this->m_get_string_internal();                                                                                                                                       \
 				}                                                                                                                                                                              \
                                                                                                                                                                                            \
 				template <typename _ = void>                                                                                                                                                   \
-					requires STRICT_TYPES_NAMESPACE::detail::can_wstringify<TYPE>                                                                                                               \
+					requires STRICT_TYPES_NAMESPACE::details::can_wstringify<TYPE>                                                                                                              \
 				inline std::wstring to_wstring() const noexcept {                                                                                                                              \
 					return this->m_get_wstring_internal();                                                                                                                                      \
 				}                                                                                                                                                                              \
                                                                                                                                                                                            \
 				template <typename _ = void>                                                                                                                                                   \
-					requires (!STRICT_TYPES_NAMESPACE::detail::can_stringify<TYPE>)                                                                                                             \
+					requires (!STRICT_TYPES_NAMESPACE::details::can_stringify<TYPE>)                                                                                                            \
 				inline std::string to_string() const noexcept {                                                                                                                                \
 					return "strict::" #NAME;                                                                                                                                                    \
 				}                                                                                                                                                                              \
                                                                                                                                                                                            \
 				template <typename _ = void>                                                                                                                                                   \
-					requires (!STRICT_TYPES_NAMESPACE::detail::can_wstringify<TYPE>)                                                                                                            \
+					requires (!STRICT_TYPES_NAMESPACE::details::can_wstringify<TYPE>)                                                                                                           \
 				inline std::wstring to_wstring() const noexcept {                                                                                                                              \
 					return L"strict::" L#NAME;                                                                                                                                                  \
 				}                                                                                                                                                                              \
@@ -394,25 +394,25 @@ namespace STRICT_TYPES_NAMESPACE {
 				using STRICT_TYPES_NAMESPACE::strict_alias_type<TYPE<Args...>>::operator[];                                                                                                             \
                                                                                                                                                                                                     \
 				template <typename _ = void>                                                                                                                                                            \
-					requires STRICT_TYPES_NAMESPACE::detail::can_stringify<TYPE<Args...>>                                                                                                                \
+					requires STRICT_TYPES_NAMESPACE::details::can_stringify<TYPE<Args...>>                                                                                                               \
 				inline std::string to_string() const noexcept {                                                                                                                                         \
 					return this->m_get_string_internal();                                                                                                                                                \
 				}                                                                                                                                                                                       \
                                                                                                                                                                                                     \
 				template <typename _ = void>                                                                                                                                                            \
-					requires STRICT_TYPES_NAMESPACE::detail::can_wstringify<TYPE<Args...>>                                                                                                               \
+					requires STRICT_TYPES_NAMESPACE::details::can_wstringify<TYPE<Args...>>                                                                                                              \
 				inline std::wstring to_wstring() const noexcept {                                                                                                                                       \
 					return this->m_get_wstring_internal();                                                                                                                                               \
 				}                                                                                                                                                                                       \
                                                                                                                                                                                                     \
 				template <typename _ = void>                                                                                                                                                            \
-					requires (!STRICT_TYPES_NAMESPACE::detail::can_wstringify<TYPE<Args...>>)                                                                                                            \
+					requires (!STRICT_TYPES_NAMESPACE::details::can_wstringify<TYPE<Args...>>)                                                                                                           \
 				inline std::string to_string() const noexcept {                                                                                                                                         \
 					return "strict::" #NAME "<" #TYPE "<...>>";                                                                                                                                          \
 				}                                                                                                                                                                                       \
                                                                                                                                                                                                     \
 				template <typename _ = void>                                                                                                                                                            \
-					requires (!STRICT_TYPES_NAMESPACE::detail::can_wstringify<TYPE<Args...>>)                                                                                                            \
+					requires (!STRICT_TYPES_NAMESPACE::details::can_wstringify<TYPE<Args...>>)                                                                                                           \
 				inline std::wstring to_wstring() const noexcept {                                                                                                                                       \
 					return L"strict::" L#NAME L"<" L#TYPE L"<...>>";                                                                                                                                     \
 				}                                                                                                                                                                                       \

@@ -28,8 +28,8 @@ namespace STRICT_TYPES_NAMESPACE {
 	/// @tparam Type The encapsulated type.
 	/// @tparam QualifiedTypes A range of qualified types suitable for implicit construction.
 	template <typename Type, typename... QualifiedTypes>
-		requires STRICT_TYPES_NAMESPACE::detail::is_qualified_integral_type<Type, QualifiedTypes...>
-	struct strict_integral_type : STRICT_TYPES_NAMESPACE::detail::strict_types_integral_base_t {
+		requires STRICT_TYPES_NAMESPACE::details::is_qualified_integral_type<Type, QualifiedTypes...>
+	struct strict_integral_type : STRICT_TYPES_NAMESPACE::details::strict_types_integral_base_t {
 			inline constexpr static Type min = std::numeric_limits<Type>::min();
 			inline constexpr static Type max = std::numeric_limits<Type>::max();
 
@@ -43,7 +43,7 @@ namespace STRICT_TYPES_NAMESPACE {
 			/// @tparam Other The implicitly-convertible type.
 			/// @param other The implicitly-convertible value.
 			template <typename Other>
-				requires STRICT_TYPES_NAMESPACE::detail::is_qualified_implicit_constructor<Other, Type, QualifiedTypes...>
+				requires STRICT_TYPES_NAMESPACE::details::is_qualified_implicit_constructor<Other, Type, QualifiedTypes...>
 			inline constexpr strict_integral_type(const Other other) noexcept :
 				value(static_cast<Type>(other)) { }
 
@@ -51,7 +51,7 @@ namespace STRICT_TYPES_NAMESPACE {
 			/// @tparam Other The explicitly-convertible type.
 			/// @param other The explicitly-convertible value.
 			template <typename Other>
-				requires STRICT_TYPES_NAMESPACE::detail::is_qualified_explicit_constructor<Other, Type>
+				requires STRICT_TYPES_NAMESPACE::details::is_qualified_explicit_constructor<Other, Type>
 			inline constexpr explicit strict_integral_type(const Other other) noexcept :
 				value(static_cast<Type>(other)) { }
 
@@ -67,7 +67,7 @@ namespace STRICT_TYPES_NAMESPACE {
 			/// @tparam Other The type to convert to.
 			/// @returns Other
 			template <typename Other>
-				requires STRICT_TYPES_NAMESPACE::detail::is_qualified_explicit_conversion_operator<Type, Other>
+				requires STRICT_TYPES_NAMESPACE::details::is_qualified_explicit_conversion_operator<Type, Other>
 			[[nodiscard]] inline constexpr explicit operator Other() noexcept {
 				return static_cast<Other>(this->value);
 			}
@@ -76,7 +76,7 @@ namespace STRICT_TYPES_NAMESPACE {
 			/// @tparam Other The type to convert to.
 			/// @returns Other
 			template <typename Other>
-				requires STRICT_TYPES_NAMESPACE::detail::is_qualified_explicit_conversion_operator<Type, Other>
+				requires STRICT_TYPES_NAMESPACE::details::is_qualified_explicit_conversion_operator<Type, Other>
 			[[nodiscard]] inline constexpr explicit operator const Other() const noexcept {
 				return static_cast<const Other>(this->value);
 			}
@@ -85,7 +85,7 @@ namespace STRICT_TYPES_NAMESPACE {
 			/// @tparam Other The type to convert to.
 			/// @returns Other
 			template <typename Other>
-				requires STRICT_TYPES_NAMESPACE::detail::is_qualified_conversion_function<Type, Other>
+				requires STRICT_TYPES_NAMESPACE::details::is_qualified_conversion_function<Type, Other>
 			[[nodiscard]] inline constexpr Other as() noexcept {
 				return static_cast<Other>(this->value);
 			}
@@ -94,7 +94,7 @@ namespace STRICT_TYPES_NAMESPACE {
 			/// @tparam Other The type to convert to.
 			/// @returns const Other
 			template <typename Other>
-				requires STRICT_TYPES_NAMESPACE::detail::is_qualified_conversion_function<Type, Other>
+				requires STRICT_TYPES_NAMESPACE::details::is_qualified_conversion_function<Type, Other>
 			[[nodiscard]] inline constexpr const Other as() const noexcept {
 				return static_cast<const Other>(this->value);
 			}
@@ -102,13 +102,13 @@ namespace STRICT_TYPES_NAMESPACE {
 			/// @brief Converts to a human-readable string representing the current value.
 			/// @returns std::string
 			template <typename _ = void>
-				requires STRICT_TYPES_NAMESPACE::detail::can_convert_to_string_function<Type>
+				requires STRICT_TYPES_NAMESPACE::details::can_convert_to_string_function<Type>
 			[[nodiscard]] inline std::string to_string() const { return std::to_string(this->value); }
 
 			/// @brief Converts to a human-readable wide string representing the current value.
 			/// @returns std::wstring
 			template <typename _ = void>
-				requires STRICT_TYPES_NAMESPACE::detail::can_convert_to_wstring_function<Type>
+				requires STRICT_TYPES_NAMESPACE::details::can_convert_to_wstring_function<Type>
 			[[nodiscard]] inline std::wstring to_wstring() const { return std::to_wstring(this->value); }
 	};
 
@@ -148,7 +148,7 @@ namespace STRICT_TYPES_NAMESPACE {
 		struct NAME : STRICT_TYPES_NAMESPACE::strict_integral_type<TYPE, QUALIFIED_TYPES> {                    \
 				using STRICT_TYPES_NAMESPACE::strict_integral_type<TYPE, QUALIFIED_TYPES>::strict_integral_type; \
 				template <typename Other>                                                                        \
-					requires STRICT_TYPES_NAMESPACE::detail::is_qualified_integral_assignment_operator<Other>     \
+					requires STRICT_TYPES_NAMESPACE::details::is_qualified_integral_assignment_operator<Other>    \
 				inline constexpr NAME& operator=(const Other other) noexcept {                                   \
 					if constexpr (std::is_integral_v<Other>) this->value = static_cast<TYPE>(other);              \
 					else this->value = static_cast<TYPE>(other.value);                                            \
@@ -164,11 +164,11 @@ namespace STRICT_TYPES_NAMESPACE {
 	#define STRICT_TYPES_DEFINE_DYNAMIC_INTEGRAL_TYPE(NAME, QUALIFIED_TYPES...)                               \
 		namespace STRICT_TYPES_NAMESPACE {                                                                     \
 			template <typename T>                                                                               \
-				requires STRICT_TYPES_NAMESPACE::detail::is_qualified_integral_type<QUALIFIED_TYPES>             \
+				requires STRICT_TYPES_NAMESPACE::details::is_qualified_integral_type<QUALIFIED_TYPES>            \
 			struct NAME : STRICT_TYPES_NAMESPACE::strict_integral_type<T, QUALIFIED_TYPES> {                    \
 					using STRICT_TYPES_NAMESPACE::strict_integral_type<T, QUALIFIED_TYPES>::strict_integral_type; \
 					template <typename Other>                                                                     \
-						requires STRICT_TYPES_NAMESPACE::detail::is_qualified_integral_assignment_operator<Other>  \
+						requires STRICT_TYPES_NAMESPACE::details::is_qualified_integral_assignment_operator<Other> \
 					inline constexpr NAME& operator=(const Other other) noexcept {                                \
 						if constexpr (std::is_integral_v<Other>) this->value = static_cast<T>(other);              \
 						else this->value = static_cast<T>(other.value);                                            \
@@ -196,11 +196,11 @@ namespace STRICT_TYPES_NAMESPACE {
 	#define STRICT_TYPES_DEFINE_DYNAMIC_INTEGRAL_TYPE(NAME, QUALIFIED_TYPES...)                               \
 		namespace STRICT_TYPES_NAMESPACE {                                                                     \
 			template <typename T>                                                                               \
-				requires STRICT_TYPES_NAMESPACE::detail::is_qualified_integral_type<QUALIFIED_TYPES>             \
+				requires STRICT_TYPES_NAMESPACE::details::is_qualified_integral_type<QUALIFIED_TYPES>            \
 			struct NAME : STRICT_TYPES_NAMESPACE::strict_integral_type<T, QUALIFIED_TYPES> {                    \
 					using STRICT_TYPES_NAMESPACE::strict_integral_type<T, QUALIFIED_TYPES>::strict_integral_type; \
 					template <typename Other>                                                                     \
-						requires STRICT_TYPES_NAMESPACE::detail::is_qualified_integral_assignment_operator<Other>  \
+						requires STRICT_TYPES_NAMESPACE::details::is_qualified_integral_assignment_operator<Other> \
 					inline constexpr auto& operator=(const Other other) noexcept {                                \
 						if constexpr (std::is_integral_v<Other>) this->value = static_cast<T>(other);              \
 						else this->value = static_cast<T>(other.value);                                            \

@@ -19,7 +19,7 @@
 */
 
 namespace STRICT_TYPES_NAMESPACE {
-	namespace detail {
+	namespace details {
 		/// @brief Base type for integral or float type qualifications.
 		struct strict_types_base_t { };
 
@@ -27,9 +27,9 @@ namespace STRICT_TYPES_NAMESPACE {
 		struct strict_types_alias_base_t { };
 
 		/// @brief Base type for integral-only type qualifications.
-		struct strict_types_integral_base_t : STRICT_TYPES_NAMESPACE::detail::strict_types_base_t { };
+		struct strict_types_integral_base_t : STRICT_TYPES_NAMESPACE::details::strict_types_base_t { };
 
 		/// @brief Base type for float-only type qualifications.
-		struct strict_types_float_base_t : STRICT_TYPES_NAMESPACE::detail::strict_types_base_t { };
+		struct strict_types_float_base_t : STRICT_TYPES_NAMESPACE::details::strict_types_base_t { };
 	}
 }

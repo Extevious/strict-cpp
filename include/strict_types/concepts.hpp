@@ -112,13 +112,13 @@ namespace STRICT_CPP_NAMESPACE {
 		template <typename Type>
 		concept can_convert_to_string = std::is_convertible_v<Type, std::string>;
 
-		// Returns true if [Type] can be converted to a std::string using std::to_string().
-		template <typename Type>
-		concept can_convert_to_string_function = requires (Type t) { std::to_string(t); };
-
 		// Returns true if [Type] can be converted to a std::wstring.
 		template <typename Type>
 		concept can_convert_to_wstring = std::is_convertible_v<Type, std::wstring>;
+
+		// Returns true if [Type] can be converted to a std::string using std::to_string().
+		template <typename Type>
+		concept can_convert_to_string_function = requires (Type t) { std::to_string(t); };
 
 		// Returns true if [Type] can be converted to a std::wstring using std::to_wstring().
 		template <typename Type>

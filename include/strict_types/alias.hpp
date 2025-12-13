@@ -378,3 +378,50 @@ namespace STRICT_CPP_NAMESPACE {
 			inline auto				 format(const STRICT_CPP_NAMESPACE::NAME& value, _STD format_context& context) const { return _STD format_to(context.out(), "{}", value.to_string()); }    \
 			inline auto				 format(const STRICT_CPP_NAMESPACE::NAME& value, _STD wformat_context& context) const { return _STD format_to(context.out(), L"{}", value.to_wstring()); } \
 	};
+
+// Defines a strict dynamic alias type.
+//
+// Usage example:
+//    STRICT_CPP_DEFINE_DYNAMIC_ALIAS_TYPE(my_dynamic_vector, std::vector)
+#define STRICT_CPP_DEFINE_DYNAMIC_ALIAS_TYPE(NAME, TYPE)                                                                                                                                          \
+	namespace STRICT_CPP_NAMESPACE {                                                                                                                                                               \
+		template <typename... Args>                                                                                                                                                                 \
+		struct NAME : STRICT_CPP_NAMESPACE::strict_alias_type<TYPE<Args...>> {                                                                                                                      \
+				using Type = TYPE<Args...>;                                                                                                                                                           \
+				using STRICT_CPP_NAMESPACE::strict_alias_type<TYPE<Args...>>::strict_alias_type;                                                                                                      \
+				using STRICT_CPP_NAMESPACE::strict_alias_type<TYPE<Args...>>::operator=;                                                                                                              \
+				using STRICT_CPP_NAMESPACE::strict_alias_type<TYPE<Args...>>::operator->;                                                                                                             \
+				using STRICT_CPP_NAMESPACE::strict_alias_type<TYPE<Args...>>::operator[];                                                                                                             \
+                                                                                                                                                                                                  \
+				template <typename _ = void>                                                                                                                                                          \
+					requires STRICT_CPP_NAMESPACE::detail::can_stringify<TYPE<Args...>>                                                                                                                \
+				inline std::string to_string() const noexcept {                                                                                                                                       \
+					return this->m_get_string_internal();                                                                                                                                              \
+				}                                                                                                                                                                                     \
+                                                                                                                                                                                                  \
+				template <typename _ = void>                                                                                                                                                          \
+					requires STRICT_CPP_NAMESPACE::detail::can_wstringify<TYPE<Args...>>                                                                                                               \
+				inline std::wstring to_wstring() const noexcept {                                                                                                                                     \
+					return this->m_get_wstring_internal();                                                                                                                                             \
+				}                                                                                                                                                                                     \
+                                                                                                                                                                                                  \
+				template <typename _ = void>                                                                                                                                                          \
+					requires (!STRICT_CPP_NAMESPACE::detail::can_wstringify<TYPE<Args...>>)                                                                                                            \
+				inline std::string to_string() const noexcept {                                                                                                                                       \
+					return "strict::" #NAME "<" #TYPE "<...>>";                                                                                                                                        \
+				}                                                                                                                                                                                     \
+                                                                                                                                                                                                  \
+				template <typename _ = void>                                                                                                                                                          \
+					requires (!STRICT_CPP_NAMESPACE::detail::can_wstringify<TYPE<Args...>>)                                                                                                            \
+				inline std::wstring to_wstring() const noexcept {                                                                                                                                     \
+					return L"strict::" L#NAME L"<" L#TYPE L"<...>>";                                                                                                                                   \
+				}                                                                                                                                                                                     \
+		};                                                                                                                                                                                          \
+	}                                                                                                                                                                                              \
+	template <typename... Args>                                                                                                                                                                    \
+	struct _STD formatter<STRICT_CPP_NAMESPACE::NAME<Args...>> {                                                                                                                                   \
+			inline constexpr auto parse(const _STD format_parse_context& context) const noexcept { return context.begin(); }                                                                         \
+			inline constexpr auto parse(const _STD wformat_parse_context& context) const noexcept { return context.begin(); }                                                                        \
+			inline auto				 format(const STRICT_CPP_NAMESPACE::NAME<Args...>& value, _STD format_context& context) const { return _STD format_to(context.out(), "{}", value.to_string()); }    \
+			inline auto				 format(const STRICT_CPP_NAMESPACE::NAME<Args...>& value, _STD wformat_context& context) const { return _STD format_to(context.out(), L"{}", value.to_wstring()); } \
+	};

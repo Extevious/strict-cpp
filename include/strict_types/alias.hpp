@@ -308,14 +308,14 @@ namespace STRICT_CPP_NAMESPACE {
 			template <typename _ = void>
 				requires STRICT_CPP_NAMESPACE::detail::can_stringify<Type>
 			inline std::string m_get_string_internal() const noexcept {
-				if constexpr (STRICT_CPP_NAMESPACE::detail::can_convert_to_string<Type>) return this->value;
+				if constexpr (STRICT_CPP_NAMESPACE::detail::can_convert_to_string<Type>) return static_cast<std::string>(this->value);
 				else return std::to_string(this->value);
 			}
 
 			template <typename _ = void>
 				requires STRICT_CPP_NAMESPACE::detail::can_wstringify<Type>
 			inline std::wstring m_get_wstring_internal() const noexcept {
-				if constexpr (STRICT_CPP_NAMESPACE::detail::can_convert_to_wstring<Type>) return this->value;
+				if constexpr (STRICT_CPP_NAMESPACE::detail::can_convert_to_wstring<Type>) return static_cast<std::wstring>(this->value);
 				else return std::to_wstring(this->value);
 			}
 
@@ -359,13 +359,15 @@ namespace STRICT_CPP_NAMESPACE {
 				}                                                                                                                                                                            \
                                                                                                                                                                                          \
 				template <typename _ = void>                                                                                                                                                 \
+					requires (!STRICT_CPP_NAMESPACE::detail::can_stringify<TYPE>)                                                                                                             \
 				inline std::string to_string() const noexcept {                                                                                                                              \
-					return "strict::" #NAME "::strict_alias_type<" #TYPE ">";                                                                                                                 \
+					return "strict::" #NAME;                                                                                                                                                  \
 				}                                                                                                                                                                            \
                                                                                                                                                                                          \
 				template <typename _ = void>                                                                                                                                                 \
+					requires (!STRICT_CPP_NAMESPACE::detail::can_wstringify<TYPE>)                                                                                                            \
 				inline std::wstring to_wstring() const noexcept {                                                                                                                            \
-					return L"strict::" L#NAME L"::strict_alias_type<" L#TYPE L">";                                                                                                            \
+					return L"strict::" L#NAME;                                                                                                                                                \
 				}                                                                                                                                                                            \
 		};                                                                                                                                                                                 \
 	}                                                                                                                                                                                     \

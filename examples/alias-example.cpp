@@ -30,6 +30,7 @@ STRICT_CPP_DEFINE_ALIAS_TYPE(encapsulated_int_ptr, int*);
 STRICT_CPP_DEFINE_ALIAS_TYPE(encapsulated_int, int);
 STRICT_CPP_DEFINE_ALIAS_TYPE(some_struct_alias, struct_with_members);
 STRICT_CPP_DEFINE_ALIAS_TYPE(some_struct_ptr_alias, struct_with_members*);
+STRICT_CPP_DEFINE_DYNAMIC_ALIAS_TYPE(my_dynamic_vector, std::vector);
 
 // some_string_A
 void example0(const STRICT_CPP_NAMESPACE::some_string_A& string) { std::cout << "\nexample0:\n"
@@ -165,7 +166,7 @@ int main() {
 
 	// Alias types also support formatters/stringification:
 	const STRICT_CPP_NAMESPACE::encapsulated_int encapsulated_int{678};
-	const STRICT_CPP_NAMESPACE::some_ints_A		encapsulated_ints_vector{5, 6, 7, 8};
+	const STRICT_CPP_NAMESPACE::some_ints_A		encapsulated_ints_vector{5, 6, 7, 8, 5, 4, 3};
 
 	// An int is easily formatted by just displaying the number:
 	std::cout << std::format("\n\nthis is a formatted message with the number {}!", encapsulated_int);
@@ -182,6 +183,11 @@ int main() {
 	for (const int& value : encapsulated_ints_vector) {
 		std::cout << value << '\n';
 	}
+
+	STRICT_CPP_NAMESPACE::my_dynamic_vector<float> my_floats = {5.0f, 6.4f, 78.9f};
+
+	std::cout << std::format("\nMy dynamic alias type's name: {}", my_floats);
+	std::cout << std::format("\nMy dynamic alias type's values: {} {} {}", my_floats[0], my_floats[1], my_floats[2]);
 
 	return 0;
 }
